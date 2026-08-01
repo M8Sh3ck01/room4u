@@ -41,6 +41,8 @@ async function findOrCreateUser(payload) {
   const user = await User.findOne({ google_sub: payload.sub });
   if (user) {
     user.is_operator = is_operator;
+    if (payload.name) user.name = payload.name;
+    if (payload.picture) user.avatar_url = payload.picture;
     await user.save();
     return user;
   }
