@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: room4u
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && cd ../client && npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ALLOW_DEV_LOGIN
+        sync: false
+      - key: OPERATOR_EMAILS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
