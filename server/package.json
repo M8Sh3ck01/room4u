@@ -1,0 +1,47 @@
+{
+  "name": "room4u-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Room4U API server — Mzuzu student hostel room marketplace",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand"
+  },
+  "_moduleAliases": {
+    "@config": "src/config",
+    "@core": "src/core",
+    "@modules": "src/modules",
+    "@shared": "src/shared"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "moduleNameMapper": {
+      "^@config$": "<rootDir>/src/config",
+      "^@config/(.*)$": "<rootDir>/src/config/$1",
+      "^@core$": "<rootDir>/src/core",
+      "^@core/(.*)$": "<rootDir>/src/core/$1",
+      "^@modules$": "<rootDir>/src/modules",
+      "^@modules/(.*)$": "<rootDir>/src/modules/$1",
+      "^@shared$": "<rootDir>/src/shared",
+      "^@shared/(.*)$": "<rootDir>/src/shared/$1"
+    }
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "google-auth-library": "^11.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "module-alias": "^2.3.4",
+    "mongoose": "^9.9.1"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
+  }
+}
