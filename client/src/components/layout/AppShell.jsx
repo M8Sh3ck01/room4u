@@ -1,15 +1,14 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
+import { Button } from '../../design/primitives';
+import './AppShell.css';
 
 export function AppShell() {
   const { user, signOut } = useAuth();
 
   return (
     <div className="app">
-      <header
-        className="app-header"
-        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-      >
+      <header className="app-header">
         <Link to="/" className="brand">
           Room4U
         </Link>
@@ -24,13 +23,13 @@ export function AppShell() {
                 )}
                 <span>{user.name || user.email}</span>
               </Link>
-              <button className="btn btn-ghost" onClick={signOut}>
+              <Button variant="ghost" size="sm" onClick={signOut}>
                 Sign out
-              </button>
+              </Button>
             </>
           ) : (
             <Link to="/login">
-              <button className="btn">Sign in</button>
+              <Button size="sm">Sign in</Button>
             </Link>
           )}
         </div>

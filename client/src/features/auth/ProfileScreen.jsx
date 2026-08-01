@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { updateMe } from '../../services/auth';
+import { Card, Field, Input, Button, Alert } from '../../design/primitives';
 
 export function ProfileScreen() {
   const { user, setUserFromResponse } = useAuth();
@@ -26,42 +27,42 @@ export function ProfileScreen() {
   };
 
   return (
-    <div className="card" style={{ maxWidth: 480 }}>
-      <h1>My profile</h1>
+    <Card className="center measure">
+      <div className="stack">
+        <h1>My profile</h1>
 
-      {!user.phone && (
-        <div className="gate-banner">
-          <strong>Add a phone number to continue.</strong> You need a phone to claim a room and
-          receive status updates.
-        </div>
-      )}
+        {!user.phone && (
+          <Alert variant="warning">
+            <strong>Add a phone number to continue.</strong> You need a phone to claim a room and
+            receive status updates.
+          </Alert>
+        )}
 
-      <p>
-        <span className="muted">Name:</span> <strong>{user.name || '—'}</strong>
-        <br />
-        <span className="muted">Email:</span> <strong>{user.email}</strong>
-        <br />
-        <span className="muted">Role:</span> {user.is_operator ? 'Operator' : 'Student'}
-      </p>
+        <p>
+          <span className="text-muted">Name:</span> <strong>{user.name || '—'}</strong>
+          <br />
+          <span className="text-muted">Email:</span> <strong>{user.email}</strong>
+          <br />
+          <span className="text-muted">Role:</span> {user.is_operator ? 'Operator' : 'Student'}
+        </p>
 
-      <form onSubmit={savePhone}>
-        <div className="field">
-          <label htmlFor="phone">Phone number</label>
-          <input
-            id="phone"
-            className="input"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="0888 123 456"
-            required
-          />
-        </div>
-        {error && <p className="error">{error}</p>}
-        {saved && <p className="muted">Saved.</p>}
-        <button className="btn" disabled={saving}>
-          {saving ? 'Saving…' : 'Save phone'}
-        </button>
-      </form>
-    </div>
+        <form onSubmit={savePhone} className="stack">
+          <Field label="Phone number" htmlFor="phone">
+            <Input
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="0888 123 456"
+              required
+            />
+          </Field>
+          {error && <p className="text-error">{error}</p>}
+          {saved && <p className="text-muted">Saved.</p>}
+          <Button loading={saving} fullWidth>
+            {saving ? 'Saving…' : 'Save phone'}
+          </Button>
+        </form>
+      </div>
+    </Card>
   );
 }
