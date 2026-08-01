@@ -64,7 +64,7 @@ async function signInWithGoogle(idToken) {
 }
 
 async function devSignIn(email, name) {
-  if (config.isProduction) {
+  if (!config.allowDevLogin) {
     throw appError(404, 'NOT_FOUND', 'Not found');
   }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
