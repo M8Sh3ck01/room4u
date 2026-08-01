@@ -6,7 +6,7 @@ const testUri = process.env.MONGODB_URI_TEST || 'mongodb://127.0.0.1:27017/room4
 async function connectTestDb() {
   if (mongoose.connection.readyState === 1) return;
   try {
-    await mongoose.connect(testUri, { serverSelectionTimeoutMS: 3000 });
+    await mongoose.connect(testUri, { serverSelectionTimeoutMS: 15000 });
   } catch (err) {
     throw new Error(
       `Tests need a MongoDB at ${testUri}. ` +

@@ -6,7 +6,7 @@ const app = require('../src/app');
 const { connectTestDb, clearDb, disconnectDb } = require('./helpers/db');
 
 describe('users module — auth', () => {
-  beforeAll(connectTestDb);
+  beforeAll(connectTestDb, 30000);
   beforeEach(clearDb);
   afterAll(disconnectDb);
 
