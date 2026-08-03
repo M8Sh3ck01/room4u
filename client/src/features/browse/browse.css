@@ -9,8 +9,44 @@
   width: 100%;
 }
 
-.filters-title {
-  margin-bottom: var(--space-4);
+.filters-toggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+}
+
+.filters-toggle:hover {
+  border-color: var(--color-primary);
+}
+
+.filters-toggle:focus-visible {
+  outline: var(--focus-ring) solid var(--color-focus);
+  outline-offset: var(--border-strong);
+}
+
+.filters-toggle-label {
+  font-weight: var(--weight-semibold);
+}
+
+.filters-chevron {
+  display: inline-block;
+  margin-left: var(--space-1);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.filters-chevron--open {
+  transform: rotate(180deg);
 }
 
 .filters-grid {
@@ -36,6 +72,10 @@
   gap: var(--space-3);
   align-items: center;
   margin-top: var(--space-4);
+}
+
+.results-count {
+  margin: 0;
 }
 
 .room-grid {
