@@ -97,7 +97,7 @@ export function RoomDetailScreen() {
 
       <p className="detail-price">
         {formatMoney(room.price)}{' '}
-        <span className="text-muted">{room.type === 'shared' ? '/bed/month' : '/month'}</span>
+        <span className="text-muted">per month</span>
       </p>
 
       <div className="detail-facts">
