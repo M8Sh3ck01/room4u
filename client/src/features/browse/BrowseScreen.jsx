@@ -91,9 +91,11 @@ export function BrowseScreen() {
     <div className="browse">
       <div>
         <h1>Student rooms near Mzuzu University</h1>
-        <p className="text-muted">
-          Every room shows the real walk time to campus, with directions to the door.
-        </p>
+        <div className="hero-chips" aria-label="What you get on every room">
+          <Badge variant="primary">Real walk times</Badge>
+          <Badge variant="primary">Directions to the door</Badge>
+          <Badge variant="primary">Beds left</Badge>
+        </div>
       </div>
 
       {showResultsBar && (
