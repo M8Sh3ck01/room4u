@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { listRooms, listAreas } from '../../services/rooms';
 import { Card, Field, Select, Input, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
+import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from '../browse/RoomCard';
 import '../browse/browse.css';
 
@@ -63,6 +64,20 @@ export function HomeScreen() {
   };
 
   const activeCount = Object.values(filters).filter((v) => v !== '' && v != null).length;
+
+  const activeFilterSummary = [];
+  if (filters.area) {
+    const a = areas.find((x) => x.id === filters.area);
+    activeFilterSummary.push(`area ${a ? a.name : filters.area}`);
+  }
+  if (filters.type) activeFilterSummary.push(`type ${filters.type}`);
+  if (filters.max_walk_min) activeFilterSummary.push(`walk ≤ ${filters.max_walk_min} min`);
+  if (filters.available_from) activeFilterSummary.push(`available from ${filters.available_from}`);
+  if (filters.max_price) activeFilterSummary.push(`price ≤ ${formatMoney(filters.max_price)}`);
+
+  const emptyBody = activeFilterSummary.length
+    ? `Nothing matches ${activeFilterSummary.join(', ')}. Widen a filter or reset.`
+    : 'No rooms are listed yet — check back soon.';
 
   return (
     <div className="browse">
@@ -187,10 +202,10 @@ export function HomeScreen() {
         <Card>
           <EmptyState
             title="No rooms match your filters"
-            body="Try widening the price or walking distance, or pick another area."
+            body={emptyBody}
             action={
               <Button variant="ghost" onClick={reset}>
-                Clear filters
+                Reset
               </Button>
             }
           />
