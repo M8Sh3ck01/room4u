@@ -13,6 +13,8 @@
   - `client/src/features/browse/BrowseScreen.jsx` (Available from field)
 - [ ] **Empty-catalog CTA** — the landing-style empty state currently has no action button; pending a decision on the mechanism (WhatsApp "message us" needs an operator number, or a landlord "list your room" link).
   - `client/src/features/browse/BrowseScreen.jsx`
+- [ ] **Booking flow** — the "contact details unlock after booking" alert was removed because no booking path exists yet; reintroduce it (and/or a "Sign in to book" CTA) when booking ships.
+  - `client/src/features/browse/RoomDetailScreen.jsx`
 
 ## Resolved
 
@@ -30,3 +32,7 @@
 | 10 | Hero copy tightened to one line ("Rooms near Mzuzu University") | `4afd451` |
 | 11 | Skeleton now matches full card geometry (photo, body, price line, footer) | `4afd451` |
 | 12 | Adaptive empty state: hide Filters/0-rooms when catalog is empty; landing-style message; Reset only shown when filters are active; fixed duplicate copy | `02c17fe` |
+| 13 | Detail distance line: fixed `Â·` mojibake; de-jargoned to "~28 min walk · N km (straight-line)" | `383e2f0` |
+| 14 | Detail availability: beds copy clarified ("All N beds open") and meta rows separated with lucide icons + spacing | `0328010` |
+| 15 | Detail content no longer framed in a Card (matches cardless listings) | `d375e46` |
+| 16 | Locked-contact dead-end alert removed (no booking flow yet) | `d375e46`, `01bd841` |
