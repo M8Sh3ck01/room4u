@@ -7,6 +7,9 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "db": "node src/scripts/start-mongod.js",
+    "seed": "node src/scripts/seed.js",
+    "seed:test": "node src/scripts/seed.js --test",
     "test": "jest --runInBand"
   },
   "_moduleAliases": {
