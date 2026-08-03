@@ -92,11 +92,11 @@ export function BrowseScreen() {
     <div className="browse">
       <section className="hero-banner">
         <div className="hero-banner-inner">
-          <p className="hero-kicker">MZUNI</p>
+          <p className="hero-kicker">@MZUNI</p>
           <h1>Discover student rooms near Mzuzu University</h1>
           <div className="hero-chips" aria-label="What you get on every room">
             <Badge variant="primary">
-              <Home className="chip-icon" /> Live Rooms
+              <Home className="chip-icon" /> Real Rooms
             </Badge>
             <Badge variant="primary">
               <Footprints className="chip-icon" /> Walking Distance
