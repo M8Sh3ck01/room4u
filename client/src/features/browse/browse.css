@@ -107,7 +107,7 @@
 .room-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-4);
+  gap: var(--space-6);
 }
 
 @media (min-width: 640px) {
@@ -132,32 +132,35 @@
   color: var(--color-primary);
 }
 
-.room-card.card {
-  padding: 0;
-  overflow: hidden;
-  height: 100%;
+.room-card {
   display: flex;
   flex-direction: column;
-  transition: box-shadow var(--dur-fast) var(--ease);
-}
-
-.room-card-link:hover .room-card.card {
-  box-shadow: var(--shadow-md);
 }
 
 .room-card-photo {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: var(--radius-md);
   background: var(--color-surface-muted);
   display: block;
+}
+
+.room-card-photo--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-faint);
 }
 
 .room-card-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-4);
+  margin-top: var(--space-3);
   flex: 1;
 }
 
@@ -197,41 +200,35 @@
 }
 
 .room-card-dir {
-  display: block;
-  padding: var(--space-3) var(--space-4);
-  border-top: var(--border-width) solid var(--color-border);
+  display: inline-block;
+  margin-top: var(--space-3);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-primary);
-  text-align: center;
   text-decoration: none;
-  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  transition: color var(--dur-fast) var(--ease);
 }
 
 .room-card-dir:hover {
-  background: var(--color-surface-muted);
   color: var(--color-primary-hover);
 }
 
 .skeleton-card {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
 }
 
 .skeleton-photo {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 0;
+  border-radius: var(--radius-md);
 }
 
 .skeleton-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-4);
+  margin-top: var(--space-3);
   flex: 1;
 }
 

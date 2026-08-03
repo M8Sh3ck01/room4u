@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
-import { Card, Badge } from '../../design/primitives';
+import { Badge } from '../../design/primitives';
 import { formatMoney } from '../../lib/formatMoney';
 
 export function RoomCard({ room }) {
   return (
-    <Card className="room-card">
+    <article className="room-card">
       <Link to={`/rooms/${room.id}`} className="room-card-link">
         {room.photos?.[0] ? (
           <img className="room-card-photo" src={room.photos[0]} alt={room.hostel} />
         ) : (
-          <div className="room-card-photo" />
+          <div className="room-card-photo room-card-photo--empty" aria-hidden="true">
+            ?
+          </div>
         )}
         <div className="room-card-body">
           <h3 className="room-card-title">{room.hostel}</h3>
@@ -45,6 +47,6 @@ export function RoomCard({ room }) {
           Walking directions
         </a>
       )}
-    </Card>
+    </article>
   );
 }

@@ -72,8 +72,8 @@ export function RoomDetailScreen() {
   return (
     <div className="room-detail center">
       <div className="detail-gallery">
-        {room.photos.map((src, i) => (
-          <img key={i} className="detail-photo" src={src} alt={`${room.hostel} photo ${i + 1}`} />
+        {room.photos.map((src) => (
+          <img key={src} className="detail-photo" src={src} alt={room.hostel} />
         ))}
       </div>
 
