@@ -127,7 +127,11 @@ export function HomeScreen() {
                 </Select>
               </Field>
 
-              <Field label="Move-in date" htmlFor="f-avail">
+              <Field
+                label="Available from"
+                htmlFor="f-avail"
+                hint="Show rooms free on or after this date."
+              >
                 <Input
                   id="f-avail"
                   type="date"
