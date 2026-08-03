@@ -14,11 +14,26 @@
 .brand {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: var(--space-12);
-  height: var(--space-12);
+  gap: var(--space-2);
   color: var(--color-primary-text);
   text-decoration: none;
+}
+
+.brand-logo {
+  width: var(--space-8);
+  height: var(--space-8);
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  white-space: nowrap;
+}
+
+.brand-name-accent {
+  color: var(--color-primary);
 }
 
 .app-main {

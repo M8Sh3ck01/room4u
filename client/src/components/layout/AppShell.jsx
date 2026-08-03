@@ -10,7 +10,10 @@ export function AppShell() {
     <div className="app">
       <header className="app-header">
         <Link to="/" className="brand" aria-label="Room4U home">
-          <Logo />
+          <Logo className="brand-logo" />
+          <span className="brand-name">
+            Room4<span className="brand-name-accent">U</span>
+          </span>
         </Link>
         <div className="header-actions">
           {user ? (
