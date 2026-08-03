@@ -30,10 +30,14 @@ export function RoomCard({ room }) {
 
           <div className="room-card-meta">
             <span className="room-price">{formatMoney(room.price)}</span>
-            <span className="text-muted">/bed/mo</span>
-            <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
-              {room.beds_left} bed{room.beds_left === 1 ? '' : 's'} left
-            </Badge>
+            <span className="text-muted">{room.type === 'shared' ? '/bed/mo' : '/mo'}</span>
+            {room.type === 'shared' ? (
+              <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
+                {room.beds_left > 0 ? `${room.beds_left} of ${room.beds} beds left` : 'Full'}
+              </Badge>
+            ) : (
+              <Badge variant="primary">Private room</Badge>
+            )}
           </div>
         </div>
       </Link>

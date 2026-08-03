@@ -83,19 +83,24 @@ export function RoomDetailScreen() {
             <p className="text-muted">{room.area}</p>
             <h1 className="detail-title">{room.hostel}</h1>
           </div>
-          <Badge variant={room.type === 'shared' ? 'info' : 'primary'}>{room.type}</Badge>
+          <Badge variant={room.type === 'shared' ? 'info' : 'primary'}>
+            {room.type === 'shared' ? 'Shared' : 'Single'}
+          </Badge>
         </div>
 
         <p className="detail-price">
-          {formatMoney(room.price)} <span className="text-muted">/bed/mo</span>
+          {formatMoney(room.price)}{' '}
+          <span className="text-muted">{room.type === 'shared' ? '/bed/mo' : '/mo'}</span>
         </p>
 
         <div className="detail-rows">
           <p className="text-muted">{distance}</p>
           <p>
-            <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
-              {room.beds_left} bed{room.beds_left === 1 ? '' : 's'} left of {room.beds}
-            </Badge>{' '}
+            {room.type === 'shared' && (
+              <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
+                {room.beds_left > 0 ? `${room.beds_left} of ${room.beds} beds left` : 'Full'}
+              </Badge>
+            )}{' '}
             <Badge variant="warning">Available {fmtDate(room.available_from)}</Badge>
           </p>
         </div>
