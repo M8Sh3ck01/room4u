@@ -75,17 +75,20 @@ export function HomeScreen() {
   if (filters.available_from) activeFilterSummary.push(`available from ${filters.available_from}`);
   if (filters.max_price) activeFilterSummary.push(`price ≤ ${formatMoney(filters.max_price)}`);
 
+  const emptyTitle = activeFilterSummary.length
+    ? 'No rooms match your filters'
+    : 'No rooms are listed yet';
+
   const emptyBody = activeFilterSummary.length
     ? `Nothing matches ${activeFilterSummary.join(', ')}. Widen a filter or reset.`
-    : 'No rooms are listed yet — check back soon.';
+    : 'No rooms are listed yet. Check back soon.';
 
   return (
     <div className="browse">
       <div>
-        <h1>Student rooms around Mzuzu University</h1>
+        <h1>Rooms near Mzuzu University</h1>
         <p className="text-muted">
-          Honest walking distances from campus, beds left, and a free walking-directions link on
-          every room.
+          Honest walk times from campus and free directions on every room.
         </p>
       </div>
 
@@ -94,6 +97,7 @@ export function HomeScreen() {
           type="button"
           className="filters-toggle"
           aria-expanded={open}
+          aria-controls="filters-panel"
           onClick={() => setOpen((o) => !o)}
         >
           <span className="filters-toggle-label">Filters</span>
@@ -107,7 +111,7 @@ export function HomeScreen() {
         </button>
 
         {!loading && !error && (
-          <p className="results-count text-muted">
+          <p className="results-count text-muted" role="status">
             {rooms.length} room{rooms.length === 1 ? '' : 's'}
           </p>
         )}
@@ -116,7 +120,7 @@ export function HomeScreen() {
       {areasError && <Alert variant="warning">{areasError}</Alert>}
 
       {open && (
-        <Card className="filters">
+        <Card id="filters-panel" className="filters">
           <form onSubmit={apply}>
             <div className="filters-grid">
               <Field label="Area" htmlFor="f-area">
@@ -186,37 +190,41 @@ export function HomeScreen() {
 
       {error && <Alert variant="danger">{error}</Alert>}
 
-      {loading ? (
-        <div className="room-grid">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="skeleton-card">
-              <Skeleton className="skeleton-photo" />
-              <div className="skeleton-body">
-                <Skeleton className="skeleton-line" />
-                <Skeleton className="skeleton-line skeleton-line--short" />
+      <div className="results-area" aria-busy={loading}>
+        {loading ? (
+          <div className="room-grid">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="skeleton-card">
+                <Skeleton className="skeleton-photo" />
+                <div className="skeleton-body">
+                  <Skeleton className="skeleton-line" />
+                  <Skeleton className="skeleton-line skeleton-line--short" />
+                  <Skeleton className="skeleton-line skeleton-line--price" />
+                </div>
+                <Skeleton className="skeleton-footer" />
               </div>
-            </div>
-          ))}
-        </div>
-      ) : error ? null : rooms.length === 0 ? (
-        <Card>
-          <EmptyState
-            title="No rooms match your filters"
-            body={emptyBody}
-            action={
-              <Button variant="ghost" onClick={reset}>
-                Reset
-              </Button>
-            }
-          />
-        </Card>
-      ) : (
-        <div className="room-grid">
-          {rooms.map((room) => (
-            <RoomCard key={room.id} room={room} />
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        ) : error ? null : rooms.length === 0 ? (
+          <Card>
+            <EmptyState
+              title={emptyTitle}
+              body={emptyBody}
+              action={
+                <Button variant="ghost" onClick={reset}>
+                  Reset
+                </Button>
+              }
+            />
+          </Card>
+        ) : (
+          <div className="room-grid">
+            {rooms.map((room) => (
+              <RoomCard key={room.id} room={room} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

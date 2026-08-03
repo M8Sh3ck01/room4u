@@ -9,11 +9,8 @@
 
 ## Open
 
-- [ ] **Home / hero copy** — the two-sentence paragraph (value prop + spec) delays first content below the fold on mobile; tighten to one line.
-  - `client/src/features/home/HomeScreen.jsx:68`
-- [ ] **Date input locale** — `type="date"` renders the browser's `mm/dd/yyyy` regardless of locale; format hint not visible on all browsers.
+- [ ] **Date input locale** — `type="date"` renders the browser's `mm/dd/yyyy` regardless of locale; a native input can't be reformatted. Only fixable by replacing with a custom input.
   - `client/src/features/home/HomeScreen.jsx` (Available from field)
-- [ ] **Type duplication** — room type shown both as a filter and (removed from cards, still) the detail badge; verify no redundancy remains on the listing page.
 
 ## Resolved
 
@@ -26,3 +23,7 @@
 | 5 | Filter model unified on Apply; skeleton matches card 16:9 geometry | `05d52a5` |
 | 6 | Card v2: distance on its own row, walking-directions footer link, type badge dropped | `2467f73` |
 | 7 | Empty state mirrors active filters; "Reset" label unified | `ac69834` |
+| 8 | Empty-state title branches on whether filters are active; fixed missing punctuation | pending |
+| 9 | A11y: `aria-controls`/panel `id`, `role="status"` on count, `aria-busy` on results region | pending |
+| 10 | Hero copy tightened to one line ("Rooms near Mzuzu University") | pending |
+| 11 | Skeleton now matches full card geometry (photo, body, price line, footer) | pending |
