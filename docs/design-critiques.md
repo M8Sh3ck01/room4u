@@ -29,4 +29,4 @@
 | 9 | A11y: `aria-controls`/panel `id`, `role="status"` on count, `aria-busy` on results region | `4afd451` |
 | 10 | Hero copy tightened to one line ("Rooms near Mzuzu University") | `4afd451` |
 | 11 | Skeleton now matches full card geometry (photo, body, price line, footer) | `4afd451` |
-| 12 | Adaptive empty state: hide Filters/0-rooms when catalog is empty; landing-style message; Reset only shown when filters are active; fixed duplicate copy | pending |
+| 12 | Adaptive empty state: hide Filters/0-rooms when catalog is empty; landing-style message; Reset only shown when filters are active; fixed duplicate copy | `02c17fe` |
