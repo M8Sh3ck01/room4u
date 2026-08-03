@@ -29,12 +29,17 @@
 room4u/
 ├── client/                  # React + Vite SPA
 │   ├── src/
-│   │   ├── app/             # main.jsx, router
-│   │   ├── features/        # one folder per feature (see below)
-│   │   ├── services/        # api.js (fetch wrapper), auth.js (Google One-Tap)
-│   │   ├── hooks/           # shared custom hooks
-│   │   ├── components/      # shared UI (Card, Button, Badge, EmptyState)
-│   │   └── lib/             # formatMoney, date helpers
+│   │   ├── main.jsx         # entry → mounts app/router
+│   │   ├── app/             # router.jsx (route table)
+│   │   ├── features/        # one folder per feature (see Client feature rules)
+│   │   │   ├── browse/      # BrowseScreen (/), RoomDetailScreen (/rooms/:id), RoomCard, browse.css
+│   │   │   └── auth/        # Login, AuthGate, Profile, AuthContext, GoogleButton
+│   │   ├── design/          # design system: tokens.css, primitives.css, primitives/* (Button, Card, Badge, …)
+│   │   ├── components/      # shared cross-cutting UI (layout/AppShell)
+│   │   ├── services/        # api.js (fetch wrapper), auth.js (Google One-Tap), rooms.js
+│   │   ├── lib/             # formatMoney, date helpers
+│   │   └── index.css        # global resets + typography
+│   ├── scripts/check-design.js  # enforces token-only styles (no raw colors/lengths outside design/)
 │   └── index.html, vite.config.js
 ├── server/
 │   ├── src/
@@ -60,6 +65,17 @@ room4u/
 ```
 
 **WhatsApp preview crawler route** lives in the same Express app (default include): `GET /room/:id` renders an HTML meta-tag page (`og:title`, `og:description`, `og:image`) for the room so WhatsApp link cards work. SPA routes on `/`; crawlers hit `/room/:id`.
+
+### Client feature rules — feature-first layout
+
+The client is organized by **user-facing capability**, not by file type. A `features/<x>/` folder is a feature when it passes the same "one job" test as a server module:
+
+- **Owns one capability** (e.g. browse rooms, authenticate) — name it in one sentence.
+- **Owns its screens, state, styles, and data calls.** A feature's components, Context, and `*.css` live inside the folder; its screens are the only public surface (imported by `app/router.jsx`).
+- **Depends one-way.** Features import shared layers (`design/`, `services/`, `lib/`, `components/`) — **never another feature**. A feature→feature import is a boundary leak: fold the shared piece into the owning feature (e.g. the listing card lives in `browse/`; `home/` was folded into `browse/` as `BrowseScreen` for exactly this reason).
+- **Ships one folder per capability.** When a screen inside a feature grows into its own capability, promote it (e.g. a future `booking/` feature, or splitting `profile/` out of `auth/`).
+
+Shared layers are not features: `design/` (tokens + primitives), `services/` (API clients), `lib/` (utils), `components/` (layout shell).
 
 ---
 

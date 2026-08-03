@@ -12,6 +12,8 @@ server/   Express API (port 4000) — function-based modular monolith
 docs/     Design docs (v6)
 ```
 
+Client `src/` is **feature-first** (one `features/<x>/` folder per capability, shared `design/`/`services/`/`lib/`/`components/` layers) — see `docs/architecture.md` §2 "Client feature rules".
+
 ## Run locally
 
 ```
