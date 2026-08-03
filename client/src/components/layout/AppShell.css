@@ -41,8 +41,13 @@
 .app-footer-brand {
   margin: 0 0 var(--space-2);
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-display);
   font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.app-footer-brand-accent {
+  color: var(--color-primary);
 }
 
 .app-footer-about {
