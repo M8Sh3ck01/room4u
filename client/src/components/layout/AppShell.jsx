@@ -39,7 +39,8 @@ export function AppShell() {
       </main>
       <footer className="app-footer">
         <div className="app-footer-inner">
-          <p className="app-footer-about">Room4U — vetted student rooms near Mzuzu University.</p>
+          <p className="app-footer-brand">Room4U</p>
+          <p className="app-footer-about">Vetted student rooms near Mzuzu University.</p>
           <p className="app-footer-line">Areas: Chibavi · Katoto · Luwinga</p>
           <p className="app-footer-line app-footer-copy">© {new Date().getFullYear()} Room4U</p>
         </div>
