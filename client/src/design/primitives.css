@@ -142,6 +142,10 @@
   color: var(--color-text-faint);
 }
 
+.input {
+  min-height: var(--control-min-h-lg);
+}
+
 .input:focus,
 .select:focus {
   outline: none;
