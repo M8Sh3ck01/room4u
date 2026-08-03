@@ -8,6 +8,7 @@ const EMPTY = { area: '', type: '', max_walk_min: '', available_from: '', max_pr
 
 export function HomeScreen() {
   const [areas, setAreas] = useState([]);
+  const [areasError, setAreasError] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [filters, setFilters] = useState(EMPTY);
   const [draft, setDraft] = useState(EMPTY);
@@ -20,7 +21,11 @@ export function HomeScreen() {
   });
 
   useEffect(() => {
-    listAreas().then(setAreas).catch(() => {});
+    listAreas()
+      .then(setAreas)
+      .catch(() =>
+        setAreasError("Couldn't load areas. The Area filter is unavailable right now.")
+      );
   }, []);
 
   useEffect(() => {
@@ -86,6 +91,8 @@ export function HomeScreen() {
           ▾
         </span>
       </button>
+
+      {areasError && <Alert variant="warning">{areasError}</Alert>}
 
       {open && (
         <Card className="filters">
