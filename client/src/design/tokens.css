@@ -1,14 +1,14 @@
 :root {
-  --brand-50: #f5f3ff;
-  --brand-100: #ede9fe;
-  --brand-200: #ddd6fe;
-  --brand-300: #c4b5fd;
-  --brand-400: #a78bfa;
-  --brand-500: #8b5cf6;
-  --brand-600: #7c3aed;
-  --brand-700: #6d28d9;
-  --brand-800: #5b21b6;
-  --brand-900: #4c1d95;
+  --brand-50: #eaf2ff;
+  --brand-100: #dbe6fe;
+  --brand-200: #bfd4fe;
+  --brand-300: #9db9fa;
+  --brand-400: #7ea3f5;
+  --brand-500: #5f86e8;
+  --brand-600: #3f68d8;
+  --brand-700: #2f53c0;
+  --brand-800: #1e3f9e;
+  --brand-900: #16306f;
 
   --neutral-0: #ffffff;
   --neutral-50: #fbfaf6;
@@ -32,13 +32,13 @@
   --color-border: var(--neutral-200);
   --color-overlay: rgba(28, 25, 21, 0.45);
 
-  --color-primary: var(--brand-600);
-  --color-on-primary: #ffffff;
-  --color-primary-hover: var(--brand-700);
-  --color-primary-active: var(--brand-800);
+  --color-primary: var(--brand-400);
+  --color-on-primary: #0a2a5c;
+  --color-primary-hover: var(--brand-500);
+  --color-primary-active: var(--brand-600);
   --color-primary-soft: var(--brand-50);
   --color-primary-soft-text: var(--brand-800);
-  --color-focus: rgba(124, 58, 237, 0.35);
+  --color-focus: rgba(126, 163, 245, 0.35);
 
   --color-danger: #dc2626;
   --color-on-danger: #ffffff;
