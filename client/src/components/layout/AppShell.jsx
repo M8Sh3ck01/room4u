@@ -39,16 +39,6 @@ export function AppShell() {
       <main className="app-main">
         <Outlet />
       </main>
-      <footer className="app-footer">
-        <div className="app-footer-inner">
-          <p className="app-footer-brand">
-            Room4<span className="app-footer-brand-accent">U</span>
-          </p>
-          <p className="app-footer-about">Vetted student rooms near Mzuzu University.</p>
-          <p className="app-footer-line">Areas: Chibavi · Katoto · Luwinga</p>
-          <p className="app-footer-line app-footer-copy">© {new Date().getFullYear()} Room4U</p>
-        </div>
-      </footer>
     </div>
   );
 }

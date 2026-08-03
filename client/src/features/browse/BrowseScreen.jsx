@@ -89,7 +89,8 @@ export function BrowseScreen() {
   const showResultsBar = !catalogEmpty;
 
   return (
-    <div className="browse">
+    <>
+      <div className="browse">
       <section className="hero-banner">
         <div className="hero-banner-inner">
           <p className="hero-kicker">MZUNI · Mzuzu University</p>
@@ -250,7 +251,18 @@ export function BrowseScreen() {
           </div>
         )}
         </div>
+        </div>
       </div>
-    </div>
+      <footer className="app-footer">
+        <div className="app-footer-inner">
+          <p className="app-footer-brand">
+            Room4<span className="app-footer-brand-accent">U</span>
+          </p>
+          <p className="app-footer-about">Vetted student rooms near Mzuzu University.</p>
+          <p className="app-footer-line">Areas: Chibavi · Katoto · Luwinga</p>
+          <p className="app-footer-line app-footer-copy">© {new Date().getFullYear()} Room4U</p>
+        </div>
+      </footer>
+    </>
   );
 }
