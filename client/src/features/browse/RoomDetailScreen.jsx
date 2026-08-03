@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
@@ -55,7 +55,7 @@ export function RoomDetailScreen() {
             body={error}
             action={
               <Link to="/">
-                <Button variant="ghost">Back to listings</Button>
+                <Button variant="ghost">Back to rooms</Button>
               </Link>
             }
           />
@@ -66,7 +66,7 @@ export function RoomDetailScreen() {
 
   const distance =
     room.dist_km != null
-      ? `${room.dist_km} km straight-line · about ${room.walk_min} min walk from Mzuni`
+      ? `${room.dist_km} km straight-line Â· about ${room.walk_min} min walk from Mzuni`
       : 'Distance to be confirmed';
 
   return (
@@ -111,7 +111,7 @@ export function RoomDetailScreen() {
         </Alert>
 
         <Link to="/">
-          <Button variant="ghost">Back to listings</Button>
+          <Button variant="ghost">Back to rooms</Button>
         </Link>
       </Card>
     </div>

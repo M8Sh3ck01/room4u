@@ -81,7 +81,7 @@ export function BrowseScreen() {
 
   const emptyBody = hasFilters
     ? `Nothing matches ${activeFilterSummary.join(', ')}. Widen a filter or reset.`
-    : "We're setting up the first listings near Mzuzu University. Check back soon.";
+    : "We're setting up the first rooms near Mzuzu University. Check back soon.";
 
   const loaded = !loading && !error;
   const catalogEmpty = loaded && rooms.length === 0 && !hasFilters;
@@ -92,7 +92,7 @@ export function BrowseScreen() {
       <div>
         <h1>Student rooms near Mzuzu University</h1>
         <p className="text-muted">
-          Every listing shows the real walk time to campus, with directions to the door.
+          Every room shows the real walk time to campus, with directions to the door.
         </p>
       </div>
 
@@ -212,21 +212,19 @@ export function BrowseScreen() {
             ))}
           </div>
         ) : error ? null : rooms.length === 0 ? (
-          hasFilters ? (
-            <Card>
-              <EmptyState
-                title={emptyTitle}
-                body={emptyBody}
-                action={
+          <Card>
+            <EmptyState
+              title={emptyTitle}
+              body={emptyBody}
+              action={
+                hasFilters ? (
                   <Button variant="ghost" onClick={reset}>
                     Reset
                   </Button>
-                }
-              />
-            </Card>
-          ) : (
-            <EmptyState title={emptyTitle} body={emptyBody} />
-          )
+                ) : null
+              }
+            />
+          </Card>
         ) : (
           <div className="room-grid">
             {rooms.map((room) => (
