@@ -4,24 +4,28 @@ import { formatMoney } from '../../lib/formatMoney';
 
 export function RoomCard({ room }) {
   return (
-    <Link to={`/rooms/${room.id}`} className="room-card-link">
-      <Card className="room-card">
+    <Card className="room-card">
+      <Link to={`/rooms/${room.id}`} className="room-card-link">
         {room.photos?.[0] ? (
           <img className="room-card-photo" src={room.photos[0]} alt={room.hostel} />
         ) : (
           <div className="room-card-photo" />
         )}
         <div className="room-card-body">
-          <div className="room-card-head">
-            <h3 className="room-card-title">{room.hostel}</h3>
-            <Badge variant={room.type === 'shared' ? 'info' : 'primary'}>{room.type}</Badge>
+          <h3 className="room-card-title">{room.hostel}</h3>
+          <p className="room-card-area text-muted">{room.area}</p>
+
+          <div className="room-card-distance">
+            {room.walk_min != null ? (
+              <>
+                <span className="room-card-walk">~{room.walk_min} min walk from Mzuni</span>
+                {room.dist_km != null && <span className="text-muted">· {room.dist_km} km</span>}
+              </>
+            ) : (
+              <span className="text-muted">Distance to come</span>
+            )}
           </div>
-          <p className="text-muted">
-            {room.area}
-            {room.dist_km != null
-              ? ` · ${room.dist_km} km · ~${room.walk_min} min walk from Mzuni`
-              : ' · distance to come'}
-          </p>
+
           <div className="room-card-meta">
             <span className="room-price">{formatMoney(room.price)}</span>
             <span className="text-muted">/bed/mo</span>
@@ -30,7 +34,17 @@ export function RoomCard({ room }) {
             </Badge>
           </div>
         </div>
-      </Card>
-    </Link>
+      </Link>
+      {room.directions_url && (
+        <a
+          className="room-card-dir"
+          href={room.directions_url}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Walking directions
+        </a>
+      )}
+    </Card>
   );
 }
