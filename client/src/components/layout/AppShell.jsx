@@ -1,10 +1,12 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '../../design/primitives';
 import './AppShell.css';
 
 export function AppShell() {
   const { user, signOut } = useAuth();
+  const { pathname } = useLocation();
+  const showFooter = pathname === '/';
 
   return (
     <div className="app">
@@ -39,6 +41,18 @@ export function AppShell() {
       <main className="app-main">
         <Outlet />
       </main>
+      {showFooter && (
+        <footer className="app-footer">
+          <div className="app-footer-inner">
+            <p className="app-footer-brand">
+              Room4<span className="app-footer-brand-accent">U</span>
+            </p>
+            <p className="app-footer-about">Vetted student rooms near Mzuzu University.</p>
+            <p className="app-footer-line">Areas: Chibavi · Katoto · Luwinga</p>
+            <p className="app-footer-line app-footer-copy">© {new Date().getFullYear()} Room4U</p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
