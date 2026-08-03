@@ -2,7 +2,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
-import { Card, Badge, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
+import { Card, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
 import { MapPin, BedDouble, CalendarDays } from 'lucide-react';
 import './browse.css';
 
@@ -95,15 +95,10 @@ export function RoomDetailScreen() {
         </div>
       )}
 
-      <div className="detail-head">
-        <div>
-          <p className="text-muted">{room.area}</p>
-          <h1 className="detail-title">{room.hostel}</h1>
-        </div>
-        <Badge variant={room.type === 'shared' ? 'info' : 'primary'}>
-          {room.type === 'shared' ? 'Shared' : 'Single'}
-        </Badge>
-      </div>
+      <p className="detail-kicker text-muted">
+        {room.type === 'shared' ? 'Shared room' : 'Single room'} · {room.area}
+      </p>
+      <h1 className="detail-title">{room.hostel}</h1>
 
       <p className="detail-price">
         {formatMoney(room.price)}{' '}
@@ -115,14 +110,12 @@ export function RoomDetailScreen() {
           <MapPin className="detail-row-icon" /> {distance}
         </p>
         {room.type === 'shared' && (
-          <p className="detail-row">
-            <BedDouble className="detail-row-icon" />
-            <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>{bedsCopy(room)}</Badge>
+          <p className="detail-row text-muted">
+            <BedDouble className="detail-row-icon" /> {bedsCopy(room)}
           </p>
         )}
-        <p className="detail-row">
-          <CalendarDays className="detail-row-icon" />
-          <Badge variant="warning">Available {fmtDate(room.available_from)}</Badge>
+        <p className="detail-row text-muted">
+          <CalendarDays className="detail-row-icon" /> Available {fmtDate(room.available_from)}
         </p>
       </div>
 
