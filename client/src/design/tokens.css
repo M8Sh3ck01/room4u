@@ -9,6 +9,7 @@
   --brand-700: #588307;
   --brand-800: #46680d;
   --brand-900: #3b570d;
+  --brand-950: #364d0b;
 
   --neutral-0: #ffffff;
   --neutral-50: #fbfaf6;
@@ -40,6 +41,8 @@
   --color-primary-soft-text: var(--brand-800);
   --color-primary-text: var(--brand-800);
   --color-primary-text-hover: var(--brand-900);
+  --color-banner: var(--brand-950);
+  --color-on-banner: var(--neutral-50);
   --color-focus: rgba(183, 237, 36, 0.35);
 
   --color-danger: #dc2626;

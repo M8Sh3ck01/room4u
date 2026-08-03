@@ -89,14 +89,17 @@ export function BrowseScreen() {
 
   return (
     <div className="browse">
-      <Card>
-        <h1>Student rooms near Mzuzu University</h1>
-        <div className="hero-chips" aria-label="What you get on every room">
-          <Badge variant="primary">Real walk times</Badge>
-          <Badge variant="primary">Directions to the door</Badge>
-          <Badge variant="primary">Beds left</Badge>
+      <section className="hero-banner">
+        <div className="hero-banner-inner">
+          <p className="hero-kicker">Mzuzu University area</p>
+          <h1>Student rooms near Mzuzu University</h1>
+          <div className="hero-chips" aria-label="What you get on every room">
+            <Badge variant="primary">Real walk times</Badge>
+            <Badge variant="primary">Directions to the door</Badge>
+            <Badge variant="primary">Beds left</Badge>
+          </div>
         </div>
-      </Card>
+      </section>
 
       {showResultsBar && (
         <div className="results-bar">

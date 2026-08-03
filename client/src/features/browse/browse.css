@@ -9,6 +9,33 @@
   width: 100%;
 }
 
+.hero-banner {
+  background: var(--color-banner);
+  color: var(--color-on-banner);
+  border-radius: 0;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.hero-banner-inner {
+  max-width: var(--measure-lg);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+.hero-banner h1 {
+  color: var(--color-on-banner);
+  margin-bottom: var(--space-3);
+}
+
+.hero-kicker {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
 .hero-chips {
   display: flex;
   flex-wrap: wrap;
