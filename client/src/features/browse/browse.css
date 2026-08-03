@@ -13,8 +13,6 @@
   background: var(--color-banner);
   color: var(--color-on-banner);
   border-radius: 0;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
 }
 
 .hero-banner-inner {
