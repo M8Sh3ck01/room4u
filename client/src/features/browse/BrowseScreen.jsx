@@ -90,9 +90,9 @@ export function BrowseScreen() {
   return (
     <div className="browse">
       <div>
-        <h1>Rooms near Mzuzu University</h1>
+        <h1>Student rooms near Mzuzu University</h1>
         <p className="text-muted">
-          Honest walk times from campus and free directions on every room.
+          Every listing shows the real walk time to campus, with directions to the door.
         </p>
       </div>
 
