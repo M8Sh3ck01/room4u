@@ -21,7 +21,7 @@
 .hero-banner-inner {
   max-width: var(--measure-lg);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-6) var(--space-4);
 }
 
 .hero-banner h1 {
@@ -46,11 +46,6 @@
 .chip-icon {
   width: var(--icon-sm);
   height: var(--icon-sm);
-}
-
-.hero-tagline {
-  margin: var(--space-3) 0 0;
-  color: var(--color-on-banner);
 }
 
 .results-bar {
@@ -234,13 +229,19 @@
 }
 
 .room-card-dir {
-  display: inline-block;
-  margin-top: var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-min-h-sm);
+  height: var(--control-min-h-sm);
+  margin-top: var(--space-2);
   color: var(--color-primary-text);
-  text-decoration: none;
   transition: color var(--dur-fast) var(--ease);
+}
+
+.room-card-dir-icon {
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .room-card-dir:hover {

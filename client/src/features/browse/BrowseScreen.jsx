@@ -92,8 +92,8 @@ export function BrowseScreen() {
     <div className="browse">
       <section className="hero-banner">
         <div className="hero-banner-inner">
-          <p className="hero-kicker">MZUNI · Mzuzu University</p>
-          <h1>Student rooms near Mzuzu University</h1>
+          <p className="hero-kicker">MZUNI</p>
+          <h1>Discover student rooms near Mzuzu University</h1>
           <div className="hero-chips" aria-label="What you get on every room">
             <Badge variant="primary">
               <Home className="chip-icon" /> Live Rooms
@@ -105,7 +105,6 @@ export function BrowseScreen() {
               <BadgeCheck className="chip-icon" /> Verified
             </Badge>
           </div>
-          <p className="hero-tagline">No surprises. No guesses. No ghosts.</p>
         </div>
       </section>
 

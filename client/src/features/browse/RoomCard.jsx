@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Badge, Illustration } from '../../design/primitives';
+import { MapPin } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 
 const hasRealPhotos = (room) =>
@@ -52,8 +53,9 @@ export function RoomCard({ room }) {
           href={room.directions_url}
           target="_blank"
           rel="noreferrer"
+          aria-label="Walking directions to this room"
         >
-          Walking directions
+          <MapPin className="room-card-dir-icon" />
         </a>
       )}
     </article>
