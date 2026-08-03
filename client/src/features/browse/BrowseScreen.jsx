@@ -75,13 +75,17 @@ export function BrowseScreen() {
   if (filters.available_from) activeFilterSummary.push(`available from ${filters.available_from}`);
   if (filters.max_price) activeFilterSummary.push(`price ≤ ${formatMoney(filters.max_price)}`);
 
-  const emptyTitle = activeFilterSummary.length
-    ? 'No rooms match your filters'
-    : 'No rooms are listed yet';
+  const hasFilters = activeFilterSummary.length > 0;
 
-  const emptyBody = activeFilterSummary.length
+  const emptyTitle = hasFilters ? 'No rooms match your filters' : 'No rooms yet';
+
+  const emptyBody = hasFilters
     ? `Nothing matches ${activeFilterSummary.join(', ')}. Widen a filter or reset.`
-    : 'No rooms are listed yet. Check back soon.';
+    : "We're setting up the first listings near Mzuzu University. Check back soon.";
+
+  const loaded = !loading && !error;
+  const catalogEmpty = loaded && rooms.length === 0 && !hasFilters;
+  const showResultsBar = !catalogEmpty;
 
   return (
     <div className="browse">
@@ -92,30 +96,32 @@ export function BrowseScreen() {
         </p>
       </div>
 
-      <div className="results-bar">
-        <button
-          type="button"
-          className="filters-toggle"
-          aria-expanded={open}
-          aria-controls="filters-panel"
-          onClick={() => setOpen((o) => !o)}
-        >
-          <span className="filters-toggle-label">Filters</span>
-          {activeCount > 0 && <Badge variant="primary">{activeCount}</Badge>}
-          <span
-            className={open ? 'filters-chevron filters-chevron--open' : 'filters-chevron'}
-            aria-hidden="true"
+      {showResultsBar && (
+        <div className="results-bar">
+          <button
+            type="button"
+            className="filters-toggle"
+            aria-expanded={open}
+            aria-controls="filters-panel"
+            onClick={() => setOpen((o) => !o)}
           >
-            ▾
-          </span>
-        </button>
+            <span className="filters-toggle-label">Filters</span>
+            {activeCount > 0 && <Badge variant="primary">{activeCount}</Badge>}
+            <span
+              className={open ? 'filters-chevron filters-chevron--open' : 'filters-chevron'}
+              aria-hidden="true"
+            >
+              ▾
+            </span>
+          </button>
 
-        {!loading && !error && (
-          <p className="results-count text-muted" role="status">
-            {rooms.length} room{rooms.length === 1 ? '' : 's'}
-          </p>
-        )}
-      </div>
+          {!loading && !error && (
+            <p className="results-count text-muted" role="status">
+              {rooms.length} room{rooms.length === 1 ? '' : 's'}
+            </p>
+          )}
+        </div>
+      )}
 
       {areasError && <Alert variant="warning">{areasError}</Alert>}
 
@@ -206,17 +212,21 @@ export function BrowseScreen() {
             ))}
           </div>
         ) : error ? null : rooms.length === 0 ? (
-          <Card>
-            <EmptyState
-              title={emptyTitle}
-              body={emptyBody}
-              action={
-                <Button variant="ghost" onClick={reset}>
-                  Reset
-                </Button>
-              }
-            />
-          </Card>
+          hasFilters ? (
+            <Card>
+              <EmptyState
+                title={emptyTitle}
+                body={emptyBody}
+                action={
+                  <Button variant="ghost" onClick={reset}>
+                    Reset
+                  </Button>
+                }
+              />
+            </Card>
+          ) : (
+            <EmptyState title={emptyTitle} body={emptyBody} />
+          )
         ) : (
           <div className="room-grid">
             {rooms.map((room) => (
