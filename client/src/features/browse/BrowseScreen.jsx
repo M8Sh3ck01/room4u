@@ -89,14 +89,14 @@ export function BrowseScreen() {
 
   return (
     <div className="browse">
-      <section className="hero-panel">
+      <Card>
         <h1>Student rooms near Mzuzu University</h1>
         <div className="hero-chips" aria-label="What you get on every room">
           <Badge variant="primary">Real walk times</Badge>
           <Badge variant="primary">Directions to the door</Badge>
           <Badge variant="primary">Beds left</Badge>
         </div>
-      </section>
+      </Card>
 
       {showResultsBar && (
         <div className="results-bar">
