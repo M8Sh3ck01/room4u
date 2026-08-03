@@ -1,16 +1,21 @@
 import { Link } from 'react-router-dom';
-import { Badge } from '../../design/primitives';
+import { Badge, Illustration } from '../../design/primitives';
 import { formatMoney } from '../../lib/formatMoney';
+
+const hasRealPhotos = (room) =>
+  Array.isArray(room.photos) && room.photos.some((p) => typeof p === 'string' && p && !p.includes('placehold.co'));
+
+const firstRealPhoto = (room) => room.photos.find((p) => !p.includes('placehold.co'));
 
 export function RoomCard({ room }) {
   return (
     <article className="room-card">
       <Link to={`/rooms/${room.id}`} className="room-card-link">
-        {room.photos?.[0] ? (
-          <img className="room-card-photo" src={room.photos[0]} alt={room.hostel} />
+        {hasRealPhotos(room) ? (
+          <img className="room-card-photo" src={firstRealPhoto(room)} alt={room.hostel} />
         ) : (
-          <div className="room-card-photo room-card-photo--empty" aria-hidden="true">
-            ?
+          <div className="room-card-photo room-card-photo--illustration">
+            <Illustration />
           </div>
         )}
         <div className="room-card-body">
@@ -36,7 +41,7 @@ export function RoomCard({ room }) {
                 {room.beds_left > 0 ? `${room.beds_left} of ${room.beds} beds left` : 'Full'}
               </Badge>
             ) : (
-              <Badge variant="primary">Private room</Badge>
+              <Badge variant="primary">Single room</Badge>
             )}
           </div>
         </div>

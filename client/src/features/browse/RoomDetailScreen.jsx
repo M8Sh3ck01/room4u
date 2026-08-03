@@ -2,8 +2,11 @@
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
-import { Card, Badge, Button, Alert, Skeleton, EmptyState } from '../../design/primitives';
+import { Card, Badge, Button, Alert, Skeleton, EmptyState, Illustration } from '../../design/primitives';
 import './browse.css';
+
+const hasRealPhotos = (room) =>
+  Array.isArray(room.photos) && room.photos.some((p) => typeof p === 'string' && p && !p.includes('placehold.co'));
 
 const fmtDate = (iso) => {
   const d = new Date(iso);
@@ -71,11 +74,19 @@ export function RoomDetailScreen() {
 
   return (
     <div className="room-detail center">
-      <div className="detail-gallery">
-        {room.photos.map((src) => (
-          <img key={src} className="detail-photo" src={src} alt={room.hostel} />
-        ))}
-      </div>
+      {hasRealPhotos(room) ? (
+        <div className="detail-gallery">
+          {room.photos
+            .filter((p) => typeof p === 'string' && p && !p.includes('placehold.co'))
+            .map((src) => (
+              <img key={src} className="detail-photo" src={src} alt={room.hostel} />
+            ))}
+        </div>
+      ) : (
+        <div className="detail-photo detail-photo--illustration">
+          <Illustration />
+        </div>
+      )}
 
       <Card className="stack">
         <div className="detail-head">

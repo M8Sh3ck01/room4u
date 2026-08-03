@@ -143,17 +143,14 @@
   object-fit: cover;
   border-radius: var(--radius-md);
   background: var(--color-surface-muted);
+  color: var(--color-text-faint);
   display: block;
 }
 
-.room-card-photo--empty {
+.room-card-photo--illustration {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: var(--weight-bold);
-  color: var(--color-text-faint);
 }
 
 .room-card-body {
@@ -279,6 +276,13 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-muted);
   display: block;
+}
+
+.detail-photo--illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-faint);
 }
 
 .detail-head {
