@@ -47,11 +47,9 @@ export function HomeScreen() {
     };
   }, [filters]);
 
-  const change = (key, autoApply = true) => (e) => {
+  const change = (key) => (e) => {
     const value = e.target.value;
-    const next = { ...draft, [key]: value };
-    setDraft(next);
-    if (autoApply) setFilters(next);
+    setDraft((prev) => ({ ...prev, [key]: value }));
   };
 
   const apply = (e) => {
@@ -156,7 +154,7 @@ export function HomeScreen() {
                   step="1000"
                   placeholder="e.g. 18000"
                   value={draft.max_price}
-                  onChange={change('max_price', false)}
+                  onChange={change('max_price')}
                 />
               </Field>
 
@@ -176,7 +174,13 @@ export function HomeScreen() {
       {loading ? (
         <div className="room-grid">
           {[0, 1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="skeleton-card" />
+            <div key={i} className="skeleton-card">
+              <Skeleton className="skeleton-photo" />
+              <div className="skeleton-body">
+                <Skeleton className="skeleton-line" />
+                <Skeleton className="skeleton-line skeleton-line--short" />
+              </div>
+            </div>
           ))}
         </div>
       ) : error ? null : rooms.length === 0 ? (
