@@ -19,7 +19,7 @@
 }
 
 .hero-banner-inner {
-  max-width: var(--measure-lg);
+  max-width: var(--bp-lg);
   margin: 0 auto;
   padding: var(--space-6) var(--space-4);
 }
