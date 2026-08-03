@@ -3,10 +3,17 @@ import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
 import { Card, Badge, Button, Alert, Skeleton, EmptyState, Illustration } from '../../design/primitives';
+import { MapPin, BedDouble, CalendarDays } from 'lucide-react';
 import './browse.css';
 
 const hasRealPhotos = (room) =>
   Array.isArray(room.photos) && room.photos.some((p) => typeof p === 'string' && p && !p.includes('placehold.co'));
+
+const bedsCopy = (room) => {
+  if (room.beds_left <= 0) return 'Full';
+  if (room.beds_left >= room.beds) return `All ${room.beds} beds open`;
+  return `${room.beds_left} of ${room.beds} beds left`;
+};
 
 const fmtDate = (iso) => {
   const d = new Date(iso);
@@ -105,13 +112,17 @@ export function RoomDetailScreen() {
         </p>
 
         <div className="detail-rows">
-          <p className="text-muted">{distance}</p>
-          <p>
-            {room.type === 'shared' && (
-              <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
-                {room.beds_left > 0 ? `${room.beds_left} of ${room.beds} beds left` : 'Full'}
-              </Badge>
-            )}{' '}
+          <p className="detail-row text-muted">
+            <MapPin className="detail-row-icon" /> {distance}
+          </p>
+          {room.type === 'shared' && (
+            <p className="detail-row">
+              <BedDouble className="detail-row-icon" />
+              <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>{bedsCopy(room)}</Badge>
+            </p>
+          )}
+          <p className="detail-row">
+            <CalendarDays className="detail-row-icon" />
             <Badge variant="warning">Available {fmtDate(room.available_from)}</Badge>
           </p>
         </div>

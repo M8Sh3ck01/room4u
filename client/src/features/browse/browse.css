@@ -347,6 +347,20 @@
   gap: var(--space-2);
 }
 
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.detail-row-icon {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
 .detail-locked {
   margin-top: var(--space-4);
 }
