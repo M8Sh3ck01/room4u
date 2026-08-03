@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
 import { Card, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
-import { MapPin, BedDouble, CalendarDays } from 'lucide-react';
+import { Footprints, Route, BedDouble, CalendarDays } from 'lucide-react';
 import './browse.css';
 
 const hasRealPhotos = (room) =>
@@ -104,13 +104,20 @@ export function RoomDetailScreen() {
         <div className="detail-fact">
           <span className="detail-fact-label">Walk</span>
           <span className="detail-fact-value">
-            <MapPin className="detail-fact-icon" />
+            <Footprints className="detail-fact-icon" />
             {room.walk_min != null ? `~${room.walk_min} min walk` : 'To be confirmed'}
           </span>
-          {room.dist_km != null && (
-            <span className="detail-fact-note">· {room.dist_km} km straight-line</span>
-          )}
         </div>
+        {room.dist_km != null && (
+          <div className="detail-fact">
+            <span className="detail-fact-label">Distance</span>
+            <span className="detail-fact-value">
+              <Route className="detail-fact-icon" />
+              {room.dist_km} km
+            </span>
+            <span className="detail-fact-note">straight-line</span>
+          </div>
+        )}
         {room.type === 'shared' && (
           <div className="detail-fact">
             <span className="detail-fact-label">Beds</span>
@@ -120,7 +127,7 @@ export function RoomDetailScreen() {
             </span>
           </div>
         )}
-        <div className={`detail-fact${room.type === 'shared' ? ' detail-fact--wide' : ''}`}>
+        <div className={`detail-fact${room.type === 'shared' ? '' : ' detail-fact--wide'}`}>
           <span className="detail-fact-label">Available</span>
           <span className="detail-fact-value">
             <CalendarDays className="detail-fact-icon" />
