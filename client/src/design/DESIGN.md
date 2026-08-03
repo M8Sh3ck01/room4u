@@ -10,7 +10,7 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 ## Tokens (quick map)
 
-- **Color**: `--brand-50…900` (blue) · `--neutral-0…950` (cream) · semantic roles (`--color-*`) with `on-*`, `*-soft` variants.
+- **Color**: `--brand-50…900` (lime) · `--neutral-0…950` (cream) · semantic roles (`--color-*`) with `on-*`, `*-soft` variants.
 - **Type**: `--font-sans` (Inter) / `--font-display` (Space Grotesk) · `--text-xs…display` · `--weight-*` · `--leading-*` · `--tracking-*`.
 - **Space**: `--space-1…16` (4px grid).
 - **Shape**: `--radius-sm/md/lg/full` · `--shadow-sm/md/lg` · `--border-width/strong`.

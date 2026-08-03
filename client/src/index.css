@@ -29,7 +29,7 @@ p {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 :focus-visible {

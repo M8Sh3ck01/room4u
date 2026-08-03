@@ -129,7 +129,7 @@
 }
 
 .room-card-link:hover .room-card-title {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .room-card {
@@ -196,7 +196,7 @@
 .room-price {
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .room-card-dir {
@@ -204,13 +204,13 @@
   margin-top: var(--space-3);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-decoration: none;
   transition: color var(--dur-fast) var(--ease);
 }
 
 .room-card-dir:hover {
-  color: var(--color-primary-hover);
+  color: var(--color-primary-text-hover);
 }
 
 .skeleton-card {
@@ -297,7 +297,7 @@
 .detail-price {
   font-size: var(--text-2xl);
   font-weight: var(--weight-bold);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .detail-rows {

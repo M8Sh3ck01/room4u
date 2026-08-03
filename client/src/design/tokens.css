@@ -1,14 +1,14 @@
 :root {
-  --brand-50: #eaf2ff;
-  --brand-100: #dbe6fe;
-  --brand-200: #bfd4fe;
-  --brand-300: #9db9fa;
-  --brand-400: #7ea3f5;
-  --brand-500: #5f86e8;
-  --brand-600: #3f68d8;
-  --brand-700: #2f53c0;
-  --brand-800: #1e3f9e;
-  --brand-900: #16306f;
+  --brand-50: #f7fee0;
+  --brand-100: #f0fdc9;
+  --brand-200: #e3fa9c;
+  --brand-300: #d3f56a;
+  --brand-400: #b7ed24;
+  --brand-500: #97d413;
+  --brand-600: #74ab0e;
+  --brand-700: #588307;
+  --brand-800: #46680d;
+  --brand-900: #3b570d;
 
   --neutral-0: #ffffff;
   --neutral-50: #fbfaf6;
@@ -33,12 +33,14 @@
   --color-overlay: rgba(28, 25, 21, 0.45);
 
   --color-primary: var(--brand-400);
-  --color-on-primary: #0a2a5c;
+  --color-on-primary: var(--brand-900);
   --color-primary-hover: var(--brand-500);
   --color-primary-active: var(--brand-600);
   --color-primary-soft: var(--brand-50);
   --color-primary-soft-text: var(--brand-800);
-  --color-focus: rgba(126, 163, 245, 0.35);
+  --color-primary-text: var(--brand-800);
+  --color-primary-text-hover: var(--brand-900);
+  --color-focus: rgba(183, 237, 36, 0.35);
 
   --color-danger: #dc2626;
   --color-on-danger: #ffffff;
