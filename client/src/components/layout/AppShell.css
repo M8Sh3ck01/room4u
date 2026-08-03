@@ -15,8 +15,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--space-8);
-  height: var(--space-8);
+  width: var(--space-12);
+  height: var(--space-12);
   color: var(--color-primary-text);
   text-decoration: none;
 }
