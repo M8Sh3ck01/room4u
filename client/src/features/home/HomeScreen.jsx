@@ -76,21 +76,29 @@ export function HomeScreen() {
         </p>
       </div>
 
-      <button
-        type="button"
-        className="filters-toggle"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="filters-toggle-label">Filters</span>
-        {activeCount > 0 && <Badge variant="primary">{activeCount}</Badge>}
-        <span
-          className={open ? 'filters-chevron filters-chevron--open' : 'filters-chevron'}
-          aria-hidden="true"
+      <div className="results-bar">
+        <button
+          type="button"
+          className="filters-toggle"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
         >
-          ▾
-        </span>
-      </button>
+          <span className="filters-toggle-label">Filters</span>
+          {activeCount > 0 && <Badge variant="primary">{activeCount}</Badge>}
+          <span
+            className={open ? 'filters-chevron filters-chevron--open' : 'filters-chevron'}
+            aria-hidden="true"
+          >
+            ▾
+          </span>
+        </button>
+
+        {!loading && !error && (
+          <p className="results-count text-muted">
+            {rooms.length} room{rooms.length === 1 ? '' : 's'}
+          </p>
+        )}
+      </div>
 
       {areasError && <Alert variant="warning">{areasError}</Alert>}
 
@@ -171,31 +179,24 @@ export function HomeScreen() {
             <Skeleton key={i} className="skeleton-card" />
           ))}
         </div>
-      ) : error ? null : (
-        <>
-          <p className="results-count text-muted">
-            {rooms.length} room{rooms.length === 1 ? '' : 's'}
-          </p>
-          {rooms.length === 0 ? (
-            <Card>
-              <EmptyState
-                title="No rooms match your filters"
-                body="Try widening the price or walking distance, or pick another area."
-                action={
-                  <Button variant="ghost" onClick={reset}>
-                    Clear filters
-                  </Button>
-                }
-              />
-            </Card>
-          ) : (
-            <div className="room-grid">
-              {rooms.map((room) => (
-                <RoomCard key={room.id} room={room} />
-              ))}
-            </div>
-          )}
-        </>
+      ) : error ? null : rooms.length === 0 ? (
+        <Card>
+          <EmptyState
+            title="No rooms match your filters"
+            body="Try widening the price or walking distance, or pick another area."
+            action={
+              <Button variant="ghost" onClick={reset}>
+                Clear filters
+              </Button>
+            }
+          />
+        </Card>
+      ) : (
+        <div className="room-grid">
+          {rooms.map((room) => (
+            <RoomCard key={room.id} room={room} />
+          ))}
+        </div>
       )}
     </div>
   );
