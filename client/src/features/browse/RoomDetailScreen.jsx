@@ -68,8 +68,8 @@ export function RoomDetailScreen() {
   }
 
   const distance =
-    room.dist_km != null
-      ? `${room.dist_km} km straight-line Â· about ${room.walk_min} min walk`
+    room.walk_min != null
+      ? `~${room.walk_min} min walk${room.dist_km != null ? ` · ${room.dist_km} km (straight-line)` : ''}`
       : 'Distance to be confirmed';
 
   return (
@@ -126,9 +126,7 @@ export function RoomDetailScreen() {
           Landlord contact details unlock after you book this room.
         </Alert>
 
-        <Link to="/">
-          <Button variant="ghost">Back to rooms</Button>
-        </Link>
+       
       </Card>
     </div>
   );
