@@ -196,21 +196,31 @@
   flex: 1;
 }
 
+.room-card-kicker {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  margin: 0;
+}
+
 .room-card-title {
   font-size: var(--text-lg);
   margin: 0;
 }
 
-.room-card-area {
+.room-card-distance {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: var(--text-sm);
   margin: 0;
 }
 
-.room-card-distance {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
+.room-card-dist-icon {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 .room-card-walk {

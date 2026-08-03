@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Badge, Illustration } from '../../design/primitives';
-import { MapPin } from 'lucide-react';
+import { MapPin, Footprints } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 
 const hasRealPhotos = (room) =>
@@ -20,23 +20,24 @@ export function RoomCard({ room }) {
           </div>
         )}
         <div className="room-card-body">
+          <p className="room-card-kicker text-muted">{room.area}</p>
           <h3 className="room-card-title">{room.hostel}</h3>
 
-          <div className="room-card-distance">
-            <span className="room-card-area text-muted">{room.area}</span>
+          <p className="room-card-distance">
             {room.walk_min != null ? (
               <>
-                <span className="room-card-walk">· ~{room.walk_min} min walk</span>
+                <Footprints className="room-card-dist-icon" />
+                <span className="room-card-walk">~{room.walk_min} min walk</span>
                 {room.dist_km != null && <span className="text-muted">· {room.dist_km} km</span>}
               </>
             ) : (
-              <span className="text-muted">· Distance to come</span>
+              <span className="text-muted">Distance to come</span>
             )}
-          </div>
+          </p>
 
           <div className="room-card-meta">
             <span className="room-price">{formatMoney(room.price)}</span>
-            <span className="text-muted">{room.type === 'shared' ? '/bed/mo' : '/mo'}</span>
+            <span className="text-muted">{room.type === 'shared' ? '/bed/month' : '/month'}</span>
             {room.type === 'shared' ? (
               <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
                 {room.beds_left > 0 ? `${room.beds_left} of ${room.beds} beds left` : 'Full'}
