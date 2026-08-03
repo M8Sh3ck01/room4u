@@ -7,11 +7,11 @@ export function Logo({ className = '', ...rest }) {
       aria-hidden="true"
       {...rest}
     >
-      <circle className="logo-accent" cx="18" cy="15" r="8" />
-      <g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round">
-        <line x1="18" y1="23" x2="18" y2="41" />
-        <line x1="10" y1="33" x2="18" y2="33" />
-        <line x1="13" y1="39" x2="18" y2="39" />
+      <circle className="logo-accent" cx="24" cy="20" r="4" />
+      <g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="24" cy="20" r="10" />
+        <line x1="18" y1="24" x2="24" y2="42" />
+        <line x1="30" y1="24" x2="24" y2="42" />
       </g>
     </svg>
   );
