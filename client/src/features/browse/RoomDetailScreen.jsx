@@ -49,7 +49,7 @@ export function RoomDetailScreen() {
 
   if (loading) {
     return (
-      <div className="room-detail center">
+      <div className="room-detail center measure-lg">
         <Skeleton className="detail-photo" />
         <Skeleton className="detail-photo" />
       </div>
@@ -58,7 +58,7 @@ export function RoomDetailScreen() {
 
   if (error) {
     return (
-      <div className="room-detail center">
+      <div className="room-detail center measure-lg">
         <Card>
           <EmptyState
             title="Room not available"
@@ -73,11 +73,6 @@ export function RoomDetailScreen() {
       </div>
     );
   }
-
-  const distance =
-    room.walk_min != null
-      ? `~${room.walk_min} min walk${room.dist_km != null ? ` · ${room.dist_km} km (straight-line)` : ''}`
-      : 'Distance to be confirmed';
 
   return (
     <div className="room-detail center">
@@ -105,18 +100,33 @@ export function RoomDetailScreen() {
         <span className="text-muted">{room.type === 'shared' ? '/bed/mo' : '/mo'}</span>
       </p>
 
-      <div className="detail-rows">
-        <p className="detail-row text-muted">
-          <MapPin className="detail-row-icon" /> {distance}
-        </p>
+      <div className="detail-facts">
+        <div className="detail-fact">
+          <span className="detail-fact-label">Walk</span>
+          <span className="detail-fact-value">
+            <MapPin className="detail-fact-icon" />
+            {room.walk_min != null ? `~${room.walk_min} min walk` : 'To be confirmed'}
+          </span>
+          {room.dist_km != null && (
+            <span className="detail-fact-note">· {room.dist_km} km straight-line</span>
+          )}
+        </div>
         {room.type === 'shared' && (
-          <p className="detail-row text-muted">
-            <BedDouble className="detail-row-icon" /> {bedsCopy(room)}
-          </p>
+          <div className="detail-fact">
+            <span className="detail-fact-label">Beds</span>
+            <span className="detail-fact-value">
+              <BedDouble className="detail-fact-icon" />
+              {bedsCopy(room)}
+            </span>
+          </div>
         )}
-        <p className="detail-row text-muted">
-          <CalendarDays className="detail-row-icon" /> Available {fmtDate(room.available_from)}
-        </p>
+        <div className={`detail-fact${room.type === 'shared' ? ' detail-fact--wide' : ''}`}>
+          <span className="detail-fact-label">Available</span>
+          <span className="detail-fact-value">
+            <CalendarDays className="detail-fact-icon" />
+            {fmtDate(room.available_from)}
+          </span>
+        </div>
       </div>
 
       {room.directions_url && (
