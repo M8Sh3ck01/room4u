@@ -22,7 +22,16 @@ function walk(dir) {
     if (path.resolve(full) === tokensFile) continue;
     const content = fs.readFileSync(full, 'utf8');
     if (hexRe.test(content)) violations.push(`${path.relative(src, full)} — raw color`);
-    if (lengthRe.test(content)) violations.push(`${path.relative(src, full)} — raw px/rem/em length`);
+    const lines = content.split(/\r?\n/);
+    for (const line of lines) {
+      // Lightning CSS can't resolve var() inside @media queries, so breakpoints
+      // may use literal px here — they must match the --bp-* tokens.
+      if (line.trim().startsWith('@media')) continue;
+      if (lengthRe.test(line)) {
+        violations.push(`${path.relative(src, full)} — raw px/rem/em length`);
+        break;
+      }
+    }
   }
 }
 

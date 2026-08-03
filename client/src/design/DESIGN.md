@@ -22,6 +22,7 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 - **Ban**: raw hex/rgb colors and `px/rem/em` lengths anywhere in `client/src` except `design/tokens.css`. Enforced by `npm run check:design`.
 - **Allowlist** (documented exceptions): `0`, `100%`, `auto`, `transparent`, `currentColor`; layout-only values (`width: 100%`, `flex`, `overflow`, `position`); unitless numbers passed as props (e.g. `Skeleton` dimensions).
+- **Media queries**: `@media` lines may use literal `px` breakpoints (Lightning CSS can't resolve `var()` in media conditions). Values must match the `--bp-*` tokens (`640px`/`1024px`). Enforced by `check:design` skipping `@media` lines.
 - **Allowed pairs** (the "this on this" contract):
   - `surface` → `text-primary` / `text-muted` / `text-faint`
   - `primary` / `danger` → only their `on-*` token

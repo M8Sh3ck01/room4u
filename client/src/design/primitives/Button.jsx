@@ -1,6 +1,7 @@
 import { Spinner } from './Spinner';
 
 export function Button({
+  as: Tag = 'button',
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -21,9 +22,9 @@ export function Button({
     .join(' ');
 
   return (
-    <button className={classes} disabled={disabled || loading} {...rest}>
+    <Tag className={classes} disabled={disabled || loading} {...rest}>
       {loading && <Spinner />}
       {children}
-    </button>
+    </Tag>
   );
 }
