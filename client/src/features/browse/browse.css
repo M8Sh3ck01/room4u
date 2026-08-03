@@ -40,6 +40,11 @@
   gap: var(--space-2);
 }
 
+.hero-tagline {
+  margin: var(--space-3) 0 0;
+  color: var(--color-on-banner);
+}
+
 .results-bar {
   display: flex;
   align-items: center;

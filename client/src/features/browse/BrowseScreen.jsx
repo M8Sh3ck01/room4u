@@ -91,13 +91,14 @@ export function BrowseScreen() {
     <div className="browse">
       <section className="hero-banner">
         <div className="hero-banner-inner">
-          <p className="hero-kicker">Mzuzu University area</p>
+          
           <h1>Student rooms near Mzuzu University</h1>
           <div className="hero-chips" aria-label="What you get on every room">
-            <Badge variant="primary">Real walk times</Badge>
-            <Badge variant="primary">Directions to the door</Badge>
-            <Badge variant="primary">Beds left</Badge>
+            <Badge variant="primary">Live Rooms</Badge>
+            <Badge variant="primary">True Walk</Badge>
+            <Badge variant="primary">Verified</Badge>
           </div>
+          <p className="hero-tagline">No surprises. No guesses. No ghosts.</p>
         </div>
       </section>
 
