@@ -1,28 +1,18 @@
 import { useEffect, useState } from 'react';
-import { listRooms, listAreas } from '../../services/rooms';
+import { listRooms } from '../../services/rooms';
 import { Card, Select, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
 import { Footprints, BadgeCheck, Banknote, X } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from './RoomCard';
 import './browse.css';
 
-const EMPTY = { area: '', type: '', max_walk_min: '', max_price: '' };
+const EMPTY = { type: '', max_walk_min: '', max_price: '' };
 
 export function BrowseScreen() {
-  const [areas, setAreas] = useState([]);
-  const [areasError, setAreasError] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [filters, setFilters] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    listAreas()
-      .then(setAreas)
-      .catch(() =>
-        setAreasError("Couldn't load areas. The Area filter is unavailable right now.")
-      );
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,10 +44,6 @@ export function BrowseScreen() {
   const clearAll = () => setFilters(EMPTY);
 
   const activeFilters = [];
-  if (filters.area) {
-    const a = areas.find((x) => x.id === filters.area);
-    activeFilters.push({ key: 'area', label: a ? a.name : filters.area });
-  }
   if (filters.type) {
     activeFilters.push({ key: 'type', label: filters.type === 'shared' ? 'Shared' : 'Single' });
   }
@@ -102,15 +88,6 @@ export function BrowseScreen() {
 
       {showResultsBar && (
         <div className="quick-filters" role="group" aria-label="Filter rooms">
-          <Select className="quick-filter" id="f-area" value={filters.area} onChange={change('area')} aria-label="Area">
-            <option value="">Area</option>
-            {areas.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </Select>
-
           <Select className="quick-filter" id="f-type" value={filters.type} onChange={change('type')} aria-label="Room type">
             <option value="">Type</option>
             <option value="single">Single</option>
@@ -157,8 +134,6 @@ export function BrowseScreen() {
           ))}
         </div>
       )}
-
-      {areasError && <Alert variant="warning">{areasError}</Alert>}
 
       {error && <Alert variant="danger">{error}</Alert>}
 
