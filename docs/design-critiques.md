@@ -23,7 +23,7 @@
 | 5 | Filter model unified on Apply; skeleton matches card 16:9 geometry | `05d52a5` |
 | 6 | Card v2: distance on its own row, walking-directions footer link, type badge dropped | `2467f73` |
 | 7 | Empty state mirrors active filters; "Reset" label unified | `ac69834` |
-| 8 | Empty-state title branches on whether filters are active; fixed missing punctuation | pending |
-| 9 | A11y: `aria-controls`/panel `id`, `role="status"` on count, `aria-busy` on results region | pending |
-| 10 | Hero copy tightened to one line ("Rooms near Mzuzu University") | pending |
-| 11 | Skeleton now matches full card geometry (photo, body, price line, footer) | pending |
+| 8 | Empty-state title branches on whether filters are active; fixed missing punctuation | `4afd451` |
+| 9 | A11y: `aria-controls`/panel `id`, `role="status"` on count, `aria-busy` on results region | `4afd451` |
+| 10 | Hero copy tightened to one line ("Rooms near Mzuzu University") | `4afd451` |
+| 11 | Skeleton now matches full card geometry (photo, body, price line, footer) | `4afd451` |
