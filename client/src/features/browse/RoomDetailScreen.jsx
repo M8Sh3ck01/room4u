@@ -2,7 +2,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
-import { Card, Badge, Button, Alert, Skeleton, EmptyState, Illustration } from '../../design/primitives';
+import { Card, Badge, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
 import { MapPin, BedDouble, CalendarDays } from 'lucide-react';
 import './browse.css';
 
@@ -95,50 +95,42 @@ export function RoomDetailScreen() {
         </div>
       )}
 
-      <Card className="stack">
-        <div className="detail-head">
-          <div>
-            <p className="text-muted">{room.area}</p>
-            <h1 className="detail-title">{room.hostel}</h1>
-          </div>
-          <Badge variant={room.type === 'shared' ? 'info' : 'primary'}>
-            {room.type === 'shared' ? 'Shared' : 'Single'}
-          </Badge>
+      <div className="detail-head">
+        <div>
+          <p className="text-muted">{room.area}</p>
+          <h1 className="detail-title">{room.hostel}</h1>
         </div>
+        <Badge variant={room.type === 'shared' ? 'info' : 'primary'}>
+          {room.type === 'shared' ? 'Shared' : 'Single'}
+        </Badge>
+      </div>
 
-        <p className="detail-price">
-          {formatMoney(room.price)}{' '}
-          <span className="text-muted">{room.type === 'shared' ? '/bed/mo' : '/mo'}</span>
+      <p className="detail-price">
+        {formatMoney(room.price)}{' '}
+        <span className="text-muted">{room.type === 'shared' ? '/bed/mo' : '/mo'}</span>
+      </p>
+
+      <div className="detail-rows">
+        <p className="detail-row text-muted">
+          <MapPin className="detail-row-icon" /> {distance}
         </p>
-
-        <div className="detail-rows">
-          <p className="detail-row text-muted">
-            <MapPin className="detail-row-icon" /> {distance}
-          </p>
-          {room.type === 'shared' && (
-            <p className="detail-row">
-              <BedDouble className="detail-row-icon" />
-              <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>{bedsCopy(room)}</Badge>
-            </p>
-          )}
+        {room.type === 'shared' && (
           <p className="detail-row">
-            <CalendarDays className="detail-row-icon" />
-            <Badge variant="warning">Available {fmtDate(room.available_from)}</Badge>
+            <BedDouble className="detail-row-icon" />
+            <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>{bedsCopy(room)}</Badge>
           </p>
-        </div>
-
-        {room.directions_url && (
-          <Button as="a" href={room.directions_url} target="_blank" rel="noreferrer" fullWidth>
-            Open walking directions
-          </Button>
         )}
+        <p className="detail-row">
+          <CalendarDays className="detail-row-icon" />
+          <Badge variant="warning">Available {fmtDate(room.available_from)}</Badge>
+        </p>
+      </div>
 
-        <Alert variant="info" className="detail-locked">
-          Landlord contact details unlock after you book this room.
-        </Alert>
-
-       
-      </Card>
+      {room.directions_url && (
+        <Button as="a" href={room.directions_url} target="_blank" rel="noreferrer" fullWidth>
+          Open walking directions
+        </Button>
+      )}
     </div>
   );
 }
