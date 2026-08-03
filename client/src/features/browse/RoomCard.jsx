@@ -20,16 +20,16 @@ export function RoomCard({ room }) {
         )}
         <div className="room-card-body">
           <h3 className="room-card-title">{room.hostel}</h3>
-          <p className="room-card-area text-muted">{room.area}</p>
 
           <div className="room-card-distance">
+            <span className="room-card-area text-muted">{room.area}</span>
             {room.walk_min != null ? (
               <>
-                <span className="room-card-walk">~{room.walk_min} min walk from Mzuni</span>
+                <span className="room-card-walk">· ~{room.walk_min} min walk</span>
                 {room.dist_km != null && <span className="text-muted">· {room.dist_km} km</span>}
               </>
             ) : (
-              <span className="text-muted">Distance to come</span>
+              <span className="text-muted">· Distance to come</span>
             )}
           </div>
 

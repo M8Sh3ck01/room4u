@@ -206,7 +206,6 @@
   align-items: baseline;
   gap: var(--space-2);
   font-size: var(--text-sm);
-  margin-top: var(--space-2);
 }
 
 .room-card-walk {
