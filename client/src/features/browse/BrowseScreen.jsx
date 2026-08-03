@@ -1,26 +1,20 @@
 import { useEffect, useState } from 'react';
 import { listRooms, listAreas } from '../../services/rooms';
-import { Card, Field, Select, Input, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
-import { Footprints, BadgeCheck, Banknote } from 'lucide-react';
+import { Card, Select, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
+import { Footprints, BadgeCheck, Banknote, X } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from './RoomCard';
 import './browse.css';
 
-const EMPTY = { area: '', type: '', max_walk_min: '', available_from: '', max_price: '' };
+const EMPTY = { area: '', type: '', max_walk_min: '', max_price: '' };
 
 export function BrowseScreen() {
   const [areas, setAreas] = useState([]);
   const [areasError, setAreasError] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [filters, setFilters] = useState(EMPTY);
-  const [draft, setDraft] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [open, setOpen] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const bp = getComputedStyle(document.documentElement).getPropertyValue('--bp-lg').trim();
-    return window.matchMedia(`(min-width: ${bp})`).matches;
-  });
 
   useEffect(() => {
     listAreas()
@@ -50,38 +44,36 @@ export function BrowseScreen() {
   }, [filters]);
 
   const change = (key) => (e) => {
-    const value = e.target.value;
-    setDraft((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
-  const apply = (e) => {
-    e.preventDefault();
-    setFilters({ ...draft });
+  const clear = (key) => {
+    setFilters((prev) => ({ ...prev, [key]: '' }));
   };
 
-  const reset = () => {
-    setDraft(EMPTY);
-    setFilters(EMPTY);
-  };
+  const clearAll = () => setFilters(EMPTY);
 
-  const activeCount = Object.values(filters).filter((v) => v !== '' && v != null).length;
-
-  const activeFilterSummary = [];
+  const activeFilters = [];
   if (filters.area) {
     const a = areas.find((x) => x.id === filters.area);
-    activeFilterSummary.push(`area ${a ? a.name : filters.area}`);
+    activeFilters.push({ key: 'area', label: a ? a.name : filters.area });
   }
-  if (filters.type) activeFilterSummary.push(`type ${filters.type}`);
-  if (filters.max_walk_min) activeFilterSummary.push(`walk ≤ ${filters.max_walk_min} min`);
-  if (filters.available_from) activeFilterSummary.push(`available from ${filters.available_from}`);
-  if (filters.max_price) activeFilterSummary.push(`price ≤ ${formatMoney(filters.max_price)}`);
+  if (filters.type) {
+    activeFilters.push({ key: 'type', label: filters.type === 'shared' ? 'Shared' : 'Single' });
+  }
+  if (filters.max_walk_min) {
+    activeFilters.push({ key: 'max_walk_min', label: `~${filters.max_walk_min} min walk` });
+  }
+  if (filters.max_price) {
+    activeFilters.push({ key: 'max_price', label: `≤ ${formatMoney(filters.max_price)} per month` });
+  }
 
-  const hasFilters = activeFilterSummary.length > 0;
+  const hasFilters = activeFilters.length > 0;
 
   const emptyTitle = hasFilters ? 'No rooms match your filters' : 'No rooms yet';
 
   const emptyBody = hasFilters
-    ? `Nothing matches ${activeFilterSummary.join(', ')}. Widen a filter or reset.`
+    ? `Nothing matches ${activeFilters.map((f) => f.label).join(', ')}. Try widening a filter or clear all.`
     : "We're setting up the first rooms near Mzuzu University. Check back soon.";
 
   const loaded = !loading && !error;
@@ -92,8 +84,8 @@ export function BrowseScreen() {
     <div className="browse">
       <section className="hero-banner">
         <div className="hero-banner-inner">
-          <p className="hero-kicker">@MZUNI</p>
-          <h1>Discover student rooms near Mzuzu University</h1>
+          
+          <h1>Discover your room around Mzuzu University</h1>
           <div className="hero-chips" aria-label="What you get on every room">
             <Badge variant="primary">
               <BadgeCheck className="chip-icon" /> Verified
@@ -109,102 +101,64 @@ export function BrowseScreen() {
       </section>
 
       {showResultsBar && (
-        <div className="results-bar">
-          <button
-            type="button"
-            className="filters-toggle"
-            aria-expanded={open}
-            aria-controls="filters-panel"
-            onClick={() => setOpen((o) => !o)}
-          >
-            <span className="filters-toggle-label">Filters</span>
-            {activeCount > 0 && <Badge variant="primary">{activeCount}</Badge>}
-            <span
-              className={open ? 'filters-chevron filters-chevron--open' : 'filters-chevron'}
-              aria-hidden="true"
-            >
-              ▾
-            </span>
-          </button>
+        <div className="quick-filters" role="group" aria-label="Filter rooms">
+          <Select className="quick-filter" id="f-area" value={filters.area} onChange={change('area')} aria-label="Area">
+            <option value="">Area</option>
+            {areas.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </Select>
 
-          {!loading && !error && (
-            <p className="results-count text-muted" role="status">
-              {rooms.length} room{rooms.length === 1 ? '' : 's'}
-            </p>
+          <Select className="quick-filter" id="f-type" value={filters.type} onChange={change('type')} aria-label="Room type">
+            <option value="">Type</option>
+            <option value="single">Single</option>
+            <option value="shared">Shared</option>
+          </Select>
+
+          <Select className="quick-filter" id="f-walk" value={filters.max_walk_min} onChange={change('max_walk_min')} aria-label="Max walking time">
+            <option value="">Walk</option>
+            <option value="15">≤ 15 min</option>
+            <option value="30">≤ 30 min</option>
+            <option value="45">≤ 45 min</option>
+            <option value="60">≤ 60 min</option>
+          </Select>
+
+          <Select className="quick-filter" id="f-price" value={filters.max_price} onChange={change('max_price')} aria-label="Max price per month">
+            <option value="">Price</option>
+            <option value="10000">≤ MK10,000</option>
+            <option value="15000">≤ MK15,000</option>
+            <option value="20000">≤ MK20,000</option>
+            <option value="25000">≤ MK25,000</option>
+          </Select>
+
+          {activeFilters.length > 0 && (
+            <button type="button" className="filters-clear" onClick={clearAll}>
+              Clear all
+            </button>
           )}
         </div>
       )}
 
-      {areasError && <Alert variant="warning">{areasError}</Alert>}
-
-      {open && (
-        <Card id="filters-panel" className="filters">
-          <form onSubmit={apply}>
-            <div className="filters-grid">
-              <Field label="Area" htmlFor="f-area">
-                <Select id="f-area" value={draft.area} onChange={change('area')}>
-                  <option value="">All areas</option>
-                  {areas.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-
-              <Field label="Room type" htmlFor="f-type">
-                <Select id="f-type" value={draft.type} onChange={change('type')}>
-                  <option value="">Any</option>
-                  <option value="single">Single</option>
-                  <option value="shared">Shared</option>
-                </Select>
-              </Field>
-
-              <Field label="Max walking time" htmlFor="f-walk">
-                <Select id="f-walk" value={draft.max_walk_min} onChange={change('max_walk_min')}>
-                  <option value="">Any</option>
-                  <option value="15">~15 min</option>
-                  <option value="30">~30 min</option>
-                  <option value="45">~45 min</option>
-                  <option value="60">~60 min</option>
-                </Select>
-              </Field>
-
-              <Field
-                label="Available from"
-                htmlFor="f-avail"
-                hint="Show rooms free on or after this date."
-              >
-                <Input
-                  id="f-avail"
-                  type="date"
-                  value={draft.available_from}
-                  onChange={change('available_from')}
-                />
-              </Field>
-
-              <Field label="Max price /bed/mo" htmlFor="f-price">
-                <Input
-                  id="f-price"
-                  type="number"
-                  min="0"
-                  step="1000"
-                  placeholder="e.g. 18000"
-                  value={draft.max_price}
-                  onChange={change('max_price')}
-                />
-              </Field>
-
-              <div className="filters-actions">
-                <Button type="submit">Apply</Button>
-                <Button type="button" variant="ghost" onClick={reset}>
-                  Reset
-                </Button>
-              </div>
-            </div>
-          </form>
-        </Card>
+      {activeFilters.length > 0 && (
+        <div className="filter-chips">
+          {activeFilters.map((chip) => (
+            <button
+              key={chip.key}
+              type="button"
+              className="filter-chip"
+              onClick={() => clear(chip.key)}
+              aria-label={`Remove ${chip.label} filter`}
+            >
+              {chip.label}
+              <X className="filter-chip-icon" aria-hidden="true" />
+            </button>
+          ))}
+        </div>
       )}
+
+      {areasError && <Alert variant="warning">{areasError}</Alert>}
 
       {error && <Alert variant="danger">{error}</Alert>}
 
@@ -234,7 +188,7 @@ export function BrowseScreen() {
               body={emptyBody}
               action={
                 hasFilters ? (
-                  <Button variant="ghost" onClick={reset}>
+                  <Button variant="ghost" onClick={clearAll}>
                     Reset
                   </Button>
                 ) : null
