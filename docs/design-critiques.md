@@ -10,7 +10,7 @@
 ## Open
 
 - [ ] **Date input locale** — `type="date"` renders the browser's `mm/dd/yyyy` regardless of locale; a native input can't be reformatted. Only fixable by replacing with a custom input.
-  - `client/src/features/home/HomeScreen.jsx` (Available from field)
+  - `client/src/features/browse/BrowseScreen.jsx` (Available from field)
 
 ## Resolved
 

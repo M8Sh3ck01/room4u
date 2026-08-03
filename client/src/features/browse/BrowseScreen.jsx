@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { listRooms, listAreas } from '../../services/rooms';
 import { Card, Field, Select, Input, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
 import { formatMoney } from '../../lib/formatMoney';
-import { RoomCard } from '../browse/RoomCard';
-import '../browse/browse.css';
+import { RoomCard } from './RoomCard';
+import './browse.css';
 
 const EMPTY = { area: '', type: '', max_walk_min: '', available_from: '', max_price: '' };
 
-export function HomeScreen() {
+export function BrowseScreen() {
   const [areas, setAreas] = useState([]);
   const [areasError, setAreasError] = useState(null);
   const [rooms, setRooms] = useState([]);
