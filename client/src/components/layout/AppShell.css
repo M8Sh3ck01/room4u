@@ -12,9 +12,11 @@
 }
 
 .brand {
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
   color: var(--color-primary-text);
   text-decoration: none;
 }

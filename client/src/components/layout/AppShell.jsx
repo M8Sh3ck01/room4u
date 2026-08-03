@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
-import { Button } from '../../design/primitives';
+import { Button, Logo } from '../../design/primitives';
 import './AppShell.css';
 
 export function AppShell() {
@@ -9,8 +9,8 @@ export function AppShell() {
   return (
     <div className="app">
       <header className="app-header">
-        <Link to="/" className="brand">
-          Room4U
+        <Link to="/" className="brand" aria-label="Room4U home">
+          <Logo />
         </Link>
         <div className="header-actions">
           {user ? (
