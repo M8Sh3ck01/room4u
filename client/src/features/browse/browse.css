@@ -9,6 +9,13 @@
   width: 100%;
 }
 
+.hero-panel {
+  background: var(--color-primary-soft);
+  border: var(--border-width) solid var(--color-primary-soft-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
 .hero-chips {
   display: flex;
   flex-wrap: wrap;
