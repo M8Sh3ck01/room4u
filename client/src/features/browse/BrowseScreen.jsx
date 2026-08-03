@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { listRooms, listAreas } from '../../services/rooms';
 import { Card, Field, Select, Input, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
-import { Home, Footprints, BadgeCheck } from 'lucide-react';
+import { Footprints, BadgeCheck, Banknote } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from './RoomCard';
 import './browse.css';
@@ -96,13 +96,13 @@ export function BrowseScreen() {
           <h1>Discover student rooms near Mzuzu University</h1>
           <div className="hero-chips" aria-label="What you get on every room">
             <Badge variant="primary">
-              <Home className="chip-icon" /> Real Rooms
-            </Badge>
-            <Badge variant="primary">
-              <Footprints className="chip-icon" /> Walking Distance
-            </Badge>
-            <Badge variant="primary">
               <BadgeCheck className="chip-icon" /> Verified
+            </Badge>
+            <Badge variant="primary">
+              <Footprints className="chip-icon" /> Walkable
+            </Badge>
+            <Badge variant="primary">
+              <Banknote className="chip-icon" /> Affordable
             </Badge>
           </div>
         </div>
