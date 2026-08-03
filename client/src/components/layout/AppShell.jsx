@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
-import { Button, Logo } from '../../design/primitives';
+import { Button } from '../../design/primitives';
 import './AppShell.css';
 
 export function AppShell() {
@@ -10,7 +10,6 @@ export function AppShell() {
     <div className="app">
       <header className="app-header">
         <Link to="/" className="brand" aria-label="Room4U home">
-          <Logo className="brand-logo" />
           <span className="brand-name">
             Room4<span className="brand-name-accent">U</span>
           </span>

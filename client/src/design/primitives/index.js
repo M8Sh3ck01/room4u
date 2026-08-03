@@ -9,4 +9,3 @@ export { Spinner } from './Spinner';
 export { Skeleton } from './Skeleton';
 export { EmptyState } from './EmptyState';
 export { Illustration } from './Illustration';
-export { Logo } from './Logo';

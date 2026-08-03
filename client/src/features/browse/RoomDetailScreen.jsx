@@ -69,7 +69,7 @@ export function RoomDetailScreen() {
 
   const distance =
     room.dist_km != null
-      ? `${room.dist_km} km straight-line Â· about ${room.walk_min} min walk from Mzuni`
+      ? `${room.dist_km} km straight-line Â· about ${room.walk_min} min walk`
       : 'Distance to be confirmed';
 
   return (
