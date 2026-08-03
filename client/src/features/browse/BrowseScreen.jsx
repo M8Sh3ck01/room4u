@@ -197,6 +197,10 @@ export function BrowseScreen() {
       {error && <Alert variant="danger">{error}</Alert>}
 
       <div className="results-area" aria-busy={loading}>
+        <div
+          key={loading ? 'loading' : rooms.length === 0 ? 'empty' : 'rooms'}
+          className="results-swap"
+        >
         {loading ? (
           <div className="room-grid">
             {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -232,6 +236,7 @@ export function BrowseScreen() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
