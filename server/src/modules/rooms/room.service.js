@@ -97,4 +97,11 @@ async function getPublicRoom(roomId) {
   return serializeRoom(room, { detail: true });
 }
 
-module.exports = { listPublicRooms, getPublicRoom, serializeRoom };
+async function getClaimableRoom(roomId) {
+  if (!mongoose.Types.ObjectId.isValid(roomId)) return null;
+  const room = await Room.findById(roomId).populate(populate);
+  if (!room || room.status !== 'stock') return null;
+  return room;
+}
+
+module.exports = { listPublicRooms, getPublicRoom, getClaimableRoom, serializeRoom };

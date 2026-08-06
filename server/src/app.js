@@ -10,6 +10,7 @@ const { errorHandler } = require('@core/middleware/errorHandler');
 const usersRoutes = require('@modules/users');
 const directoriesRoutes = require('@modules/directories');
 const roomsRoutes = require('@modules/rooms');
+const bookingsRoutes = require('@modules/bookings');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api', usersRoutes);
 app.use('/api', directoriesRoutes);
 app.use('/api', roomsRoutes);
+app.use('/api', bookingsRoutes);
 
 const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
 const clientIndex = path.join(clientDist, 'index.html');

@@ -119,8 +119,8 @@ id:            uuid (PK)
 room_id:       uuid (FK → Room.id)
 user_id:       uuid (FK → User.id)                  ← which user booked this bed
 status:        enum (requested | paid | cancelled | refunded) default 'requested'
-charge_id:     string (nullable)                     ← PayChangu charge id
-move_in_date:  date (nullable)                       ← set when this tenant's bed is paid
+charge_id:     string (nullable)                     ← PayChangu charge id, captured at claim time
+move_in_date:  date (nullable)                       ← set to room.available_from when the bed is paid
 notes:         text (nullable)
 requested_at:  timestamp (default now)
 paid_at:       timestamp (nullable)
@@ -128,7 +128,10 @@ cancelled_at:  timestamp (nullable)
 
 Notes: each Booking claims exactly 1 bed (beds are interchangeable — no bed number needed).
        A room is `rented` when paid bookings = Room.beds.
+       One active claim per room per user — enforced by a unique partial index on
+       (room_id, user_id) where status = 'requested' (a claim slot frees on cancel/refund).
 Indexes: room_id, user_id, status
+         (room_id, user_id) unique partial — status = 'requested'
 ```
 
 ### Payment

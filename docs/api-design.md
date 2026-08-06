@@ -130,6 +130,9 @@
 // 403 NEEDS_PHONE — set phone first
 // 409 NO_BEDS — no beds left on this room
 // 404 ROOM_NOT_FOUND — not stock
+// 409 CONFLICT — tenant already holds an active claim on this room
+//   (one active claim per room per user; re-send the SAME Idempotency-Key to
+//    fetch the existing booking, use a NEW key only after cancelling)
 ```
 
 ### POST /api/leads  (spotter)

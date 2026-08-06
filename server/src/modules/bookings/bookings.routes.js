@@ -1,0 +1,72 @@
+const express = require('express');
+
+const { asyncCatch } = require('@core/middleware/asyncCatch');
+const { auth, requirePhone } = require('@core/middleware/auth');
+const { successResponse } = require('@core/utils/apiResponse');
+const { appError } = require('@core/errors');
+const mongoose = require('mongoose');
+const { claimRoom, getBookingById, getMyBookings, cancelBooking } = require('./bookings.service');
+const { serializeBooking } = require('./booking.model');
+
+const router = express.Router();
+
+router.post(
+  '/rooms/:id/claims',
+  auth,
+  requirePhone,
+  asyncCatch(async (req, res) => {
+    const idempotencyKey = req.headers['idempotency-key'];
+    if (!idempotencyKey) {
+      throw appError(400, 'VALIDATION_ERROR', 'Idempotency-Key header is required');
+    }
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw appError(404, 'ROOM_NOT_FOUND', 'Room not found');
+    }
+    const { booking, pay_amount, payment_link } = await claimRoom({
+      roomId: req.params.id,
+      userId: req.user.id,
+      idempotencyKey,
+    });
+    successResponse(
+      res,
+      { booking: serializeBooking(booking), pay_amount, payment_link },
+      'Booking created',
+      201
+    );
+  })
+);
+
+router.get(
+  '/bookings/mine',
+  auth,
+  asyncCatch(async (req, res) => {
+    const bookings = await getMyBookings(req.user.id);
+    successResponse(res, { bookings: bookings.map(serializeBooking) }, 'OK', 200);
+  })
+);
+
+router.get(
+  '/bookings/:id',
+  auth,
+  asyncCatch(async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
+    }
+    const booking = await getBookingById({ bookingId: req.params.id, user: req.user });
+    successResponse(res, { booking: serializeBooking(booking) }, 'OK', 200);
+  })
+);
+
+router.post(
+  '/bookings/:id/cancel',
+  auth,
+  asyncCatch(async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
+    }
+    const booking = await cancelBooking({ bookingId: req.params.id, user: req.user });
+    successResponse(res, { booking: serializeBooking(booking) }, 'Booking cancelled', 200);
+  })
+);
+
+module.exports = router;
