@@ -13,7 +13,8 @@ export function AppShell() {
       <header className="app-header">
         <Link to="/" className="brand" aria-label="Room4U home">
           <span className="brand-name">
-            Room4<span className="brand-name-accent">U</span>
+            Room<span className="brand-name-num">4</span>
+            <span className="brand-name-accent">U</span>
           </span>
         </Link>
         <div className="header-actions">
@@ -45,7 +46,8 @@ export function AppShell() {
         <footer className="app-footer">
           <div className="app-footer-inner">
             <p className="app-footer-brand">
-              Room4<span className="app-footer-brand-accent">U</span>
+              Room<span className="app-footer-brand-num">4</span>
+              <span className="app-footer-brand-accent">U</span>
             </p>
             <p className="app-footer-about">Vetted student rooms near Mzuzu University.</p>
             <p className="app-footer-line app-footer-copy">© {new Date().getFullYear()} Room4U</p>

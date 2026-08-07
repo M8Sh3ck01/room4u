@@ -32,6 +32,11 @@
   color: var(--color-banner-accent);
 }
 
+.brand-name-num,
+.app-footer-brand-num {
+  color: var(--teal-300);
+}
+
 .app-main {
   max-width: var(--bp-lg);
   margin: 0 auto;
