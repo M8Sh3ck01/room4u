@@ -63,12 +63,12 @@ const seed = async () => {
         lng: 34.0286,
       },
       {
-        name: 'No Pin Hostel',
+        name: 'Masasa Hostel',
         area_id: luwinga._id,
-        caretaker_name: null,
-        caretaker_phone: null,
-        lat: null,
-        lng: null,
+        caretaker_name: 'Falesi',
+        caretaker_phone: '0992 555 444',
+        lat: -11.4522,
+        lng: 34.0204,
       },
       {
         name: 'Zolozolo Hostel',
