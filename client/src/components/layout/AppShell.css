@@ -10,6 +10,37 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   border-bottom: var(--border-width) solid var(--color-border);
+  transition:
+    background var(--dur-med) var(--ease),
+    border-color var(--dur-med) var(--ease);
+}
+
+.app-header--overlay {
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+.app-header--overlay .brand,
+.app-header--overlay .header-user {
+  color: var(--color-on-banner);
+}
+
+.app-header--overlay .brand-name-accent {
+  color: var(--color-banner-accent);
+}
+
+.app-header--overlay .brand-name-num {
+  color: var(--teal-300);
+}
+
+.app-header--overlay .btn--ghost {
+  color: var(--color-on-banner);
+  border-color: var(--neutral-400);
+}
+
+.app-header--overlay .btn--ghost:hover:not(:disabled) {
+  background: var(--teal-900);
+  border-color: var(--neutral-300);
 }
 
 .brand {
@@ -19,6 +50,7 @@
   gap: var(--space-2);
   color: var(--color-text-primary);
   text-decoration: none;
+  transition: color var(--dur-med) var(--ease);
 }
 
 .brand-name {
@@ -31,10 +63,12 @@
 
 .brand-name-accent {
   color: var(--ember-600);
+  transition: color var(--dur-med) var(--ease);
 }
 
 .brand-name-num {
   color: var(--teal-600);
+  transition: color var(--dur-med) var(--ease);
 }
 
 .app-footer-brand-num {
@@ -98,6 +132,7 @@
   font-size: var(--text-sm);
   color: var(--color-text-primary);
   text-decoration: none;
+  transition: color var(--dur-med) var(--ease);
 }
 
 .app-header .btn--ghost {

@@ -6,11 +6,17 @@
 
 .hero-banner {
   background: var(--color-banner);
-  color: var(--color-on-banner);
   border-radius: 0;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  margin-top: calc(-1 * var(--space-6));
+  margin-top: calc(-1 * (var(--space-6) + var(--space-16)));
+}
+
+.hero-banner-inner {
+  max-width: var(--bp-lg);
+  margin: 0 auto;
+  padding: calc(var(--space-6) + var(--space-16)) var(--space-4) var(--space-6);
+  text-align: center;
 }
 
 .hero-banner-inner {

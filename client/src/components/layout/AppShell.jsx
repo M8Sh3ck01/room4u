@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '../../design/primitives';
@@ -6,11 +7,21 @@ import './AppShell.css';
 export function AppShell() {
   const { user, signOut } = useAuth();
   const { pathname } = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const overlay = pathname === '/' && !scrolled;
   const showFooter = pathname === '/';
 
   return (
     <div className="app">
-      <header className="app-header">
+      <header className={`app-header${overlay ? ' app-header--overlay' : ''}`}>
         <Link to="/" className="brand" aria-label="Room4U home">
           <span className="brand-name">
             Room<span className="brand-name-num">4</span>
