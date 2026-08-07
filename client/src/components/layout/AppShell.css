@@ -7,8 +7,9 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
-  background: var(--color-banner);
-  color: var(--color-on-banner);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .brand {
@@ -16,7 +17,7 @@
   align-items: center;
   min-height: var(--control-min-h);
   gap: var(--space-2);
-  color: var(--color-on-banner);
+  color: var(--color-text-primary);
   text-decoration: none;
 }
 
@@ -29,10 +30,13 @@
 }
 
 .brand-name-accent {
-  color: var(--color-banner-accent);
+  color: var(--ember-600);
 }
 
-.brand-name-num,
+.brand-name-num {
+  color: var(--teal-600);
+}
+
 .app-footer-brand-num {
   color: var(--teal-300);
 }
@@ -92,18 +96,18 @@
   min-height: var(--control-min-h);
   gap: var(--space-2);
   font-size: var(--text-sm);
-  color: var(--color-on-banner);
+  color: var(--color-text-primary);
   text-decoration: none;
 }
 
 .app-header .btn--ghost {
   background: transparent;
-  color: var(--color-on-banner);
-  border: var(--border-width) solid var(--neutral-400);
+  color: var(--color-text-primary);
+  border: var(--border-width) solid var(--color-border);
 }
 
 .app-header .btn--ghost:hover:not(:disabled) {
-  background: var(--teal-900);
+  background: var(--color-surface-muted);
   border-color: var(--neutral-300);
 }
 

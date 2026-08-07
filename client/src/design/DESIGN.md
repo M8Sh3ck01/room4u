@@ -20,7 +20,8 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 ## Rules
 
-- **Accent on dark**: `--color-banner-accent` (ember) is the only accent allowed on `--color-banner` / header / footer — with one exception, the "Room4U" wordmark, which is three-color by design: `on-banner` (Room) + `--teal-300` (4) + `--color-banner-accent` (U).
+- **Accent on dark**: `--color-banner-accent` (ember) is the only accent allowed on `--color-banner` / footer — with one exception, the "Room4U" wordmark, which is three-color by design.
+- **Wordmark variants**: on dark (`--color-banner`, footer) it is `on-banner` (Room) + `--teal-300` (4) + `--color-banner-accent` (U). On light (header `--color-surface`) it is `text-primary` (Room) + `--teal-600` (4) + `--ember-600` (U).
 - **Ban**: raw hex/rgb colors and `px/rem/em` lengths anywhere in `client/src` except `design/tokens.css`. Enforced by `npm run check:design`.
 - **Allowlist** (documented exceptions): `0`, `100%`, `auto`, `transparent`, `currentColor`; layout-only values (`width: 100%`, `flex`, `overflow`, `position`); unitless numbers passed as props (e.g. `Skeleton` dimensions).
 - **Media queries**: `@media` lines may use literal `px` breakpoints (Lightning CSS can't resolve `var()` in media conditions). Values must match the `--bp-*` tokens (`640px`/`1024px`). Enforced by `check:design` skipping `@media` lines.
