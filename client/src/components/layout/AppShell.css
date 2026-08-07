@@ -1,14 +1,37 @@
 .app-header {
   position: sticky;
-  top: 0;
+  top: var(--space-2);
   z-index: var(--z-header);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-4);
+  margin: var(--space-2) var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
   background: var(--color-banner);
   color: var(--color-on-banner);
+  border: var(--border-width) solid var(--teal-800);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.app-header::after {
+  content: '';
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: calc(-1 * var(--border-width));
+  height: var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-banner-accent);
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    top: var(--space-3);
+    margin: var(--space-3) var(--space-3) 0;
+  }
 }
 
 .brand {
