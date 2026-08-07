@@ -291,16 +291,98 @@
   gap: var(--space-6);
 }
 
-.detail-gallery {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
+.detail-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  overflow: hidden;
+  touch-action: pan-y;
 }
 
-@media (min-width: 640px) {
-  .detail-gallery {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.detail-stage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+}
+
+.detail-counter {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-full);
+  background: var(--color-overlay);
+  color: var(--neutral-50);
+  pointer-events: none;
+}
+
+.detail-stage-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-min-h-sm);
+  height: var(--control-min-h-sm);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-overlay);
+  color: var(--neutral-50);
+  cursor: pointer;
+}
+
+.detail-stage-btn--prev {
+  left: var(--space-2);
+}
+
+.detail-stage-btn--next {
+  right: var(--space-2);
+}
+
+.detail-stage-btn:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.detail-thumbs {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.detail-thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.detail-thumb {
+  flex-shrink: 0;
+  width: var(--space-16);
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: var(--border-strong) solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface-muted);
+  cursor: pointer;
+}
+
+.detail-thumb--active {
+  border-color: var(--color-primary);
+}
+
+.detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
 }
 
 .detail-photo {

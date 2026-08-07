@@ -13,7 +13,7 @@ export function RoomCard({ room }) {
     <article className="room-card">
       <Link to={`/rooms/${room.id}`} className="room-card-link">
         {hasRealPhotos(room) ? (
-          <img className="room-card-photo" src={firstRealPhoto(room)} alt={room.hostel} />
+          <img className="room-card-photo" src={firstRealPhoto(room)} alt={room.hostel} loading="lazy" />
         ) : (
           <div className="room-card-photo room-card-photo--illustration">
             <Illustration />

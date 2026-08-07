@@ -1,13 +1,13 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
 import { Card, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
-import { Footprints, Route, BedDouble, CalendarDays } from 'lucide-react';
+import { Footprints, Route, BedDouble, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import './browse.css';
 
-const hasRealPhotos = (room) =>
-  Array.isArray(room.photos) && room.photos.some((p) => typeof p === 'string' && p && !p.includes('placehold.co'));
+const realPhotos = (room) =>
+  Array.isArray(room.photos) ? room.photos.filter((p) => typeof p === 'string' && p && !p.includes('placehold.co')) : [];
 
 const bedsCopy = (room) => {
   if (room.beds_left <= 0) return 'Full';
@@ -27,6 +27,12 @@ export function RoomDetailScreen() {
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [active, setActive] = useState(0);
+  const touchX = useRef(null);
+
+  useEffect(() => {
+    setActive(0);
+  }, [id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,11 +53,25 @@ export function RoomDetailScreen() {
     };
   }, [id]);
 
+  const photos = realPhotos(room);
+  const prev = () => setActive((a) => (a - 1 + photos.length) % photos.length);
+  const next = () => setActive((a) => (a + 1) % photos.length);
+  const onTouchStart = (e) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e) => {
+    if (touchX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 40) return;
+    if (dx > 0) prev();
+    else next();
+  };
+
   if (loading) {
     return (
       <div className="room-detail center measure-lg">
-        <Skeleton className="detail-photo" />
-        <Skeleton className="detail-photo" />
+        <Skeleton className="detail-stage" />
       </div>
     );
   }
@@ -76,14 +96,56 @@ export function RoomDetailScreen() {
 
   return (
     <div className="room-detail center">
-      {hasRealPhotos(room) ? (
-        <div className="detail-gallery">
-          {room.photos
-            .filter((p) => typeof p === 'string' && p && !p.includes('placehold.co'))
-            .map((src) => (
-              <img key={src} className="detail-photo" src={src} alt={room.hostel} />
-            ))}
-        </div>
+      {photos.length > 0 ? (
+        <>
+          <div className="detail-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+            <img
+              className="detail-stage-img"
+              src={photos[active]}
+              alt={`${room.hostel} — photo ${active + 1}`}
+              loading={active === 0 ? 'eager' : 'lazy'}
+            />
+            {photos.length > 1 && (
+              <>
+                <span className="detail-counter" aria-live="polite">
+                  {active + 1} / {photos.length}
+                </span>
+                <button
+                  type="button"
+                  className="detail-stage-btn detail-stage-btn--prev"
+                  onClick={prev}
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type="button"
+                  className="detail-stage-btn detail-stage-btn--next"
+                  onClick={next}
+                  aria-label="Next photo"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </>
+            )}
+          </div>
+          {photos.length > 1 && (
+            <div className="detail-thumbs">
+              {photos.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  className={`detail-thumb${i === active ? ' detail-thumb--active' : ''}`}
+                  onClick={() => setActive(i)}
+                  aria-label={`Photo ${i + 1}`}
+                  aria-current={i === active ? 'true' : undefined}
+                >
+                  <img src={src} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+        </>
       ) : (
         <div className="detail-photo detail-photo--illustration">
           <Illustration />
