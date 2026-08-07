@@ -39,11 +39,15 @@ export function RoomCard({ room }) {
             <span className="room-price">{formatMoney(room.price)}</span>
             <span className="text-muted">per month</span>
             {room.type === 'shared' ? (
-              <Badge variant={room.beds_left <= 1 ? 'danger' : 'success'}>
-                {room.beds_left > 0 ? `${room.beds_left} of ${room.beds} beds left` : 'Full'}
-              </Badge>
+              room.beds_left <= 1 ? (
+                <Badge variant="warning">{room.beds_left > 0 ? 'Last bed' : 'Full'}</Badge>
+              ) : (
+                <span className="text-muted">
+                  {room.beds_left} of {room.beds} beds left
+                </span>
+              )
             ) : (
-              <Badge variant="primary">Single room</Badge>
+              <span className="text-muted">Single room</span>
             )}
           </div>
         </div>
