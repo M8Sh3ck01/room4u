@@ -53,7 +53,7 @@ export function RoomDetailScreen() {
     };
   }, [id]);
 
-  const photos = realPhotos(room);
+  const photos = room ? realPhotos(room) : [];
   const prev = () => setActive((a) => (a - 1 + photos.length) % photos.length);
   const next = () => setActive((a) => (a + 1) % photos.length);
   const onTouchStart = (e) => {
