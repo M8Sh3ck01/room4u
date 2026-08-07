@@ -10,8 +10,8 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 ## Tokens (quick map)
 
-- **Color**: `--brand-50…900` (lime) · `--neutral-0…950` (cream) · semantic roles (`--color-*`) with `on-*`, `*-soft` variants.
-- **Type**: `--font-sans` (Inter) / `--font-display` (Space Grotesk) · `--text-xs…display` · `--weight-*` · `--leading-*` · `--tracking-*`.
+- **Color**: `--teal-50…950` (deep teal, primary + banner) · `--ember-50…950` (warm sunset, banner accent + warning) · `--neutral-0…950` (cream) · semantic roles (`--color-*`) with `on-*`, `*-soft` variants.
+- **Type**: `--font-sans` (Inter) / `--font-display` (Fraunces) · `--text-xs…display` · `--weight-*` · `--leading-*` · `--tracking-*`.
 - **Space**: `--space-1…16` (4px grid).
 - **Shape**: `--radius-sm/md/lg/full` · `--shadow-sm/md/lg` · `--border-width/strong`.
 - **Control**: `--control-min-h[-sm/-lg]` (touch targets) · `--focus-ring` · `--measure[-lg]`.
@@ -20,6 +20,7 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 ## Rules
 
+- **Accent on dark**: `--color-banner-accent` (ember) is the only accent allowed on `--color-banner` / header / footer (logo "U", hero kicker) — deep teal would vanish on the teal banner.
 - **Ban**: raw hex/rgb colors and `px/rem/em` lengths anywhere in `client/src` except `design/tokens.css`. Enforced by `npm run check:design`.
 - **Allowlist** (documented exceptions): `0`, `100%`, `auto`, `transparent`, `currentColor`; layout-only values (`width: 100%`, `flex`, `overflow`, `position`); unitless numbers passed as props (e.g. `Skeleton` dimensions).
 - **Media queries**: `@media` lines may use literal `px` breakpoints (Lightning CSS can't resolve `var()` in media conditions). Values must match the `--bp-*` tokens (`640px`/`1024px`). Enforced by `check:design` skipping `@media` lines.

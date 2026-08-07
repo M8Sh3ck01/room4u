@@ -33,6 +33,6 @@ a {
 }
 
 :focus-visible {
-  outline: var(--border-strong) solid var(--color-primary);
+  outline: var(--border-strong) solid var(--color-primary-text);
   outline-offset: var(--border-strong);
 }

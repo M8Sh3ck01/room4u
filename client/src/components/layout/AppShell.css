@@ -29,7 +29,7 @@
 }
 
 .brand-name-accent {
-  color: var(--color-primary);
+  color: var(--color-banner-accent);
 }
 
 .app-main {
@@ -39,7 +39,7 @@
 }
 
 .app-footer {
-  background: var(--color-ink);
+  background: var(--color-banner);
   color: var(--neutral-50);
 }
 
@@ -58,7 +58,7 @@
 }
 
 .app-footer-brand-accent {
-  color: var(--color-primary);
+  color: var(--color-banner-accent);
 }
 
 .app-footer-about {
@@ -98,7 +98,7 @@
 }
 
 .app-header .btn--ghost:hover:not(:disabled) {
-  background: var(--brand-900);
+  background: var(--teal-900);
   border-color: var(--neutral-300);
 }
 
