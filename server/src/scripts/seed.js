@@ -2,9 +2,9 @@ require('module-alias/register');
 
 const mongoose = require('mongoose');
 
-const Area = require('@modules/directories/area.model');
-const Hostel = require('@modules/directories/hostel.model');
-const Landlord = require('@modules/directories/landlord.model');
+const Area = require('@modules/rooms/area.model');
+const Hostel = require('@modules/rooms/hostel.model');
+const Landlord = require('@modules/rooms/landlord.model');
 const Room = require('@modules/rooms/room.model');
 
 const useTest = process.argv.includes('--test');

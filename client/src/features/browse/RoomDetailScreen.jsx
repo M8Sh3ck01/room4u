@@ -2,9 +2,11 @@
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
+import { showArea } from '../../lib/area';
 import { Card, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
 import { Footprints, Route, BedDouble, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { RoomMap } from './RoomMap';
+import { ClaimBar } from '../booking/ClaimBar';
 import './browse.css';
 
 const realPhotos = (room) =>
@@ -154,7 +156,8 @@ export function RoomDetailScreen() {
       )}
 
       <p className="detail-kicker text-muted">
-        {room.type === 'shared' ? 'Shared room' : 'Single room'} · {room.area}
+        {room.type === 'shared' ? 'Shared room' : 'Single room'}
+        {showArea(room.hostel, room.area) ? ` · ${room.area}` : ''}
       </p>
       <h1 className="detail-title">{room.hostel}</h1>
 
@@ -162,6 +165,8 @@ export function RoomDetailScreen() {
         {formatMoney(room.price)}{' '}
         <span className="text-muted">per month</span>
       </p>
+
+      <ClaimBar room={room} />
 
       <div className="detail-facts">
         <div className="detail-fact">
@@ -202,7 +207,7 @@ export function RoomDetailScreen() {
       <RoomMap key={room.id} lat={room.lat} lng={room.lng} />
 
       {room.directions_url && (
-        <Button as="a" href={room.directions_url} target="_blank" rel="noreferrer" fullWidth>
+        <Button as="a" href={room.directions_url} target="_blank" rel="noreferrer" variant="ghost" fullWidth>
           Open in Google Maps
         </Button>
       )}

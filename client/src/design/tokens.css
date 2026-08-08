@@ -166,9 +166,9 @@
   --border-strong: 2px;
   --border-ghost: 1.5px solid var(--color-slate);
 
-  --control-min-h: 44px;
-  --control-min-h-sm: 36px;
-  --control-min-h-lg: 48px;
+  --control-min-h: 52px;
+  --control-min-h-sm: 44px;
+  --control-min-h-lg: 60px;
   --focus-ring: 3px;
 
   --measure: 420px;
@@ -178,6 +178,7 @@
   --bp-md: 768px;
   --bp-lg: 1024px;
 
+  --icon-xs: 12px;
   --icon-sm: 18px;
   --icon-md: 24px;
   --icon-lg: 28px;

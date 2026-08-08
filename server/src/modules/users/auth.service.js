@@ -35,6 +35,10 @@ async function verifyGoogleIdToken(idToken) {
   return payload;
 }
 
+async function getUserById(id) {
+  return User.findById(id);
+}
+
 async function findOrCreateUser(payload) {
   const is_operator = config.operatorEmails.includes(payload.email);
 
@@ -80,4 +84,11 @@ async function devSignIn(email, name) {
   return { token: issueSessionToken(user), user: serializeUser(user) };
 }
 
-module.exports = { verifyGoogleIdToken, findOrCreateUser, issueSessionToken, signInWithGoogle, devSignIn };
+module.exports = {
+  verifyGoogleIdToken,
+  findOrCreateUser,
+  getUserById,
+  issueSessionToken,
+  signInWithGoogle,
+  devSignIn,
+};

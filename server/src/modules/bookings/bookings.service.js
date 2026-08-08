@@ -6,7 +6,11 @@ const { getClaimableRoom } = require('@modules/rooms/room.service');
 const { initiate } = require('@shared/services/paychanguService');
 const Booking = require('./booking.model');
 const IdempotencyKey = require('./idempotencykey.model');
+const Payment = require('./payment.model');
+const FollowUp = require('./followup.model');
 const { assertCanTransition } = require('./booking.model');
+
+const FOLLOW_UP_DAYS = 3;
 
 const bookingPopulate = [
   { path: 'room_id', populate: { path: 'hostel_id', populate: { path: 'area_id', model: 'Area' } } },
@@ -24,7 +28,6 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
 
   const room = await getClaimableRoom(roomId);
   if (!room) throw appError(404, 'ROOM_NOT_FOUND', 'Room not found');
-  if (room.beds_left < 1) throw appError(409, 'NO_BEDS', 'No beds left on this room');
 
   const active = await Booking.findOne({
     room_id: room._id,
@@ -32,8 +35,15 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
     status: 'requested',
   });
   if (active) {
+    const idem = await IdempotencyKey.findOne({ booking_id: active._id, user_id: userId });
+    if (idem) {
+      await active.populate(bookingPopulate);
+      return { booking: active, pay_amount: config.amounts.tenantFee, payment_link: idem.payment_link };
+    }
     throw appError(409, 'CONFLICT', 'You already have an active claim on this room');
   }
+
+  if (room.beds_left < 1) throw appError(409, 'NO_BEDS', 'No beds left on this room');
 
   let booking;
   try {
@@ -95,4 +105,65 @@ async function cancelBooking({ bookingId, user }) {
   return booking;
 }
 
-module.exports = { claimRoom, getBookingById, getMyBookings, cancelBooking };
+async function markPaid({ booking, moveInDate, paidAt = new Date() }) {
+  if (booking.status !== 'requested') return null;
+  return Booking.findOneAndUpdate(
+    { _id: booking._id, status: 'requested' },
+    { $set: { status: 'paid', paid_at: paidAt, move_in_date: moveInDate } },
+    { returnDocument: 'after' }
+  );
+}
+
+async function completePayment({ booking, chargeId, moveInDate, paidAt = new Date() }) {
+  const claimed = await markPaid({ booking, moveInDate, paidAt });
+  if (!claimed) return null;
+
+  await Payment.create([
+    {
+      booking_id: claimed._id,
+      room_id: claimed.room_id,
+      type: 'tenant_payment',
+      amount: config.amounts.tenantFee,
+      method: 'gateway',
+      reference: chargeId,
+      charge_id: chargeId,
+    },
+    {
+      booking_id: claimed._id,
+      room_id: claimed.room_id,
+      type: 'gateway_fee',
+      amount: -config.amounts.gatewayFee,
+      method: 'gateway',
+      reference: chargeId,
+      charge_id: chargeId,
+    },
+  ]);
+
+  const dueDate = new Date(moveInDate.getTime() + FOLLOW_UP_DAYS * 24 * 60 * 60 * 1000);
+  await FollowUp.create({ booking_id: claimed._id, due_date: dueDate });
+
+  return claimed;
+}
+
+async function cancelRequestsForRoom({ roomId, exceptChargeId, at = new Date() }) {
+  await Booking.updateMany(
+    { room_id: roomId, status: 'requested', charge_id: { $ne: exceptChargeId } },
+    { $set: { status: 'cancelled', cancelled_at: at } }
+  );
+}
+
+async function findByChargeId(chargeId) {
+  return Booking.findOne({ charge_id: chargeId });
+}
+
+module.exports = {
+  claimRoom,
+  getBookingById,
+  getMyBookings,
+  cancelBooking,
+  markPaid,
+  completePayment,
+  cancelRequestsForRoom,
+  findByChargeId,
+  FOLLOW_UP_DAYS,
+};

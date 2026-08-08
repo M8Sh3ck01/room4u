@@ -89,7 +89,7 @@ export function BrowseScreen() {
         <div className="hero-banner-inner">
           <div className="hero-message">
             <div className="hero-copy">
-              <p className="hero-kicker">Vetted student rooms · Mzuzu University</p>
+              
               <h1>Discover your room around Mzuzu University</h1>
               <div className="hero-chips" aria-label="What you get on every room">
                 <Badge variant="primary">

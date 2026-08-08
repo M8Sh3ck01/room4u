@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const Room = require('./room.model');
-const Hostel = require('@modules/directories/hostel.model');
+const RoomEvent = require('./roomevent.model');
+const Hostel = require('./hostel.model');
 const { distanceFromCampus, walkMinutes, directionsUrl } = require('@shared/services/distance');
 
 const populate = [{ path: 'hostel_id', populate: { path: 'area_id', model: 'Area' } }];
@@ -106,4 +107,44 @@ async function getClaimableRoom(roomId) {
   return room;
 }
 
-module.exports = { listPublicRooms, getPublicRoom, getClaimableRoom, serializeRoom };
+async function consumeBed({ roomId, chargeId, userId, paidAt = new Date() }) {
+  if (!mongoose.Types.ObjectId.isValid(roomId) || !chargeId) return null;
+
+  const room = await Room.findOneAndUpdate(
+    {
+      _id: roomId,
+      rented: false,
+      beds_left: { $gte: 1 },
+      'sold.charge_id': { $ne: chargeId },
+    },
+    {
+      $inc: { beds_left: -1 },
+      $push: { sold: { user_id: userId, charge_id: chargeId, paid_at: paidAt } },
+    },
+    { returnDocument: 'after' }
+  );
+
+  if (!room) return null;
+
+  let justRented = false;
+  if (room.beds_left === 0) {
+    const flipped = await Room.updateOne(
+      { _id: room._id, beds_left: 0, rented: false },
+      { $set: { rented: true, rented_at: paidAt, status: 'rented' } }
+    );
+    justRented = flipped.matchedCount === 1;
+    if (justRented) {
+      await RoomEvent.create({
+        room_id: room._id,
+        from_status: 'stock',
+        to_status: 'rented',
+        actor_id: userId,
+        note: `Last bed paid — charge ${chargeId}`,
+      });
+    }
+  }
+
+  return { room, justRented };
+}
+
+module.exports = { listPublicRooms, getPublicRoom, getClaimableRoom, consumeBed, serializeRoom };

@@ -2,4 +2,8 @@ node_modules/
 dist/
 .env
 *.log
+*.err
 .DS_Store
+server/coverage/
+/hostel *.jpg
+/hostel *.jpeg

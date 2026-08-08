@@ -7,6 +7,17 @@
 .hero-banner {
   position: relative;
   background-color: var(--color-banner);
+  background-image: radial-gradient(
+      circle at 85% 15%,
+      var(--color-mint-chip) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      115deg,
+      var(--color-carbon-black) 0%,
+      var(--color-graphite) 55%,
+      var(--color-slate) 100%
+    );
   color: var(--color-on-banner);
   border-radius: 0;
   width: 100vw;
@@ -682,36 +693,26 @@
   background: var(--color-surface-card);
 }
 
-.room-map-toggle {
+.room-map-label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   width: 100%;
-  min-height: var(--control-min-h-lg);
-  padding: var(--space-2) var(--space-4);
-  background: none;
-  border: 0;
-  font: inherit;
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--color-primary-text);
-  cursor: pointer;
-  transition: background var(--dur-fast) var(--ease);
-}
-
-.room-map-toggle:hover {
-  background: var(--color-surface-muted);
-}
-
-.room-map-toggle:focus-visible {
-  outline: var(--focus-ring) solid var(--color-focus);
-  outline-offset: calc(-1 * var(--border-strong));
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-muted);
+  border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .room-map-toggle-icon {
-  width: var(--icon-md);
-  height: var(--icon-md);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   color: var(--color-accent-yellow);
 }
 

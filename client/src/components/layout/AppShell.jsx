@@ -6,11 +6,14 @@ import './AppShell.css';
 export function AppShell() {
   const { user, signOut } = useAuth();
   const { pathname } = useLocation();
+  const showHeader = pathname !== '/login';
   const showFooter = pathname === '/';
+  const onReserve = /\/rooms\/[^/]+\/reserve$/.test(pathname);
 
   return (
     <div className="app">
-      <header className="app-header">
+      {showHeader && (
+        <header className="app-header">
         <Link to="/" className="brand" aria-label="Room4U home">
           <span className="brand-name">
             Room<span className="brand-name-num">4</span>
@@ -28,17 +31,16 @@ export function AppShell() {
                 )}
                 <span>{user.name || user.email}</span>
               </Link>
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                Sign out
-              </Button>
+              
             </>
-          ) : (
+          ) : !onReserve ? (
             <Link to="/login">
               <Button size="sm">Sign in</Button>
             </Link>
-          )}
+          ) : null}
         </div>
-      </header>
+        </header>
+      )}
       <main className="app-main">
         <Outlet />
       </main>

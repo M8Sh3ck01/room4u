@@ -52,8 +52,7 @@ room4u/
 │   │   │   ├── middleware/  # auth.js, requireOperator.js, validate.js, rateLimit.js, errorHandler.js, asyncCatch.js
 │   │   │   └── utils/       # apiResponse.js (successResponse), idempotency key guard, TTL key, haversine, generateChargeRef
 │   │   ├── modules/         # one folder per domain (§3)
-│   │   │   ├── users/  ├── directories/  ├── rooms/
-│   │   │   ├── bookings/  ├── payments/  └── followups/
+│   │   │   ├── users/  ├── rooms/  └── bookings/
 │   │   └── shared/
 │   │       ├── services/    # paychanguService.js, r2Service.js, distance.js, exportService.js
 │   │       └── jobs/        # reconcileSweep.js, nightlyExport.js
@@ -103,7 +102,7 @@ modules/rooms/
 | **R4** | **Modules talk via service functions only** — never `require` another module's model. | `payments` can't reach into `rooms`'s collection behind its back; coupling stays explicit and auditable. |
 | **R5** | **State machines are the single source of truth** for `lead→stock→rented`, `requested→paid→cancelled|refunded`, `due→done|skipped`. | First-to-pay / last-bed business rules live in one pure, testable place. |
 
-**Relaxations (allowed, not ceremony):** a route that is purely read CRUD (e.g. `GET /api/areas`, directories autocomplete) may skip the service function and call the model directly — R2 binds where there is real logic or a state change. Simple modules keep R1/R5 (don't touch another module's model, don't inline transitions) but don't need a service file at all.
+**Relaxations (allowed, not ceremony):** a route that is purely read CRUD (e.g. `GET /api/areas`) may skip the service function and call the model directly — R2 binds where there is real logic or a state change. Simple modules keep R1/R5 (don't touch another module's model, don't inline transitions) but don't need a service file at all.
 
 **Controllers are folded into routes.** Express handlers *are* the controllers — the reference repo's `controller.js` class (read `req` → call service → respond) is dropped as ceremony. Its two reusable idioms survive in `core/`: **`asyncCatch`** (wraps handlers so thrown errors auto-forward to the error handler) and **`successResponse`** (standard success envelope, mirroring the error envelope).
 
@@ -112,21 +111,20 @@ modules/rooms/
 - **Path aliases** via `module-alias`: `@core/...`, `@modules/...`, `@shared/...`.
 - Why not class+DI (the "gorilla in the Node ecosystem" lesson): `class` is ES6 (2015) sugar over 1995 prototypes and exists mainly to support constructor injection. We dropped DI → we drop classes. `this` binds at call-site, which is why class-based code keeps needing arrow-function class properties as a workaround; plain functions sidestep the whole thing. Reach for a DI container only if the app ever passes ~20–30 services.
 
-**Server modules — 6 real modules.** A module must pass the **module test** (community consensus: "name it in one sentence", "own a specific business capability", "control its data evolution exclusively"): it **owns at least one entity** (the only thing that writes that collection) and **owns the rules** over it (state machine, invariants, atomic ops). If a folder owns no data, it is not a module — it's a route grouping.
+**Server modules — 3 real modules + shared.** A module must pass the **module test** (community consensus: "name it in one sentence", "own a specific business capability", "control its data evolution exclusively"): it **owns at least one entity** (the only thing that writes that collection) and **owns the rules** over it (state machine, invariants, atomic ops). If a folder owns no data, it is not a module — it's a route grouping.
 
 | Module | Owns | Notes |
 |---|---|---|
 | `users` | User model, auth (Google token → session JWT), `me`, phone gate | `requireOperator` middleware checks `is_operator` (whitelist applied at sign-in) |
-| `directories` | Area, Hostel, Landlord models | autocomplete routes, find-or-create on lead submission |
-| `rooms` | Room model + Room state machine | **includes lead intake** (`createLead`) — a lead IS a Room with status `lead` (one aggregate); spotter flow, listing, verify, deposit-to-stock |
-| `bookings` | Booking model + state machine | claims (with idempotency), status, cancel, refund |
-| `payments` | Payment model | tenant/gateway/deposit/reporter/refund records |
-| `followups` | FollowUp model + state machine | auto-create on paid, operator log |
+| `rooms` | Room model + state machine; **Area, Hostel, Landlord models** | reference data folded in from the former `directories` module; **includes lead intake** (`createLead`) — a lead IS a Room with status `lead` (one aggregate); spotter flow, listing, verify, deposit-to-stock |
+| `bookings` | Booking model + state machine; **Payment, FollowUp models** | ledger + follow-up folded in from the former `payments`/`followups` modules; claims (with idempotency), status, cancel, refund, webhook-paid flow |
 | `shared/services` | PayChangu, R2, distance, export | cross-cutting, not domain |
 | `shared/jobs` | reconcile sweep, nightly export | cron (node-cron) |
 
+**Deferred extraction (YAGNI, not accident):** `Area`/`Hostel`/`Landlord` currently live in `rooms` because their only consumers are room reads (area filter, populate). Re-extract a `directories` module (own models, autocomplete routes, find-or-create on lead submission) when operator CRUD for hostels/landlords or lead intake lands — the folder shape and the seam (models private, `directoriesService` as contract) are exactly as documented here.
+
 **No `admin` and no `leads` module** (both fail the module test — they own no entity):
-- A **lead is a Room** in the `lead` state → lead intake lives in `rooms` (`roomsService.createLead`), which also does the find-or-create on Hostel/Landlord via `directoriesService`. One aggregate, one writer.
+- A **lead is a Room** in the `lead` state → lead intake lives in `rooms` (`roomsService.createLead`), which also does the find-or-create on Hostel/Landlord (models live in `rooms` today). One aggregate, one writer.
 - **`/api/admin/*` is a route grouping, not a folder.** Operator endpoints live in the module that owns the data (`rooms` owns verify/deposit, `bookings` owns refund/cancel, `payments` owns manual records), all guarded by `requireOperator`. Dashboard stats = a read-aggregation helper in `shared/services/statsService.js` that composes the six modules' service functions. Admin panels are a presentation/console concern, not a domain ("management is not a purpose" — name by capability, never a vague umbrella).
 
 ---
@@ -135,14 +133,14 @@ modules/rooms/
 
 | Mount path | Router |
 |---|---|
-| `/api/health`, `/api/areas` | `core` (health) + `modules/directories` (areas) |
+| `/api/health`, `/api/areas` | `core` (health) + `modules/rooms` (areas) |
 | `/api/rooms` (public listing + detail), `/api/leads` | `modules/rooms` |
 | `/api/auth`, `/api/me` | `modules/users` |
 | `/api/rooms/:id/claims`, `/api/bookings` | `modules/bookings` |
 | `/api/uploads` | small `modules/uploads` router (thin wrapper over `shared/services/r2Service`) |
 | `/api/webhooks/paychangu` | `shared/services/paychangu` (HMAC, no JWT) |
 | `/api/admin/*` | **route grouping, not a module** — each operator endpoint lives in its owning module (`rooms` verify/deposit, `bookings` refund, `payments` manual records), all behind `requireOperator`; stats via `shared/services/statsService` |
-| `/api/directories/*` | `modules/directories` (autocomplete public or operator-guarded as designed) |
+| `/api/directories/*` (future) | re-extract `modules/directories` from `rooms` when operator CRUD / lead intake lands (§3 deferred extraction) |
 | `/room/:id` | WhatsApp-preview crawler page (public) |
 
 Client routing (React): `/#/` home listing, `/#/room/:id`, `/#/auth`, `/#/me`, `/#/my-bookings`, `/#/my-leads`, `/#/admin/*` (stats, leads, rooms, bookings, followups, directories). Client and server share the route names from `wireframes.md`.

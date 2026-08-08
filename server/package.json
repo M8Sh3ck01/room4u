@@ -10,6 +10,7 @@
     "db": "node src/scripts/start-mongod.js",
     "seed": "node src/scripts/seed.js",
     "seed:test": "node src/scripts/seed.js --test",
+    "pretest": "node scripts/architecture-check.js",
     "test": "jest --runInBand"
   },
   "_moduleAliases": {

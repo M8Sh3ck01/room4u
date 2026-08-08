@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const config = require('@config');
 const { appError } = require('@core/errors');
-const User = require('@modules/users/user.model');
+const { getUserById } = require('@modules/users/auth.service');
 
 const auth = async (req, res, next) => {
   const header = req.headers.authorization || '';
@@ -19,7 +19,7 @@ const auth = async (req, res, next) => {
 
   let user;
   try {
-    user = await User.findById(payload.sub);
+    user = await getUserById(payload.sub);
   } catch {
     return next(appError(401, 'UNAUTHORIZED', 'Invalid session'));
   }

@@ -4,9 +4,9 @@ const request = require('supertest');
 const app = require('../src/app');
 const { connectTestDb, clearDb, disconnectDb } = require('./helpers/db');
 
-const Area = require('../src/modules/directories/area.model');
-const Hostel = require('../src/modules/directories/hostel.model');
-const Landlord = require('../src/modules/directories/landlord.model');
+const Area = require('../src/modules/rooms/area.model');
+const Hostel = require('../src/modules/rooms/hostel.model');
+const Landlord = require('../src/modules/rooms/landlord.model');
 const Room = require('../src/modules/rooms/room.model');
 
 const stockRoom = (overrides = {}) => ({

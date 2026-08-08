@@ -23,6 +23,12 @@ const config = {
     tenantFee: 20000,
     gatewayFee: 360,
   },
+  paychangu: {
+    enabled: process.env.PAYCHANGU_ENABLED === 'true',
+    apiUrl: process.env.PAYCHANGU_API_URL || 'https://api.paychangu.com',
+    secret: process.env.PAYCHANGU_SECRET || '',
+    webhookSecret: process.env.PAYCHANGU_WEBHOOK_SECRET || '',
+  },
 };
 
 module.exports = config;

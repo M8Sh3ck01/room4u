@@ -48,6 +48,17 @@
   background: var(--color-surface-muted);
 }
 
+.btn--ghost-danger {
+  background: transparent;
+  color: var(--color-danger);
+  border: var(--border-width) solid var(--color-danger);
+  border-radius: var(--radius-sm);
+}
+
+.btn--ghost-danger:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+
 .btn--danger {
   background: var(--color-danger);
   color: var(--color-on-danger);
@@ -71,8 +82,8 @@
 
 .card {
   background: var(--color-surface-card);
-  border: 0;
-  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
   padding: var(--space-6);
 }
 
@@ -210,18 +221,37 @@
 }
 
 .spinner {
-  display: inline-block;
-  width: var(--icon-md);
-  height: var(--icon-md);
-  border: var(--border-strong) solid currentColor;
-  border-right-color: transparent;
-  border-radius: var(--radius-full);
-  animation: spin var(--dur-spin) linear infinite;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.spinner-dot {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  border-radius: var(--radius-full);
+  background: currentColor;
+  animation: dot-pulse var(--dur-pulse) var(--ease) infinite;
+}
+
+.spinner-dot:nth-child(2) {
+  animation-delay: var(--dur-slow);
+}
+
+.spinner-dot:nth-child(3) {
+  animation-delay: calc(var(--dur-slow) + var(--dur-slow));
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 

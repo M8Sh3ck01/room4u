@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { GoogleButton } from './GoogleButton';
 import { Card, Field, Input, Button } from '../../design/primitives';
+import './auth.css';
 
 const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
@@ -42,7 +43,8 @@ export function LoginScreen() {
   };
 
   return (
-    <Card className="center measure">
+    <div className="auth-center">
+      <Card className="center measure">
       <div className="stack">
         <h1>Sign in</h1>
         <p className="text-muted">
@@ -80,7 +82,8 @@ export function LoginScreen() {
         )}
 
         {googleConfigured && error && <p className="text-error">{error}</p>}
-      </div>
-    </Card>
+        </div>
+      </Card>
+    </div>
   );
 }

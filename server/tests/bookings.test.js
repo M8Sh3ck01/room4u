@@ -8,9 +8,9 @@ const mongoose = require('mongoose');
 const app = require('../src/app');
 const { connectTestDb, clearDb, disconnectDb } = require('./helpers/db');
 
-const Area = require('../src/modules/directories/area.model');
-const Hostel = require('../src/modules/directories/hostel.model');
-const Landlord = require('../src/modules/directories/landlord.model');
+const Area = require('../src/modules/rooms/area.model');
+const Hostel = require('../src/modules/rooms/hostel.model');
+const Landlord = require('../src/modules/rooms/landlord.model');
 const Room = require('../src/modules/rooms/room.model');
 const Booking = require('../src/modules/bookings/booking.model');
 
@@ -167,14 +167,15 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     expect(await Booking.countDocuments({})).toBe(1);
   });
 
-  it('allows only one active claim per room per user', async () => {
+  it('resumes an existing active claim on the same room instead of erroring', async () => {
     const token = await loginWithPhone('oneclaim@gmail.com');
     const first = await claim(token, room.id, 'key-one-a');
     expect(first.status).toBe(201);
 
     const second = await claim(token, room.id, 'key-one-b');
-    expect(second.status).toBe(409);
-    expect(second.body.error.code).toBe('CONFLICT');
+    expect(second.status).toBe(201);
+    expect(second.body.data.booking.id).toBe(first.body.data.booking.id);
+    expect(second.body.data.payment_link).toBe(first.body.data.payment_link);
     expect(await Booking.countDocuments({})).toBe(1);
   });
 
