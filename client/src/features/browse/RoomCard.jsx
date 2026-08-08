@@ -61,6 +61,7 @@ export function RoomCard({ room }) {
           aria-label="Walking directions to this room"
         >
           <MapPin className="room-card-dir-icon" />
+          <span>Directions</span>
         </a>
       )}
     </article>

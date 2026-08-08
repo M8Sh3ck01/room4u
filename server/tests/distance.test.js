@@ -23,7 +23,7 @@ describe('shared/services/distance', () => {
   it('directionsUrl deep-links walking directions from campus to the hostel', () => {
     const url = directionsUrl({ lat: -11.439266, lng: 34.0257 });
     expect(url).toBe(
-      'https://maps.google.com/?dirflg=w&saddr=-11.4584,34.0257&daddr=-11.439266,34.0257'
+      'https://www.google.com/maps/dir/?api=1&origin=-11.4584,34.0257&destination=-11.439266,34.0257&travelmode=walking'
     );
   });
 

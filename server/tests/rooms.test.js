@@ -164,7 +164,9 @@ describe('rooms module — browse listings', () => {
       walk_min: 32,
       landlord_contact: null,
     });
-    expect(res.body.data.room.directions_url).toContain('https://maps.google.com/?dirflg=w&');
+    expect(res.body.data.room.directions_url).toContain('https://www.google.com/maps/dir/?api=1&');
+    expect(typeof res.body.data.room.lat).toBe('number');
+    expect(typeof res.body.data.room.lng).toBe('number');
   });
 
   it('detail of a lead room is 404 ROOM_NOT_FOUND', async () => {

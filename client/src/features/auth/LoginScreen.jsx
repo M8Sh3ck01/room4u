@@ -48,7 +48,7 @@ export function LoginScreen() {
         <p className="text-muted">
           {googleConfigured
             ? 'Sign in with Google to find and claim your room.'
-            : 'Google sign-in is not configured yet — use the dev sign-in below.'}
+            : 'Google sign-in is not configured yet use the dev sign-in below.'}
         </p>
 
         <GoogleButton onCredential={handleGoogle} />

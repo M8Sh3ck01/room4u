@@ -4,6 +4,7 @@ import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
 import { Card, Button, Skeleton, EmptyState, Illustration } from '../../design/primitives';
 import { Footprints, Route, BedDouble, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RoomMap } from './RoomMap';
 import './browse.css';
 
 const realPhotos = (room) =>
@@ -116,7 +117,7 @@ export function RoomDetailScreen() {
                   onClick={prev}
                   aria-label="Previous photo"
                 >
-                  <ChevronLeft size={20} />
+                  <ChevronLeft className="detail-stage-btn-icon" />
                 </button>
                 <button
                   type="button"
@@ -124,7 +125,7 @@ export function RoomDetailScreen() {
                   onClick={next}
                   aria-label="Next photo"
                 >
-                  <ChevronRight size={20} />
+                  <ChevronRight className="detail-stage-btn-icon" />
                 </button>
               </>
             )}
@@ -198,9 +199,11 @@ export function RoomDetailScreen() {
         </div>
       </div>
 
+      <RoomMap key={room.id} lat={room.lat} lng={room.lng} />
+
       {room.directions_url && (
         <Button as="a" href={room.directions_url} target="_blank" rel="noreferrer" fullWidth>
-          Open walking directions
+          Open in Google Maps
         </Button>
       )}
     </div>

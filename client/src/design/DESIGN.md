@@ -10,18 +10,20 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 ## Tokens (quick map)
 
-- **Color**: `--teal-50…950` (deep teal, primary + banner) · `--ember-50…950` (warm sunset, banner accent + warning) · `--neutral-0…950` (cream) · semantic roles (`--color-*`) with `on-*`, `*-soft` variants.
+- **Color**: monochrome drafting table + one electric teal. `--color-glide-teal #71eaee` (action fills only) · `--color-teal-mist #e4feff` (soft washes) · neutrals `--color-ink-black → --color-paper-white` (black text, charcoal secondary, stone borders, bone surfaces) · semantic roles (`--color-*`) with `on-*`, `*-soft` variants. Ember survives only as the `--color-warning` family (urgent "Last bed"/"Full" badges).
 - **Type**: `--font-sans` (Inter) / `--font-display` (Fraunces) · `--text-xs…display` · `--weight-*` · `--leading-*` · `--tracking-*`.
 - **Space**: `--space-1…16` (4px grid).
-- **Shape**: `--radius-sm/md/lg/full` · `--shadow-sm/md/lg` · `--border-width/strong`.
+- **Shape**: `--radius-sm/md/lg` all `6px` · inset highlight shadows (`--shadow-sm/md/lg`) · `--border-width/strong`.
 - **Control**: `--control-min-h[-sm/-lg]` (touch targets) · `--focus-ring` · `--measure[-lg]`.
 - **Motion**: `--dur-fast/med/slow/spin/pulse` + `--ease`.
 - **Layout**: `--bp-sm/md/lg` · `--icon-sm/md/lg` · `--z-*`.
 
 ## Rules
 
-- **Accent on dark**: `--color-banner-accent` (ember) is the only accent allowed on `--color-banner` / footer — with one exception, the "Room4U" wordmark, which is three-color by design.
-- **Wordmark variants**: on dark (`--color-banner`, footer) it is `on-banner` (Room) + `--teal-300` (4) + `--color-banner-accent` (U). On light (header `--color-surface`) it is `text-primary` (Room) + `--teal-600` (4) + `--ember-600` (U).
+- **One accent**: `--color-glide-teal` is the single chromatic accent, reserved for primary action fills (buttons, avatar, active CTA) and the wordmark "4". Never teal on teal, never teal as text on white (contrast fails — use `--color-ink` for focus/active indicators instead). Ember is not an accent; it is the warning family only.
+- **One dark moment**: `--color-banner` (ink black) appears only on the hero. The footer is light (bone) with a hairline top border. No other dark surfaces.
+- **Wordmark**: three-part mark — Room + `4` (teal spark) + `U`. On light surfaces `4` is `--teal-600`; Room and `U` inherit `--color-text-primary`. There is no dark wordmark variant anymore.
+- **Borders over shadows**: structure comes from `1px` ink/stone borders; shadows are inset white highlights only (`--shadow-*`), never drop shadows.
 - **Ban**: raw hex/rgb colors and `px/rem/em` lengths anywhere in `client/src` except `design/tokens.css`. Enforced by `npm run check:design`.
 - **Allowlist** (documented exceptions): `0`, `100%`, `auto`, `transparent`, `currentColor`; layout-only values (`width: 100%`, `flex`, `overflow`, `position`); unitless numbers passed as props (e.g. `Skeleton` dimensions).
 - **Media queries**: `@media` lines may use literal `px` breakpoints (Lightning CSS can't resolve `var()` in media conditions). Values must match the `--bp-*` tokens (`640px`/`1024px`). Enforced by `check:design` skipping `@media` lines.

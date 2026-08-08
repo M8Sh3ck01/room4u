@@ -26,9 +26,9 @@ function distanceFromCampus(hostel) {
 
 function directionsUrl(hostel) {
   if (!hostel || typeof hostel.lat !== 'number' || typeof hostel.lng !== 'number') return null;
-  const saddr = `${config.campus.lat},${config.campus.lng}`;
-  const daddr = `${hostel.lat},${hostel.lng}`;
-  return `https://maps.google.com/?dirflg=w&saddr=${saddr}&daddr=${daddr}`;
+  const origin = `${config.campus.lat},${config.campus.lng}`;
+  const destination = `${hostel.lat},${hostel.lng}`;
+  return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=walking`;
 }
 
 module.exports = { haversineKm, walkMinutes, distanceFromCampus, directionsUrl };

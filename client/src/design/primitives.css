@@ -9,10 +9,10 @@
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
   font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-medium);
   line-height: 1;
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 
 .btn:disabled {
@@ -40,7 +40,8 @@
 .btn--ghost {
   background: transparent;
   color: var(--color-text-primary);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-ghost);
+  border-radius: var(--radius-sm);
 }
 
 .btn--ghost:hover:not(:disabled) {
@@ -69,11 +70,10 @@
 }
 
 .card {
-  background: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface-card);
+  border: 0;
   border-radius: var(--radius-lg);
   padding: var(--space-6);
-  box-shadow: var(--shadow-sm);
 }
 
 .badge {
@@ -134,7 +134,7 @@
   font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--color-text-primary);
-  background: var(--color-surface);
+  background: var(--color-surface-card);
   transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
 }
 
@@ -149,7 +149,7 @@
 .input:focus,
 .select:focus {
   outline: none;
-  border-color: var(--color-primary);
+  border-color: var(--color-accent-yellow);
   box-shadow: 0 0 0 var(--focus-ring) var(--color-focus);
 }
 
@@ -293,5 +293,5 @@
 }
 
 .illustration-accent {
-  fill: var(--color-primary);
+  fill: var(--color-text-faint);
 }

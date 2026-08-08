@@ -27,6 +27,8 @@ function serializeRoom(room, { detail = false } = {}) {
     available_from: toDateString(room.available_from),
     dist_km: dist_km === null ? null : round1(dist_km),
     walk_min: dist_km === null ? null : walkMinutes(dist_km),
+    lat: hostel && typeof hostel.lat === 'number' ? hostel.lat : null,
+    lng: hostel && typeof hostel.lng === 'number' ? hostel.lng : null,
   };
 
   if (detail) {

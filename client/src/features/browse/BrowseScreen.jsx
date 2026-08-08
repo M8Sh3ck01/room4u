@@ -1,18 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { listRooms } from '../../services/rooms';
-import { Card, Select, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
-import { Footprints, BadgeCheck, Banknote, X } from 'lucide-react';
+import { Card, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
+import { Footprints, BadgeCheck, Banknote, X, ArrowDown } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from './RoomCard';
+import { FilterSelect } from './FilterSelect';
 import './browse.css';
 
-const EMPTY = { type: '', max_walk_min: '', max_price: '' };
+const PARAM_BY_KEY = { type: 'type', max_walk_min: 'walk', max_price: 'price' };
 
 export function BrowseScreen() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rooms, setRooms] = useState([]);
-  const [filters, setFilters] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const toolbarRef = useRef(null);
+
+  const filters = {
+    type: searchParams.get('type') ?? '',
+    max_walk_min: searchParams.get('walk') ?? '',
+    max_price: searchParams.get('price') ?? '',
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -31,17 +40,29 @@ export function BrowseScreen() {
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [filters.type, filters.max_walk_min, filters.max_price]);
 
-  const change = (key) => (e) => {
-    setFilters((prev) => ({ ...prev, [key]: e.target.value }));
+  const change = (key) => (value) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value) next.set(PARAM_BY_KEY[key], value);
+        else next.delete(PARAM_BY_KEY[key]);
+        return next;
+      },
+      { replace: true }
+    );
   };
 
-  const clear = (key) => {
-    setFilters((prev) => ({ ...prev, [key]: '' }));
+  const clear = (key) => change(key)('');
+
+  const clearAll = () => {
+    setSearchParams({}, { replace: true });
   };
 
-  const clearAll = () => setFilters(EMPTY);
+  const scrollToResults = () => {
+    toolbarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const activeFilters = [];
   if (filters.type) {
@@ -62,61 +83,82 @@ export function BrowseScreen() {
     ? `Nothing matches ${activeFilters.map((f) => f.label).join(', ')}. Try widening a filter or clear all.`
     : "We're setting up the first rooms near Mzuzu University. Check back soon.";
 
-  const loaded = !loading && !error;
-  const catalogEmpty = loaded && rooms.length === 0 && !hasFilters;
-  const showResultsBar = !catalogEmpty;
-
   return (
     <div className="browse">
       <section className="hero-banner">
         <div className="hero-banner-inner">
-          
-          <h1>Discover your room around Mzuzu University</h1>
-          <div className="hero-chips" aria-label="What you get on every room">
-            <Badge variant="primary">
-              <BadgeCheck className="chip-icon" /> Verified
-            </Badge>
-            <Badge variant="primary">
-              <Footprints className="chip-icon" /> Walkable
-            </Badge>
-            <Badge variant="primary">
-              <Banknote className="chip-icon" /> Affordable
-            </Badge>
+          <div className="hero-message">
+            <div className="hero-copy">
+              <p className="hero-kicker">Vetted student rooms · Mzuzu University</p>
+              <h1>Discover your room around Mzuzu University</h1>
+              <div className="hero-chips" aria-label="What you get on every room">
+                <Badge variant="primary">
+                  <BadgeCheck className="chip-icon" /> Verified
+                </Badge>
+                <Badge variant="primary">
+                  <Footprints className="chip-icon" /> Walkable
+                </Badge>
+                <Badge variant="primary">
+                  <Banknote className="chip-icon" /> Affordable
+                </Badge>
+              </div>
+
+              <button type="button" className="hero-cta" onClick={scrollToResults}>
+                Find a room
+                <ArrowDown className="hero-cta-icon" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {showResultsBar && (
-        <div className="quick-filters" role="group" aria-label="Filter rooms">
-          <Select className="quick-filter" id="f-type" value={filters.type} onChange={change('type')} aria-label="Room type">
-            <option value="">Type</option>
-            <option value="single">Single</option>
-            <option value="shared">Shared</option>
-          </Select>
+      <div className="results-toolbar" role="group" aria-label="Filter rooms" ref={toolbarRef}>
+        <FilterSelect
+          label="Type"
+          ariaLabel="Room type"
+          value={filters.type}
+          onChange={change('type')}
+          options={[
+            { value: '', label: 'Type' },
+            { value: 'single', label: 'Single' },
+            { value: 'shared', label: 'Shared' },
+          ]}
+        />
 
-          <Select className="quick-filter" id="f-walk" value={filters.max_walk_min} onChange={change('max_walk_min')} aria-label="Max walking time">
-            <option value="">Walk</option>
-            <option value="15">≤ 15 min</option>
-            <option value="30">≤ 30 min</option>
-            <option value="45">≤ 45 min</option>
-            <option value="60">≤ 60 min</option>
-          </Select>
+        <FilterSelect
+          label="Walk"
+          ariaLabel="Max walking time"
+          value={filters.max_walk_min}
+          onChange={change('max_walk_min')}
+          options={[
+            { value: '', label: 'Walk' },
+            { value: '15', label: '≤ 15 min' },
+            { value: '30', label: '≤ 30 min' },
+            { value: '45', label: '≤ 45 min' },
+            { value: '60', label: '≤ 60 min' },
+          ]}
+        />
 
-          <Select className="quick-filter" id="f-price" value={filters.max_price} onChange={change('max_price')} aria-label="Max price per month">
-            <option value="">Price</option>
-            <option value="10000">≤ MK10,000</option>
-            <option value="15000">≤ MK15,000</option>
-            <option value="20000">≤ MK20,000</option>
-            <option value="25000">≤ MK25,000</option>
-          </Select>
+        <FilterSelect
+          label="Price"
+          ariaLabel="Max price per month"
+          value={filters.max_price}
+          onChange={change('max_price')}
+          options={[
+            { value: '', label: 'Price' },
+            { value: '10000', label: '≤ MK10,000' },
+            { value: '15000', label: '≤ MK15,000' },
+            { value: '20000', label: '≤ MK20,000' },
+            { value: '25000', label: '≤ MK25,000' },
+          ]}
+        />
 
-          {activeFilters.length > 0 && (
-            <button type="button" className="filters-clear" onClick={clearAll}>
-              Clear all
-            </button>
-          )}
-        </div>
-      )}
+        {activeFilters.length > 0 && (
+          <button type="button" className="filters-clear" onClick={clearAll}>
+            Clear all
+          </button>
+        )}
+      </div>
 
       {activeFilters.length > 0 && (
         <div className="filter-chips">

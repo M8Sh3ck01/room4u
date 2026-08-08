@@ -1,15 +1,18 @@
 .app-header {
   position: sticky;
-  top: 0;
+  top: var(--space-3);
   z-index: var(--z-header);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
+  max-width: var(--bp-lg);
+  margin: var(--space-3) auto 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface-card);
   color: var(--color-text-primary);
-  border-bottom: var(--border-width) solid var(--color-border);
+  border: 0;
+  border-radius: var(--radius-pill);
 }
 
 .brand {
@@ -23,22 +26,24 @@
 
 .brand-name {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-regular);
+  text-transform: uppercase;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
   white-space: nowrap;
 }
 
 .brand-name-accent {
-  color: var(--ember-600);
+  color: var(--color-text-primary);
 }
 
 .brand-name-num {
-  color: var(--teal-600);
+  color: var(--color-accent-yellow);
 }
 
 .app-footer-brand-num {
-  color: var(--teal-300);
+  color: var(--color-banner-yellow);
 }
 
 .app-main {
@@ -48,36 +53,43 @@
 }
 
 .app-footer {
-  background: var(--color-banner);
-  color: var(--neutral-50);
+  background: var(--color-carbon-black);
+  color: var(--color-paper-white);
+  border-top: 0;
 }
 
 .app-footer-inner {
   max-width: var(--bp-lg);
   margin: 0 auto;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-12) var(--space-4);
 }
 
 .app-footer-brand {
   margin: 0 0 var(--space-2);
   font-family: var(--font-display);
   font-size: var(--text-display);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-regular);
+  text-transform: uppercase;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
 }
 
 .app-footer-brand-accent {
-  color: var(--color-banner-accent);
+  color: var(--color-paper-white);
 }
 
 .app-footer-about {
   margin: 0 0 var(--space-2);
-  color: var(--neutral-400);
+  color: var(--color-smoke);
 }
 
 .app-footer-line {
   margin: 0;
-  color: var(--neutral-400);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-smoke);
 }
 
 .app-footer-copy {
@@ -103,12 +115,12 @@
 .app-header .btn--ghost {
   background: transparent;
   color: var(--color-text-primary);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-ghost);
 }
 
 .app-header .btn--ghost:hover:not(:disabled) {
   background: var(--color-surface-muted);
-  border-color: var(--neutral-300);
+  border-color: var(--color-slate);
 }
 
 .header-avatar {
