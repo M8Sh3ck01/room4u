@@ -325,3 +325,13 @@
 .illustration-accent {
   fill: var(--color-text-faint);
 }
+
+@media (max-width: 480px) {
+  .btn.btn {
+    min-height: var(--control-min-h-sm);
+  }
+
+  .btn--lg.btn--lg.btn--lg {
+    min-height: var(--control-min-h);
+  }
+}

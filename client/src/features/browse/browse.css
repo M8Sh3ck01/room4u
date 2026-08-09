@@ -124,6 +124,10 @@
     min-height: var(--control-min-h-sm);
     padding: var(--space-2) var(--space-3);
   }
+
+  .browse .hero-cta {
+    min-height: var(--control-min-h-sm);
+  }
 }
 
 .chip-icon {
