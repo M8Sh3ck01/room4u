@@ -679,11 +679,12 @@
 
 .detail-title {
   font-size: var(--text-display);
+  line-height: var(--leading-display);
   margin: 0;
 }
 
 .detail-price {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   font-weight: var(--weight-bold);
   color: var(--color-primary-text);
   margin: 0;
