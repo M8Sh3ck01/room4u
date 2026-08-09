@@ -24,6 +24,7 @@ const BOOKING_FEE = 20000;
 const DEPOSIT = 10000;
 const AGENT_FEE = 10000;
 const POLL_MS = 4000;
+const CLAIM_WINDOW_MINUTES = 5;
 
 export function ReserveScreen() {
   const { id } = useParams();
@@ -45,6 +46,7 @@ export function ReserveScreen() {
   const [payWindowBlocked, setPayWindowBlocked] = useState(false);
   const [simulating, setSimulating] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [claimExpired, setClaimExpired] = useState(false);
 
   const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
@@ -125,6 +127,9 @@ export function ReserveScreen() {
 
   useEffect(() => {
     if (!claim || status !== 'requested') return;
+    const deadline =
+      Number(claim.expiresAt) ||
+      Date.now() + CLAIM_WINDOW_MINUTES * 60 * 1000;
     let cancelled = false;
     let busy = false;
     const run = async () => {
@@ -140,6 +145,8 @@ export function ReserveScreen() {
           } catch {
             // storage unavailable
           }
+        } else if (data.status === 'requested' && Date.now() >= deadline) {
+          setClaimExpired(true);
         }
       } catch (err) {
         if (!cancelled) setPayError(err.message);
@@ -180,6 +187,7 @@ export function ReserveScreen() {
           payAmount: res.pay_amount,
           paymentLink: res.payment_link,
           idempotencyKey,
+          expiresAt: Date.now() + CLAIM_WINDOW_MINUTES * 60 * 1000,
         };
         try {
           sessionStorage.setItem(CLAIM_STORAGE_KEY, JSON.stringify(claimData));
@@ -351,7 +359,7 @@ export function ReserveScreen() {
           </p>
           {moveIn && <p className="pay-success-movein">Move-in {formatDate(moveIn)}</p>}
           <div className="pay-success-facts">
-            <p>Rent is separate. You pay it directly to the landlord.</p>
+            <p>The booking fee is part of the rental fee.</p>
             <p>We call to check you&apos;ve settled in, 3 days after move-in.</p>
           </div>
           <div className="pay-actions">
@@ -364,6 +372,17 @@ export function ReserveScreen() {
               <Button fullWidth>Keep browsing</Button>
             </Link>
           </div>
+        </Card>
+      ) : claimExpired && status === 'requested' ? (
+        <Card className="stack">
+          <Alert variant="danger">This payment link expired.</Alert>
+          <p className="text-muted">
+            Your spot at {claim.roomName} was released. You can reserve again if the room is still
+            available.
+          </p>
+          <Link to={`/rooms/${claim.roomId}`}>
+            <Button fullWidth>Back to room</Button>
+          </Link>
         </Card>
       ) : status === 'cancelled' ? (
         <Card className="stack">
@@ -388,7 +407,9 @@ export function ReserveScreen() {
                   Booking fee for a bed at {claim.roomName}
                   {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
                 </p>
-                <p className="pay-hero-note">Then come back. This page updates by itself.</p>
+                <p className="pay-hero-note">
+                  Then come back. This page updates by itself. The link expires in 5 minutes.
+                </p>
               </div>
               {payError && <Alert variant="danger">{payError}</Alert>}
               {payWindowBlocked && (
@@ -401,7 +422,7 @@ export function ReserveScreen() {
               )}
               <div className="pay-actions pay-actions--center">
                 <Button variant="ghost-danger" onClick={cancel} loading={cancelling}>
-                  {cancelling ? 'Cancelling…' : 'Cancel this claim'}
+                  {cancelling ? 'Cancelling…' : 'Cancel'}
                 </Button>
                 {import.meta.env.DEV && (
                   <Button variant="ghost" onClick={simulate} loading={simulating}>

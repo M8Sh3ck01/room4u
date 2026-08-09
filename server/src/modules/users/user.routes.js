@@ -4,6 +4,7 @@ const { asyncCatch } = require('@core/middleware/asyncCatch');
 const { auth } = require('@core/middleware/auth');
 const { successResponse } = require('@core/utils/apiResponse');
 const { appError } = require('@core/errors');
+const { normalizePhone } = require('@core/utils/phone');
 const { signInWithGoogle, devSignIn } = require('./auth.service');
 const { serializeUser } = require('./user.model');
 
@@ -43,10 +44,11 @@ router.patch(
     const { phone, name } = req.body || {};
 
     if (phone !== undefined) {
-      if (typeof phone !== 'string' || phone.trim().length < 9) {
-        throw appError(400, 'VALIDATION_ERROR', 'Enter a valid phone number');
+      const normalized = normalizePhone(phone);
+      if (!normalized) {
+        throw appError(400, 'VALIDATION_ERROR', 'Enter a valid Malawi phone number, e.g. 0888 123 456');
       }
-      req.user.phone = phone.trim();
+      req.user.phone = normalized;
     }
     if (name !== undefined) {
       if (typeof name !== 'string' || !name.trim()) {

@@ -11,10 +11,23 @@ const FollowUp = require('./followup.model');
 const { assertCanTransition } = require('./booking.model');
 
 const FOLLOW_UP_DAYS = 3;
+const CLAIM_TTL_MS = config.claimTtlMinutes * 60 * 1000;
 
 const bookingPopulate = [
   { path: 'room_id', populate: { path: 'hostel_id', populate: { path: 'area_id', model: 'Area' } } },
 ];
+
+async function expireIfStale(booking, now = new Date()) {
+  if (!booking || booking.status !== 'requested') return false;
+  if (!booking.expires_at || booking.expires_at >= now) return false;
+  await Booking.updateOne(
+    { _id: booking._id, status: 'requested' },
+    { $set: { status: 'cancelled', cancelled_at: now } }
+  );
+  booking.status = 'cancelled';
+  booking.cancelled_at = now;
+  return true;
+}
 
 async function claimRoom({ roomId, userId, idempotencyKey }) {
   const existing = await IdempotencyKey.findOne({ key: idempotencyKey, user_id: userId });
@@ -22,6 +35,10 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
     const booking = await Booking.findById(existing.booking_id).populate(bookingPopulate);
     if (!booking) {
       throw appError(409, 'CONFLICT', 'Booking for this key no longer exists');
+    }
+    if (await expireIfStale(booking)) {
+      await IdempotencyKey.deleteOne({ _id: existing._id });
+      throw appError(409, 'CONFLICT', 'Your payment link expired. Try reserving again.');
     }
     return { booking, pay_amount: config.amounts.tenantFee, payment_link: existing.payment_link };
   }
@@ -35,19 +52,27 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
     status: 'requested',
   });
   if (active) {
-    const idem = await IdempotencyKey.findOne({ booking_id: active._id, user_id: userId });
-    if (idem) {
-      await active.populate(bookingPopulate);
-      return { booking: active, pay_amount: config.amounts.tenantFee, payment_link: idem.payment_link };
+    if (await expireIfStale(active)) {
+      await IdempotencyKey.deleteOne({ booking_id: active._id, user_id: userId });
+    } else {
+      const idem = await IdempotencyKey.findOne({ booking_id: active._id, user_id: userId });
+      if (idem) {
+        await active.populate(bookingPopulate);
+        return { booking: active, pay_amount: config.amounts.tenantFee, payment_link: idem.payment_link };
+      }
+      throw appError(409, 'CONFLICT', 'You already have an active claim on this room');
     }
-    throw appError(409, 'CONFLICT', 'You already have an active claim on this room');
   }
 
   if (room.beds_left < 1) throw appError(409, 'NO_BEDS', 'No beds left on this room');
 
   let booking;
   try {
-    booking = await Booking.create({ room_id: room._id, user_id: userId });
+    booking = await Booking.create({
+      room_id: room._id,
+      user_id: userId,
+      expires_at: new Date(Date.now() + CLAIM_TTL_MS),
+    });
   } catch (err) {
     if (err.code === 11000) {
       throw appError(409, 'CONFLICT', 'You already have an active claim on this room');
@@ -82,6 +107,7 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
 async function getBookingById({ bookingId, user }) {
   const booking = await Booking.findById(bookingId).populate(bookingPopulate);
   if (!booking) throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
+  await expireIfStale(booking);
   if (!user.is_operator && booking.user_id.toString() !== user.id) {
     throw appError(403, 'FORBIDDEN', 'Not your booking');
   }
@@ -89,7 +115,11 @@ async function getBookingById({ bookingId, user }) {
 }
 
 async function getMyBookings(userId) {
-  return Booking.find({ user_id: userId }).sort({ requested_at: -1 }).populate(bookingPopulate);
+  const bookings = await Booking.find({ user_id: userId })
+    .sort({ requested_at: -1 })
+    .populate(bookingPopulate);
+  for (const booking of bookings) await expireIfStale(booking);
+  return bookings;
 }
 
 async function cancelBooking({ bookingId, user }) {

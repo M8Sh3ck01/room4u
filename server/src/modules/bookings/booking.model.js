@@ -24,6 +24,7 @@ const bookingSchema = new mongoose.Schema(
     requested_at: { type: Date, default: Date.now },
     paid_at: { type: Date, default: null },
     cancelled_at: { type: Date, default: null },
+    expires_at: { type: Date, default: null },
   },
   { timestamps: true }
 );

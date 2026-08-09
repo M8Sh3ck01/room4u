@@ -289,6 +289,38 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     expect(second.status).toBe(201);
   });
 
+  it('auto-cancels a stale requested booking on read after the claim window', async () => {
+    const token = await loginWithPhone('stale@gmail.com');
+    const created = await claim(token, room.id, 'key-stale');
+    const bookingId = created.body.data.booking.id;
+
+    await Booking.updateOne(
+      { _id: bookingId },
+      { $set: { expires_at: new Date(Date.now() - 1000) } }
+    );
+
+    const res = await request(app)
+      .get(`/api/bookings/${bookingId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.booking.status).toBe('cancelled');
+    expect(res.body.data.booking.cancelled_at).toBeTruthy();
+  });
+
+  it('lets the same tenant re-claim after a stale booking expires', async () => {
+    const token = await loginWithPhone('stale2@gmail.com');
+    const first = await claim(token, room.id, 'key-stale-2a');
+
+    await Booking.updateOne(
+      { _id: first.body.data.booking.id },
+      { $set: { expires_at: new Date(Date.now() - 1000) } }
+    );
+
+    const second = await claim(token, room.id, 'key-stale-2b');
+    expect(second.status).toBe(201);
+    expect(second.body.data.booking.id).not.toBe(first.body.data.booking.id);
+  });
+
   it('an operator can view and cancel any requested booking', async () => {
     const { token } = await devLogin('operator@example.com', 'Operator');
     const created = await claim(await loginWithPhone('tenant-op@gmail.com'), room.id, 'key-op');

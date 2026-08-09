@@ -23,6 +23,7 @@ const config = {
     tenantFee: 20000,
     gatewayFee: 360,
   },
+  claimTtlMinutes: parseInt(process.env.CLAIM_TTL_MINUTES || '5', 10),
   paychangu: {
     enabled: process.env.PAYCHANGU_ENABLED === 'true',
     apiUrl: process.env.PAYCHANGU_API_URL || 'https://api.paychangu.com',
