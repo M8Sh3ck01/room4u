@@ -107,9 +107,16 @@
   align-items: center;
   min-height: var(--control-min-h);
   gap: var(--space-2);
+  max-width: 220px;
   font-size: var(--text-sm);
   color: var(--color-text-primary);
   text-decoration: none;
+}
+
+.header-user > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header-link {
@@ -146,4 +153,15 @@
   color: var(--color-on-primary);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
+}
+
+@media (max-width: 767px) {
+  .header-link,
+  .header-user {
+    display: none;
+  }
+
+  .app-main {
+    padding-bottom: calc(var(--space-16) + var(--control-min-h-lg));
+  }
 }
