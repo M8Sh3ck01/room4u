@@ -162,8 +162,8 @@ export function RoomDetailScreen() {
       <h1 className="detail-title">{room.hostel}</h1>
 
       <p className="detail-price">
-        {formatMoney(room.price)}{' '}
-        <span className="text-muted">per month</span>
+        {formatMoney(room.price)}
+        <span className="text-muted">&#160;per month</span>
       </p>
 
       <ClaimBar room={room} />
