@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { updateMe } from '../../services/auth';
@@ -46,13 +46,22 @@ export function ReserveScreen() {
   const [simulating, setSimulating] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [claimExpired, setClaimExpired] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
 
   const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
+  const claimRef = useRef(null);
+  claimRef.current = claim;
+  const isFirstLoad = useRef(true);
+
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setLoadError(null);
+    if (isFirstLoad.current) {
+      setLoading(true);
+      isFirstLoad.current = false;
+    } else {
+      setLoadError(null);
+    }
     getRoom(id)
       .then((data) => {
         if (!cancelled) setRoom(data);
@@ -66,7 +75,37 @@ export function ReserveScreen() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, refreshTick]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.self === window.top) return;
+    try {
+      const parentDoc = window.parent.document;
+      const overlay = parentDoc.getElementById('wrapper') || parentDoc.getElementById('iframe1');
+      if (overlay) overlay.remove();
+      window.parent.postMessage({ type: 'room4u:payment-return' }, window.location.origin);
+    } catch {
+      // cross-origin or already closed
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.self !== window.top) return;
+    const onMessage = (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.type === 'room4u:payment-return') {
+        setRefreshTick((t) => t + 1);
+        const currentClaim = claimRef.current;
+        if (currentClaim) {
+          getBooking(currentClaim.bookingId)
+            .then((data) => setBooking(data))
+            .catch(() => {});
+        }
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
   const handleGoogle = useCallback(
     async (credential) => {
@@ -116,7 +155,7 @@ export function ReserveScreen() {
     [phone, setUserFromResponse]
   );
 
-  const cachedClaim = user && user.phone && room ? getCachedClaim(room.id) : null;
+  const cachedClaim = user && user.phone ? getCachedClaim(id) : null;
 
   useEffect(() => {
     if (!claim && cachedClaim) setClaim(cachedClaim);
@@ -303,7 +342,7 @@ export function ReserveScreen() {
     );
   }
 
-  if (loadError || !room) {
+  if ((loadError || !room) && !claim) {
     return (
       <div className="reserve center measure">
         <Card>
@@ -321,12 +360,12 @@ export function ReserveScreen() {
     );
   }
 
-  const full = room.beds_left < 1;
+  const full = room ? room.beds_left < 1 : false;
   const moveIn = booking?.move_in_date || claim?.availableFrom;
 
   return (
     <div className="reserve center measure">
-      <Link to={`/rooms/${room.id}`} className="reserve-back">
+      <Link to={`/rooms/${room ? room.id : claim.roomId}`} className="reserve-back">
         ← Back to room
       </Link>
 
