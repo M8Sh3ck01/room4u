@@ -248,14 +248,7 @@ export function BookedRoomScreen() {
         </Button>
       )}
 
-      <div className="booked-actions">
-        <Link to="/bookings">
-          <Button variant="ghost">Back to my bookings</Button>
-        </Link>
-        <Link to="/">
-          <Button>Keep browsing</Button>
-        </Link>
-      </div>
+      
     </div>
   );
 }
