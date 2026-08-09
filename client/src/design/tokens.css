@@ -118,8 +118,8 @@
   --text-lg: 18px;
   --text-xl: 20px;
   --text-2xl: 24px;
-  --text-display: clamp(28px, 4vw, 40px);
-  --text-hero: clamp(40px, 6vw, 80px);
+  --text-display: clamp(24px, 3.5vw, 36px);
+  --text-hero: clamp(32px, 5vw, 64px);
 
   --weight-regular: 400;
   --weight-medium: 500;
