@@ -42,13 +42,24 @@ async function getUserById(id) {
 async function findOrCreateUser(payload) {
   const is_operator = config.operatorEmails.includes(payload.email);
 
-  const user = await User.findOne({ google_sub: payload.sub });
-  if (user) {
+  const applyProfile = (user) => {
     user.is_operator = is_operator;
     if (payload.name) user.name = payload.name;
     if (payload.picture) user.avatar_url = payload.picture;
-    await user.save();
     return user;
+  };
+
+  const bySub = await User.findOne({ google_sub: payload.sub });
+  if (bySub) {
+    await applyProfile(bySub).save();
+    return bySub;
+  }
+
+  const byEmail = await User.findOne({ email: payload.email });
+  if (byEmail) {
+    byEmail.google_sub = payload.sub;
+    await applyProfile(byEmail).save();
+    return byEmail;
   }
 
   return User.create({
