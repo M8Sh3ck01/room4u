@@ -70,7 +70,7 @@ async function signInWithGoogle(idToken) {
 }
 
 async function devSignIn(email, name) {
-  if (!config.allowDevLogin) {
+  if (config.isProduction || !config.allowDevLogin) {
     throw appError(404, 'NOT_FOUND', 'Not found');
   }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

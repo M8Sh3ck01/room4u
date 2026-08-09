@@ -6,7 +6,8 @@ const { getUserById } = require('@modules/users/auth.service');
 
 const auth = async (req, res, next) => {
   const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const bearer = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const token = (req.cookies && req.cookies[config.sessionCookieName]) || bearer;
 
   if (!token) return next(appError(401, 'UNAUTHORIZED', 'Sign in required'));
 

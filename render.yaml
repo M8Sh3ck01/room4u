@@ -17,10 +17,13 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: ALLOW_DEV_LOGIN
+        value: "false"
         sync: false
       - key: OPERATOR_EMAILS
         sync: false
       - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: VITE_GOOGLE_CLIENT_ID
         sync: false
       - key: PAYCHANGU_ENABLED
         value: "true"

@@ -9,15 +9,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     (async () => {
-      if (!authApi.getToken()) {
-        setLoading(false);
-        return;
-      }
       try {
         const res = await authApi.me();
         setUser(res.data.user);
       } catch {
-        authApi.clearToken();
+        setUser(null);
       }
       setLoading(false);
     })();
@@ -27,13 +23,15 @@ export function AuthProvider({ children }) {
     const res = credentials.google
       ? await authApi.loginWithGoogle(credentials.google)
       : await authApi.login(credentials.dev);
-    authApi.setToken(res.data.token);
     setUser(res.data.user);
   }, []);
 
-  const signOut = useCallback(() => {
-    authApi.clearToken();
-    setUser(null);
+  const signOut = useCallback(async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      setUser(null);
+    }
   }, []);
 
   const setUserFromResponse = useCallback((res) => setUser(res.data.user), []);

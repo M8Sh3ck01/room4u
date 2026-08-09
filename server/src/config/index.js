@@ -8,6 +8,7 @@ const config = {
   mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/room4u',
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
   jwtTtl: '1h',
+  sessionCookieName: 'room4u_session',
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   operatorEmails: (process.env.OPERATOR_EMAILS || '')
     .split(',')

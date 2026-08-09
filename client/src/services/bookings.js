@@ -1,5 +1,4 @@
 import { api } from './api';
-import { authHeaders } from './auth';
 
 export const CLAIM_STORAGE_KEY = 'room4u_active_claim';
 
@@ -29,19 +28,18 @@ export const makeIdempotencyKey = () =>
 export const claimRoom = (roomId, idempotencyKey) =>
   api(`/api/rooms/${roomId}/claims`, {
     method: 'POST',
-    headers: { ...authHeaders(), 'Idempotency-Key': idempotencyKey },
+    headers: { 'Idempotency-Key': idempotencyKey },
   }).then((res) => res.data);
 
 export const getBooking = (id) =>
-  api(`/api/bookings/${id}`, { headers: authHeaders() }).then((res) => res.data.booking);
+  api(`/api/bookings/${id}`).then((res) => res.data.booking);
 
 export const cancelBooking = (id) =>
-  api(`/api/bookings/${id}/cancel`, { method: 'POST', headers: authHeaders() }).then(
+  api(`/api/bookings/${id}/cancel`, { method: 'POST' }).then(
     (res) => res.data.booking
   );
 
 export const simulatePayment = (bookingId) =>
   api(`/api/dev/bookings/${bookingId}/simulate-payment`, {
     method: 'POST',
-    headers: authHeaders(),
   }).then((res) => res.data);
