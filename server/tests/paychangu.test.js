@@ -16,28 +16,16 @@ describe('paychangu service', () => {
     delete process.env.PAYCHANGU_WEBHOOK_SECRET;
   });
 
-  describe('generateChargeId', () => {
+  describe('generateTxRef', () => {
     it('returns unique prefixed ids', () => {
-      const ids = new Set(Array.from({ length: 20 }, () => service.generateChargeId()));
+      const ids = new Set(Array.from({ length: 20 }, () => service.generateTxRef()));
       expect(ids.size).toBe(20);
       expect([...ids].every((id) => id.startsWith('room4u_'))).toBe(true);
     });
   });
 
-  describe('initiate — stub mode (disabled)', () => {
-    it('returns a stub charge and payment link without any network call', async () => {
-      expect(config.paychangu.enabled).toBe(false);
-      const { charge_id, payment_link } = await service.initiate({
-        booking: { _id: 'booking-1' },
-        room: { _id: 'room-1' },
-      });
-      expect(charge_id).toMatch(/^room4u_/);
-      expect(payment_link).toMatch(/^https:\/\/paychangu\.com\/pay\//);
-    });
-  });
-
   describe('verifyWebhookSignature', () => {
-    const raw = JSON.stringify({ charge_id: 'c1', amount: 20000, status: 'SUCCESS' });
+    const raw = JSON.stringify({ reference: 'c1', amount: 20000, status: 'success' });
 
     it('accepts a valid HMAC signature', () => {
       expect(service.verifyWebhookSignature(raw, sign(raw, 'wh-secret'))).toBe(true);
@@ -81,7 +69,7 @@ describe('paychangu service', () => {
     });
   });
 
-  describe('initiate — real mode (enabled)', () => {
+  describe('verifyPayment', () => {
     const gatewayUrl = 'https://gateway.test';
 
     beforeAll(() => {
@@ -96,46 +84,36 @@ describe('paychangu service', () => {
       return require('../src/shared/services/paychanguService');
     };
 
-    it('posts a charge to the gateway and returns the parsed charge + link', async () => {
+    it('returns the verified transaction data', async () => {
       const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue({
         ok: true,
         json: async () => ({
-          data: {
-            charge_id: 'gateway_123',
-            payment_link: 'https://gateway.test/pay/gateway_123',
-          },
+          status: 'success',
+          data: { status: 'success', currency: 'MWK', amount: 20000, tx_ref: 'room4u_abc' },
         }),
       });
 
       const svc = freshService();
-      const res = await svc.initiate({ booking: { _id: 'booking-1' }, room: { _id: 'room-1' } });
+      const data = await svc.verifyPayment('room4u_abc');
 
       const [url, opts] = fetchSpy.mock.calls[0];
-      expect(url).toBe(`${gatewayUrl}/v1/charges`);
-      expect(opts.method).toBe('POST');
+      expect(url).toBe(`${gatewayUrl}/verify-payment/room4u_abc`);
+      expect(opts.method).toBe('GET');
       expect(opts.headers).toMatchObject({
+        Accept: 'application/json',
         Authorization: 'Bearer sk-test',
-        'Content-Type': 'application/json',
       });
-      const sent = JSON.parse(opts.body);
-      expect(sent).toEqual({
-        amount: 20000,
-        currency: 'MWK',
-        reference: expect.stringMatching(/^room4u_/),
-        meta: { booking_id: 'booking-1', room_id: 'room-1' },
-      });
-      expect(res.charge_id).toBe('gateway_123');
-      expect(res.payment_link).toBe('https://gateway.test/pay/gateway_123');
+      expect(data).toMatchObject({ status: 'success', currency: 'MWK', amount: 20000 });
       fetchSpy.mockRestore();
     });
 
-    it('throws GATEWAY_ERROR when the gateway responds non-2xx', async () => {
+    it('throws GATEWAY_ERROR on a non-2xx verification response', async () => {
       const fetchSpy = jest
         .spyOn(global, 'fetch')
-        .mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
+        .mockResolvedValue({ ok: false, status: 404, json: async () => ({}) });
 
       const svc = freshService();
-      await expect(svc.initiate({ booking: { _id: 'b' }, room: { _id: 'r' } })).rejects.toMatchObject({
+      await expect(svc.verifyPayment('room4u_missing')).rejects.toMatchObject({
         statusCode: 502,
         code: 'GATEWAY_ERROR',
       });
@@ -143,40 +121,24 @@ describe('paychangu service', () => {
     });
 
     it('throws GATEWAY_ERROR on network failure', async () => {
-      const fetchSpy = jest.spyOn(global, 'fetch').mockRejectedValue(new Error('ECONNREFUSED'));
+      const fetchSpy = jest.spyOn(global, 'fetch').mockRejectedValue(new Error('ECONNRESET'));
 
       const svc = freshService();
-      await expect(svc.initiate({ booking: { _id: 'b' }, room: { _id: 'r' } })).rejects.toMatchObject({
+      await expect(svc.verifyPayment('room4u_down')).rejects.toMatchObject({
         statusCode: 502,
         code: 'GATEWAY_ERROR',
       });
       fetchSpy.mockRestore();
     });
 
-    it('throws GATEWAY_ERROR when the gateway returns no payment link', async () => {
+    it('throws GATEWAY_ERROR when the gateway returns no verification data', async () => {
       const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue({
         ok: true,
-        json: async () => ({ data: { charge_id: 'gateway_456' } }),
+        json: async () => ({ status: 'success', data: null }),
       });
 
       const svc = freshService();
-      await expect(svc.initiate({ booking: { _id: 'b' }, room: { _id: 'r' } })).rejects.toMatchObject({
-        statusCode: 502,
-        code: 'GATEWAY_ERROR',
-      });
-      fetchSpy.mockRestore();
-    });
-
-    it('throws GATEWAY_ERROR when the gateway returns an unparseable body', async () => {
-      const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue({
-        ok: true,
-        json: async () => {
-          throw new SyntaxError('Unexpected token');
-        },
-      });
-
-      const svc = freshService();
-      await expect(svc.initiate({ booking: { _id: 'b' }, room: { _id: 'r' } })).rejects.toMatchObject({
+      await expect(svc.verifyPayment('room4u_empty')).rejects.toMatchObject({
         statusCode: 502,
         code: 'GATEWAY_ERROR',
       });

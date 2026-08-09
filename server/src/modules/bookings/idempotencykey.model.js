@@ -5,7 +5,7 @@ const idempotencyKeySchema = new mongoose.Schema(
     key: { type: String, required: true },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     booking_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', required: true },
-    payment_link: { type: String, required: true },
+    tx_ref: { type: String, required: true },
     created_at: { type: Date, default: Date.now },
   },
   { timestamps: true }

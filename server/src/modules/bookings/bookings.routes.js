@@ -6,10 +6,11 @@ const { successResponse } = require('@core/utils/apiResponse');
 const { appError } = require('@core/errors');
 const mongoose = require('mongoose');
 const config = require('@config');
-const { claimRoom, getBookingById, getMyBookings, cancelBooking } = require('./bookings.service');
+const { claimRoom, getBookingById, getMyBookings, cancelBooking, findByTxRef } = require('./bookings.service');
 const { serializeBooking } = require('./booking.model');
 const Booking = require('./booking.model');
 const { handlePayChanguWebhook } = require('@shared/services/paychanguWebhook');
+const { verifyPayment } = require('@shared/services/paychanguService');
 
 const router = express.Router();
 
@@ -25,17 +26,40 @@ router.post(
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       throw appError(404, 'ROOM_NOT_FOUND', 'Room not found');
     }
-    const { booking, pay_amount, payment_link } = await claimRoom({
+    const { booking, pay_amount, tx_ref } = await claimRoom({
       roomId: req.params.id,
       userId: req.user.id,
       idempotencyKey,
     });
     successResponse(
       res,
-      { booking: serializeBooking(booking), pay_amount, payment_link },
+      { booking: serializeBooking(booking), pay_amount, tx_ref },
       'Booking created',
       201
     );
+  })
+);
+
+router.get(
+  '/paychangu/return',
+  asyncCatch(async (req, res) => {
+    const txRef = req.query.tx_ref;
+    if (!txRef) return res.redirect('/');
+    const booking = await findByTxRef(txRef);
+    if (!booking) return res.redirect('/');
+
+    const target = `/rooms/${booking.room_id.toString()}/reserve`;
+    let status = '';
+    if (config.paychangu.enabled) {
+      try {
+        const verified = await verifyPayment(txRef);
+        const data = verified && verified.data ? verified.data : verified;
+        if (data && data.status === 'success') status = 'success';
+      } catch (err) {
+        status = 'error';
+      }
+    }
+    return res.redirect(status ? `${target}?status=${status}` : target);
   })
 );
 
@@ -82,9 +106,9 @@ router.post(
     }
     const booking = await Booking.findById(req.params.id);
     if (!booking) throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
-    if (!booking.charge_id) throw appError(409, 'CONFLICT', 'Booking has no charge yet');
+    if (!booking.tx_ref) throw appError(409, 'CONFLICT', 'Booking has no charge yet');
     const result = await handlePayChanguWebhook(
-      JSON.stringify({ charge_id: booking.charge_id, status: 'SUCCESS' })
+      JSON.stringify({ reference: booking.tx_ref, status: 'success' })
     );
     successResponse(res, result, 'Payment simulated', 200);
   })

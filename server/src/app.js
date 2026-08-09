@@ -21,7 +21,7 @@ app.post(
   express.raw({ type: () => true, limit: '1mb' }),
   async (req, res, next) => {
     try {
-      const signature = req.headers['x-paychangu-signature'];
+      const signature = req.headers['signature'] || req.headers['x-paychangu-signature'];
       if (!verifyWebhookSignature(req.body, signature)) {
         return res
           .status(401)

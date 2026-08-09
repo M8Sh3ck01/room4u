@@ -27,7 +27,7 @@ const config = {
   paychangu: {
     enabled: process.env.PAYCHANGU_ENABLED === 'true',
     apiUrl: process.env.PAYCHANGU_API_URL || 'https://api.paychangu.com',
-    secret: process.env.PAYCHANGU_SECRET || '',
+    secret: process.env.PAYCHANGU_SECRET || process.env.SECRET_KEY || '',
     webhookSecret: process.env.PAYCHANGU_WEBHOOK_SECRET || '',
   },
 };

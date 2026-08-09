@@ -43,7 +43,6 @@ export function ReserveScreen() {
   const [booking, setBooking] = useState(null);
   const [claiming, setClaiming] = useState(false);
   const [payError, setPayError] = useState(null);
-  const [payWindowBlocked, setPayWindowBlocked] = useState(false);
   const [simulating, setSimulating] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [claimExpired, setClaimExpired] = useState(false);
@@ -162,57 +161,90 @@ export function ReserveScreen() {
     };
   }, [claim, status]);
 
-  const onPay = useCallback(
-    async (win) => {
-      if (claim) return;
-      setClaiming(true);
-      setPayError(null);
-      setPayWindowBlocked(false);
-      const idempotencyKey = makeIdempotencyKey();
-      const openPayment = (link) => {
-        if (win && !win.closed) {
-          win.location = link;
-        } else {
-          setPayWindowBlocked(true);
-        }
-      };
+  const loadPaychanguScript = () =>
+    new Promise((resolve, reject) => {
+      if (typeof window !== 'undefined' && window.PaychanguCheckout) return resolve();
+      const script = document.createElement('script');
+      script.src = 'https://in.paychangu.com/js/popup.js';
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Could not load the payment provider. Try again.'));
+      document.head.appendChild(script);
+    });
+
+  const openInlineCheckout = useCallback(
+    async (claimData) => {
+      const publicKey = import.meta.env.VITE_PAYCHANGU_PUBLIC_KEY;
+      if (!publicKey) {
+        setPayError('Payment gateway is not configured for this build.');
+        return;
+      }
       try {
-        const res = await claimRoom(room.id, idempotencyKey);
-        const claimData = {
-          bookingId: res.booking.id,
-          roomId: room.id,
-          roomName: room.hostel,
-          roomArea: room.area,
-          availableFrom: room.available_from,
-          payAmount: res.pay_amount,
-          paymentLink: res.payment_link,
-          idempotencyKey,
-          expiresAt: Date.now() + CLAIM_WINDOW_MINUTES * 60 * 1000,
-        };
-        try {
-          sessionStorage.setItem(CLAIM_STORAGE_KEY, JSON.stringify(claimData));
-        } catch {
-          // storage unavailable
-        }
-        setClaim(claimData);
-        openPayment(claimData.paymentLink);
+        await loadPaychanguScript();
+        const [firstName, ...rest] = (user.name || '').trim().split(/\s+/);
+        window.PaychanguCheckout({
+          public_key: publicKey,
+          tx_ref: claimData.txRef,
+          amount: claimData.payAmount,
+          currency: 'MWK',
+          callback_url: `${window.location.origin}/api/paychangu/return`,
+          return_url: `${window.location.origin}/rooms/${claimData.roomId}/reserve`,
+          customer: {
+            email: user.email,
+            ...(firstName ? { first_name: firstName } : {}),
+            ...(rest.length ? { last_name: rest.join(' ') } : {}),
+          },
+          customization: {
+            title: 'Room4U booking fee',
+            description: `Booking fee for a bed at ${claimData.roomName}`,
+          },
+        });
       } catch (err) {
-        if (err.code === 'CONFLICT') {
-          const existing = getCachedClaim(room.id);
-          if (existing) {
-            setClaim(existing);
-            openPayment(existing.paymentLink);
-            return;
-          }
-        }
-        if (win && !win.closed) win.close();
         setPayError(err.message);
-      } finally {
-        setClaiming(false);
       }
     },
-    [claim, room]
+    [user]
   );
+
+  const onPay = useCallback(async () => {
+    if (claim) return;
+    setClaiming(true);
+    setPayError(null);
+    const idempotencyKey = makeIdempotencyKey();
+    try {
+      const res = await claimRoom(room.id, idempotencyKey);
+      const claimData = {
+        bookingId: res.booking.id,
+        roomId: room.id,
+        roomName: room.hostel,
+        roomArea: room.area,
+        availableFrom: room.available_from,
+        payAmount: res.pay_amount,
+        txRef: res.tx_ref,
+        idempotencyKey,
+        expiresAt: Date.now() + CLAIM_WINDOW_MINUTES * 60 * 1000,
+      };
+      try {
+        sessionStorage.setItem(CLAIM_STORAGE_KEY, JSON.stringify(claimData));
+      } catch {
+        // storage unavailable
+      }
+      setClaim(claimData);
+      await openInlineCheckout(claimData);
+    } catch (err) {
+      if (err.code === 'CONFLICT') {
+        const existing = getCachedClaim(room.id);
+        if (existing) {
+          setClaim(existing);
+          await openInlineCheckout(existing);
+          return;
+        }
+      }
+      setPayError(err.message);
+    } finally {
+      setClaiming(false);
+    }
+  }, [claim, room, openInlineCheckout]);
 
   const simulate = useCallback(async () => {
     if (!claim) return;
@@ -412,14 +444,6 @@ export function ReserveScreen() {
                 </p>
               </div>
               {payError && <Alert variant="danger">{payError}</Alert>}
-              {payWindowBlocked && (
-                <p className="pay-window-fallback">
-                  Payment didn&apos;t open?{' '}
-                  <a href={claim.paymentLink} target="_blank" rel="noreferrer">
-                    Tap here.
-                  </a>
-                </p>
-              )}
               <div className="pay-actions pay-actions--center">
                 <Button variant="ghost-danger" onClick={cancel} loading={cancelling}>
                   {cancelling ? 'Cancelling…' : 'Cancel'}
@@ -454,14 +478,7 @@ export function ReserveScreen() {
               </div>
               <p className="pay-trust">The deposit counts toward your rent. The agent fee is separate.</p>
               {payError && <Alert variant="danger">{payError}</Alert>}
-              <Button
-                onClick={(e) => {
-                  const win = window.open('', '_blank');
-                  onPay(win);
-                }}
-                loading={claiming}
-                fullWidth
-              >
+              <Button onClick={onPay} loading={claiming} fullWidth>
                 {claiming ? 'Reserving…' : `Pay ${formatMoney(BOOKING_FEE)} now`}
               </Button>
             </>

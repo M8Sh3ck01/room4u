@@ -20,11 +20,11 @@ const User = require('../src/modules/users/user.model');
 const SECRET = process.env.PAYCHANGU_WEBHOOK_SECRET;
 const sign = (body) => crypto.createHmac('sha256', SECRET).update(body).digest('hex');
 
-const fireWebhook = (body, { signature, status } = {}) =>
+const fireWebhook = (body, { signature, header = 'Signature' } = {}) =>
   request(app)
     .post('/api/webhooks/paychangu')
     .set('Content-Type', 'application/json')
-    .set('x-paychangu-signature', signature !== undefined ? signature : sign(body))
+    .set(header, signature !== undefined ? signature : sign(body))
     .send(body);
 
 const stockRoom = (overrides = {}) => ({
@@ -42,8 +42,17 @@ const stockRoom = (overrides = {}) => ({
 const makeUser = (suffix) =>
   User.create({ google_sub: `wh-${suffix}`, email: `wh-${suffix}@example.com`, name: suffix });
 
-const makeRequestedBooking = (room, user, chargeId) =>
-  Booking.create({ room_id: room._id, user_id: user._id, status: 'requested', charge_id: chargeId });
+const makeRequestedBooking = (room, user, txRef) =>
+  Booking.create({ room_id: room._id, user_id: user._id, status: 'requested', tx_ref: txRef });
+
+const paymentBody = (reference, extra = {}) =>
+  JSON.stringify({
+    event_type: 'api.charge.payment',
+    status: 'success',
+    reference,
+    amount: 20000,
+    ...extra,
+  });
 
 describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
   beforeAll(connectTestDb, 30000);
@@ -66,15 +75,13 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     const user = await makeUser('happy');
     await makeRequestedBooking(room, user, 'wh-charge-1');
 
-    const res = await fireWebhook(
-      JSON.stringify({ charge_id: 'wh-charge-1', amount: 20000, status: 'SUCCESS', move_in_date: '2026-09-01' })
-    );
+    const res = await fireWebhook(paymentBody('wh-charge-1', { move_in_date: '2026-09-01' }));
 
     expect(res.status).toBe(200);
     expect(res.body.ok).toBe(true);
     expect(res.body.skipped).toBeUndefined();
 
-    const booking = await Booking.findOne({ charge_id: 'wh-charge-1' });
+    const booking = await Booking.findOne({ tx_ref: 'wh-charge-1' });
     expect(booking.status).toBe('paid');
     expect(booking.paid_at).toBeTruthy();
     expect(booking.move_in_date.toISOString().slice(0, 10)).toBe('2026-09-01');
@@ -98,18 +105,57 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     expect(followup.due_date.toISOString().slice(0, 10)).toBe('2026-09-04');
   });
 
+  it('accepts the legacy x-paychangu-signature header as a fallback', async () => {
+    const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
+    const user = await makeUser('legacy');
+    await makeRequestedBooking(room, user, 'wh-charge-legacy');
+
+    const res = await fireWebhook(paymentBody('wh-charge-legacy'), { header: 'x-paychangu-signature' });
+    expect(res.status).toBe(200);
+    expect(res.body.skipped).toBeUndefined();
+    expect(await Booking.countDocuments({ status: 'paid' })).toBe(1);
+  });
+
+  it('accepts a checkout.payment event (Inline Checkout webhooks)', async () => {
+    const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
+    const user = await makeUser('inline');
+    await makeRequestedBooking(room, user, 'wh-charge-inline');
+
+    const res = await fireWebhook(
+      JSON.stringify({
+        event_type: 'checkout.payment',
+        status: 'success',
+        reference: 'wh-charge-inline',
+        charge_id: 'paychangu_12345',
+        amount: 20000,
+      })
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.skipped).toBeUndefined();
+
+    const booking = await Booking.findOne({ tx_ref: 'wh-charge-inline' });
+    expect(booking.status).toBe('paid');
+    expect(booking.charge_id).toBe('paychangu_12345');
+
+    const saved = await Room.findById(room.id);
+    expect(saved.sold[0].charge_id).toBe('paychangu_12345');
+
+    const payments = await Payment.find({});
+    expect(payments).toHaveLength(2);
+    expect(payments.every((p) => p.reference === 'wh-charge-inline')).toBe(true);
+  });
+
   it('falls back to the room available_from when move_in_date is invalid', async () => {
     const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
     const user = await makeUser('nudate');
     await makeRequestedBooking(room, user, 'wh-charge-nudate');
 
-    const res = await fireWebhook(
-      JSON.stringify({ charge_id: 'wh-charge-nudate', amount: 20000, status: 'SUCCESS', move_in_date: 'not-a-date' })
-    );
+    const res = await fireWebhook(paymentBody('wh-charge-nudate', { move_in_date: 'not-a-date' }));
     expect(res.status).toBe(200);
     expect(res.body.skipped).toBeUndefined();
 
-    const booking = await Booking.findOne({ charge_id: 'wh-charge-nudate' });
+    const booking = await Booking.findOne({ tx_ref: 'wh-charge-nudate' });
     expect(booking.status).toBe('paid');
     expect(booking.move_in_date.toISOString().slice(0, 10)).toBe('2026-09-01');
   });
@@ -118,7 +164,7 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
     const user = await makeUser('dup');
     await makeRequestedBooking(room, user, 'wh-charge-2');
-    const body = JSON.stringify({ charge_id: 'wh-charge-2', amount: 20000, status: 'SUCCESS' });
+    const body = paymentBody('wh-charge-2');
 
     const first = await fireWebhook(body);
     expect(first.status).toBe(200);
@@ -140,13 +186,12 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
     const user = await makeUser('bad');
     await makeRequestedBooking(room, user, 'wh-charge-3');
-    const body = JSON.stringify({ charge_id: 'wh-charge-3', amount: 20000, status: 'SUCCESS' });
 
-    const res = await fireWebhook(body, { signature: 'deadbeef' });
+    const res = await fireWebhook(paymentBody('wh-charge-3'), { signature: 'deadbeef' });
     expect(res.status).toBe(401);
     expect(res.body.error.code).toBe('UNAUTHORIZED');
 
-    const booking = await Booking.findOne({ charge_id: 'wh-charge-3' });
+    const booking = await Booking.findOne({ tx_ref: 'wh-charge-3' });
     expect(booking.status).toBe('requested');
     expect(await Payment.countDocuments({})).toBe(0);
     expect(await FollowUp.countDocuments({})).toBe(0);
@@ -162,10 +207,7 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     await makeRequestedBooking(room, ua, 'wh-charge-a');
     await makeRequestedBooking(room, ub, 'wh-charge-b');
 
-    const bodyA = JSON.stringify({ charge_id: 'wh-charge-a', amount: 20000, status: 'SUCCESS' });
-    const bodyB = JSON.stringify({ charge_id: 'wh-charge-b', amount: 20000, status: 'SUCCESS' });
-
-    const [ra, rb] = await Promise.all([fireWebhook(bodyA), fireWebhook(bodyB)]);
+    const [ra, rb] = await Promise.all([fireWebhook(paymentBody('wh-charge-a')), fireWebhook(paymentBody('wh-charge-b'))]);
     expect([ra.status, rb.status]).toEqual([200, 200]);
     expect([ra.body.skipped, rb.body.skipped]).toContain(true);
 
@@ -186,16 +228,16 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     await makeRequestedBooking(room, b, 'wh-charge-b');
     await makeRequestedBooking(room, c, 'wh-charge-c');
 
-    const first = await fireWebhook(JSON.stringify({ charge_id: 'wh-charge-a', amount: 20000, status: 'SUCCESS' }));
+    const first = await fireWebhook(paymentBody('wh-charge-a'));
     expect(first.body.room_rented).toBe(false);
     expect(await Booking.countDocuments({ status: 'requested' })).toBe(2);
 
-    const second = await fireWebhook(JSON.stringify({ charge_id: 'wh-charge-b', amount: 20000, status: 'SUCCESS' }));
+    const second = await fireWebhook(paymentBody('wh-charge-b'));
     expect(second.body.room_rented).toBe(true);
 
     expect(await Booking.countDocuments({ status: 'paid' })).toBe(2);
     expect(await Booking.countDocuments({ status: 'requested' })).toBe(0);
-    const cBooking = await Booking.findOne({ charge_id: 'wh-charge-c' });
+    const cBooking = await Booking.findOne({ tx_ref: 'wh-charge-c' });
     expect(cBooking.status).toBe('cancelled');
     expect(await Payment.countDocuments({})).toBe(4);
     expect(await FollowUp.countDocuments({})).toBe(2);
@@ -209,7 +251,7 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     const user = await makeUser('listed');
     await makeRequestedBooking(room, user, 'wh-charge-list');
 
-    await fireWebhook(JSON.stringify({ charge_id: 'wh-charge-list', amount: 20000, status: 'SUCCESS' }));
+    await fireWebhook(paymentBody('wh-charge-list'));
 
     const listing = await request(app).get('/api/rooms');
     expect(listing.status).toBe(200);
@@ -228,13 +270,11 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
       room_id: room._id,
       user_id: user._id,
       status: 'cancelled',
-      charge_id: 'wh-charge-cancelled',
+      tx_ref: 'wh-charge-cancelled',
       cancelled_at: new Date(),
     });
 
-    const res = await fireWebhook(
-      JSON.stringify({ charge_id: 'wh-charge-cancelled', amount: 20000, status: 'SUCCESS' })
-    );
+    const res = await fireWebhook(paymentBody('wh-charge-cancelled'));
     expect(res.status).toBe(200);
     expect(res.body.skipped).toBe(true);
     expect(res.body.reason).toBe('booking-not-requested');
@@ -242,22 +282,36 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     expect(await FollowUp.countDocuments({})).toBe(0);
   });
 
-  it('acks and skips a non-SUCCESS status without side effects', async () => {
+  it('acks and skips a non-success status without side effects', async () => {
     const res = await fireWebhook(
-      JSON.stringify({ charge_id: 'wh-charge-fail', amount: 20000, status: 'FAILED' })
+      JSON.stringify({ event_type: 'api.charge.payment', status: 'failed', reference: 'wh-charge-fail', amount: 20000 })
     );
     expect(res.status).toBe(200);
     expect(res.body.skipped).toBe(true);
+    expect(res.body.reason).toBe('status=failed');
     expect(await Payment.countDocuments({})).toBe(0);
     expect(await Booking.countDocuments({})).toBe(0);
   });
 
-  it('returns 404 for an unknown charge and 400 for a missing charge_id', async () => {
-    const missing = await fireWebhook(JSON.stringify({ charge_id: 'wh-ghost', amount: 20000, status: 'SUCCESS' }));
+  it('acks and skips an unrelated event_type without side effects', async () => {
+    const res = await fireWebhook(
+      JSON.stringify({ event_type: 'api.payout', status: 'success', reference: 'wh-any', amount: 20000 })
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.skipped).toBe(true);
+    expect(res.body.reason).toBe('event_type=api.payout');
+    expect(await Payment.countDocuments({})).toBe(0);
+    expect(await Booking.countDocuments({})).toBe(0);
+  });
+
+  it('returns 404 for an unknown charge and 400 for a missing charge reference', async () => {
+    const missing = await fireWebhook(paymentBody('wh-ghost'));
     expect(missing.status).toBe(404);
     expect(missing.body.error.code).toBe('BOOKING_NOT_FOUND');
 
-    const noCharge = await fireWebhook(JSON.stringify({ amount: 20000, status: 'SUCCESS' }));
+    const noCharge = await fireWebhook(
+      JSON.stringify({ event_type: 'api.charge.payment', status: 'success', amount: 20000 })
+    );
     expect(noCharge.status).toBe(400);
     expect(noCharge.body.error.code).toBe('VALIDATION_ERROR');
 

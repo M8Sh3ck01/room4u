@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const config = require('@config');
 const { appError } = require('@core/errors');
 const { getClaimableRoom } = require('@modules/rooms/room.service');
-const { initiate } = require('@shared/services/paychanguService');
+const { generateTxRef } = require('@shared/services/paychanguService');
 const Booking = require('./booking.model');
 const IdempotencyKey = require('./idempotencykey.model');
 const Payment = require('./payment.model');
@@ -40,7 +40,7 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
       await IdempotencyKey.deleteOne({ _id: existing._id });
       throw appError(409, 'CONFLICT', 'Your payment link expired. Try reserving again.');
     }
-    return { booking, pay_amount: config.amounts.tenantFee, payment_link: existing.payment_link };
+    return { booking, pay_amount: config.amounts.tenantFee, tx_ref: existing.tx_ref };
   }
 
   const room = await getClaimableRoom(roomId);
@@ -58,7 +58,7 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
       const idem = await IdempotencyKey.findOne({ booking_id: active._id, user_id: userId });
       if (idem) {
         await active.populate(bookingPopulate);
-        return { booking: active, pay_amount: config.amounts.tenantFee, payment_link: idem.payment_link };
+        return { booking: active, pay_amount: config.amounts.tenantFee, tx_ref: idem.tx_ref };
       }
       throw appError(409, 'CONFLICT', 'You already have an active claim on this room');
     }
@@ -80,8 +80,7 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
     throw err;
   }
 
-  const { charge_id, payment_link } = await initiate({ booking, room });
-  booking.charge_id = charge_id;
+  booking.tx_ref = generateTxRef();
   await booking.save();
 
   try {
@@ -89,19 +88,19 @@ async function claimRoom({ roomId, userId, idempotencyKey }) {
       key: idempotencyKey,
       user_id: userId,
       booking_id: booking._id,
-      payment_link,
+      tx_ref: booking.tx_ref,
     });
   } catch (err) {
     if (err.code === 11000) {
       const dup = await IdempotencyKey.findOne({ key: idempotencyKey, user_id: userId });
       const dupBooking = await Booking.findById(dup.booking_id).populate(bookingPopulate);
-      return { booking: dupBooking, pay_amount: config.amounts.tenantFee, payment_link: dup.payment_link };
+      return { booking: dupBooking, pay_amount: config.amounts.tenantFee, tx_ref: dup.tx_ref };
     }
     throw err;
   }
 
   await booking.populate(bookingPopulate);
-  return { booking, pay_amount: config.amounts.tenantFee, payment_link };
+  return { booking, pay_amount: config.amounts.tenantFee, tx_ref: booking.tx_ref };
 }
 
 async function getBookingById({ bookingId, user }) {
@@ -144,7 +143,7 @@ async function markPaid({ booking, moveInDate, paidAt = new Date() }) {
   );
 }
 
-async function completePayment({ booking, chargeId, moveInDate, paidAt = new Date() }) {
+async function completePayment({ booking, txRef, chargeId, moveInDate, paidAt = new Date() }) {
   const claimed = await markPaid({ booking, moveInDate, paidAt });
   if (!claimed) return null;
 
@@ -155,7 +154,7 @@ async function completePayment({ booking, chargeId, moveInDate, paidAt = new Dat
       type: 'tenant_payment',
       amount: config.amounts.tenantFee,
       method: 'gateway',
-      reference: chargeId,
+      reference: txRef,
       charge_id: chargeId,
     },
     {
@@ -164,7 +163,7 @@ async function completePayment({ booking, chargeId, moveInDate, paidAt = new Dat
       type: 'gateway_fee',
       amount: -config.amounts.gatewayFee,
       method: 'gateway',
-      reference: chargeId,
+      reference: txRef,
       charge_id: chargeId,
     },
   ]);
@@ -175,15 +174,15 @@ async function completePayment({ booking, chargeId, moveInDate, paidAt = new Dat
   return claimed;
 }
 
-async function cancelRequestsForRoom({ roomId, exceptChargeId, at = new Date() }) {
+async function cancelRequestsForRoom({ roomId, exceptTxRef, at = new Date() }) {
   await Booking.updateMany(
-    { room_id: roomId, status: 'requested', charge_id: { $ne: exceptChargeId } },
+    { room_id: roomId, status: 'requested', tx_ref: { $ne: exceptTxRef } },
     { $set: { status: 'cancelled', cancelled_at: at } }
   );
 }
 
-async function findByChargeId(chargeId) {
-  return Booking.findOne({ charge_id: chargeId });
+async function findByTxRef(txRef) {
+  return Booking.findOne({ tx_ref: txRef });
 }
 
 module.exports = {
@@ -194,6 +193,6 @@ module.exports = {
   markPaid,
   completePayment,
   cancelRequestsForRoom,
-  findByChargeId,
+  findByTxRef,
   FOLLOW_UP_DAYS,
 };

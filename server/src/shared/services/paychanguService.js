@@ -3,59 +3,33 @@ const crypto = require('crypto');
 const config = require('@config');
 const { appError } = require('@core/errors');
 
-const generateChargeId = () =>
+const generateTxRef = () =>
   `room4u_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
 
-async function initiate({ booking, room }) {
-  const charge_id = generateChargeId();
-
-  if (!config.paychangu.enabled) {
-    return {
-      charge_id,
-      payment_link: `https://paychangu.com/pay/${charge_id}`,
-    };
-  }
-
-  // Real gateway contract — adjust to PayChangu's documented API once
-  // credentials exist (headers, payload shape, and field names).
-  const payload = {
-    amount: config.amounts.tenantFee,
-    currency: 'MWK',
-    reference: charge_id,
-    meta: {
-      booking_id: String(booking._id),
-      room_id: String(room._id),
-    },
-  };
-
+async function verifyPayment(txRef) {
   let res;
   try {
-    res = await fetch(`${config.paychangu.apiUrl}/v1/charges`, {
-      method: 'POST',
+    res = await fetch(`${config.paychangu.apiUrl}/verify-payment/${txRef}`, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
         Authorization: `Bearer ${config.paychangu.secret}`,
       },
-      body: JSON.stringify(payload),
     });
   } catch (err) {
     throw appError(502, 'GATEWAY_ERROR', 'Payment provider unavailable — try again later');
   }
 
   if (!res.ok) {
-    throw appError(502, 'GATEWAY_ERROR', 'Payment provider rejected the charge');
+    throw appError(502, 'GATEWAY_ERROR', 'Payment provider could not verify the charge');
   }
 
   const body = await res.json().catch(() => ({}));
-  const data = body && body.data ? body.data : body;
-  const gatewayChargeId = data.charge_id || data.id || charge_id;
-  const payment_link = data.payment_link || data.checkout_url || null;
-
-  if (!payment_link) {
-    throw appError(502, 'GATEWAY_ERROR', 'Payment provider returned no payment link');
+  if (!body || !body.data) {
+    throw appError(502, 'GATEWAY_ERROR', 'Payment provider returned no verification data');
   }
 
-  return { charge_id: gatewayChargeId, payment_link };
+  return body.data;
 }
 
 function verifyWebhookSignature(rawBody, signature) {
@@ -70,4 +44,4 @@ function verifyWebhookSignature(rawBody, signature) {
   return crypto.timingSafeEqual(expected, given);
 }
 
-module.exports = { initiate, verifyWebhookSignature, generateChargeId };
+module.exports = { generateTxRef, verifyPayment, verifyWebhookSignature };

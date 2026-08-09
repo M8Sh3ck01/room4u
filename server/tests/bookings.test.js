@@ -86,18 +86,18 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     fullRoom = docs[3];
   });
 
-  it('claims a bed and returns a payment link (requested)', async () => {
+  it('claims a bed and returns a tx_ref (requested)', async () => {
     const token = await loginWithPhone('chisomo@gmail.com');
     const res = await claim(token, room.id, 'key-happy');
 
     expect(res.status).toBe(201);
     expect(res.body.data.pay_amount).toBe(20000);
-    expect(res.body.data.payment_link).toMatch(/^https:\/\/paychangu\.com\/pay\//);
+    expect(res.body.data.tx_ref).toMatch(/^room4u_/);
     expect(res.body.data.booking).toMatchObject({
       status: 'requested',
       room_id: room.id,
     });
-    expect(res.body.data.booking.charge_id).toBeTruthy();
+    expect(res.body.data.booking.tx_ref).toBeTruthy();
     expect(res.body.data.booking.room).toMatchObject({
       hostel: 'Chibavi Hostel',
       area: 'Chibavi',
@@ -108,7 +108,7 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
 
     const booking = await Booking.findById(res.body.data.booking.id);
     expect(booking.status).toBe('requested');
-    expect(booking.charge_id).toBeTruthy();
+    expect(booking.tx_ref).toBeTruthy();
   });
 
   it('requires the Idempotency-Key header', async () => {
@@ -155,7 +155,7 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     expect(res.body.error.code).toBe('NO_BEDS');
   });
 
-  it('re-sending the same Idempotency-Key returns the same booking and link', async () => {
+  it('re-sending the same Idempotency-Key returns the same booking and tx_ref', async () => {
     const token = await loginWithPhone('dup@gmail.com');
     const first = await claim(token, room.id, 'key-same');
     const second = await claim(token, room.id, 'key-same');
@@ -163,7 +163,7 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     expect(first.status).toBe(201);
     expect(second.status).toBe(201);
     expect(second.body.data.booking.id).toBe(first.body.data.booking.id);
-    expect(second.body.data.payment_link).toBe(first.body.data.payment_link);
+    expect(second.body.data.tx_ref).toBe(first.body.data.tx_ref);
     expect(await Booking.countDocuments({})).toBe(1);
   });
 
@@ -175,7 +175,7 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     const second = await claim(token, room.id, 'key-one-b');
     expect(second.status).toBe(201);
     expect(second.body.data.booking.id).toBe(first.body.data.booking.id);
-    expect(second.body.data.payment_link).toBe(first.body.data.payment_link);
+    expect(second.body.data.tx_ref).toBe(first.body.data.tx_ref);
     expect(await Booking.countDocuments({})).toBe(1);
   });
 
@@ -336,5 +336,25 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
       .set('Authorization', `Bearer ${token}`);
     expect(cancel.status).toBe(200);
     expect(cancel.body.data.booking.status).toBe('cancelled');
+  });
+
+  it('GET /api/paychangu/return redirects to the reserve page (disabled gateway)', async () => {
+    const token = await loginWithPhone('ret@gmail.com');
+    const created = await claim(token, room.id, 'key-return');
+    const booking = await Booking.findById(created.body.data.booking.id);
+
+    const res = await request(app).get(`/api/paychangu/return?tx_ref=${booking.tx_ref}`);
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe(`/rooms/${room.id}/reserve`);
+  });
+
+  it('GET /api/paychangu/return redirects home for missing or unknown tx_ref', async () => {
+    const missing = await request(app).get('/api/paychangu/return');
+    expect(missing.status).toBe(302);
+    expect(missing.headers.location).toBe('/');
+
+    const unknown = await request(app).get('/api/paychangu/return?tx_ref=ghost');
+    expect(unknown.status).toBe(302);
+    expect(unknown.headers.location).toBe('/');
   });
 });

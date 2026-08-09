@@ -22,3 +22,8 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
+      - key: PAYCHANGU_ENABLED
+        value: "true"
+        sync: false
+      - key: VITE_PAYCHANGU_PUBLIC_KEY
+        sync: false
