@@ -9,8 +9,7 @@ const config = require('@config');
 const { claimRoom, getBookingById, getMyBookings, cancelBooking, findByTxRef } = require('./bookings.service');
 const { serializeBooking } = require('./booking.model');
 const Booking = require('./booking.model');
-const { handlePayChanguWebhook } = require('@shared/services/paychanguWebhook');
-const { verifyPayment } = require('@shared/services/paychanguService');
+const { processPaidBooking } = require('@shared/services/paychanguWebhook');
 
 const router = express.Router();
 
@@ -49,17 +48,13 @@ router.get(
     if (!booking) return res.redirect('/');
 
     const target = `/rooms/${booking.room_id.toString()}/reserve`;
-    let status = '';
-    if (config.paychangu.enabled) {
-      try {
-        const verified = await verifyPayment(txRef);
-        const data = verified && verified.data ? verified.data : verified;
-        if (data && data.status === 'success') status = 'success';
-      } catch (err) {
-        status = 'error';
-      }
+    if (!config.paychangu.enabled) return res.redirect(target);
+    try {
+      await processPaidBooking({ txRef, paidAt: new Date() });
+      return res.redirect(`${target}?status=success`);
+    } catch (err) {
+      return res.redirect(`${target}?status=error`);
     }
-    return res.redirect(status ? `${target}?status=${status}` : target);
   })
 );
 

@@ -25,5 +25,9 @@ services:
       - key: PAYCHANGU_ENABLED
         value: "true"
         sync: false
+      - key: PAYCHANGU_SECRET
+        sync: false
+      - key: PAYCHANGU_WEBHOOK_SECRET
+        sync: false
       - key: VITE_PAYCHANGU_PUBLIC_KEY
         sync: false

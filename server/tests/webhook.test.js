@@ -146,6 +146,37 @@ describe('POST /api/webhooks/paychangu (Slice 3 W4)', () => {
     expect(payments.every((p) => p.reference === 'wh-charge-inline')).toBe(true);
   });
 
+  it('matches by tx_ref when the payload carries an internal reference too', async () => {
+    const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
+    const user = await makeUser('txreflookup');
+    await makeRequestedBooking(room, user, 'wh-charge-txref');
+
+    const res = await fireWebhook(
+      JSON.stringify({
+        event_type: 'checkout.payment',
+        status: 'success',
+        tx_ref: 'wh-charge-txref',
+        reference: '26262633201',
+        charge_id: 'paychangu_67890',
+        amount: 20000,
+      })
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.skipped).toBeUndefined();
+
+    const booking = await Booking.findOne({ tx_ref: 'wh-charge-txref' });
+    expect(booking.status).toBe('paid');
+    expect(booking.charge_id).toBe('paychangu_67890');
+
+    const saved = await Room.findById(room.id);
+    expect(saved.sold[0].charge_id).toBe('paychangu_67890');
+
+    const payments = await Payment.find({});
+    expect(payments).toHaveLength(2);
+    expect(payments.every((p) => p.reference === 'wh-charge-txref')).toBe(true);
+  });
+
   it('falls back to the room available_from when move_in_date is invalid', async () => {
     const [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
     const user = await makeUser('nudate');

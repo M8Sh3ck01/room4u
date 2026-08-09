@@ -33,39 +33,20 @@ async function assertVerified(chargeId) {
   }
 }
 
-async function handlePayChanguWebhook(rawBody) {
-  let body;
-  try {
-    body = JSON.parse(Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : String(rawBody));
-  } catch (err) {
-    throw appError(400, 'VALIDATION_ERROR', 'Webhook body must be valid JSON');
-  }
-
-  if (body.event_type && !PAYMENT_EVENT_TYPES.has(body.event_type)) {
-    return { ok: true, skipped: true, reason: `event_type=${body.event_type}` };
-  }
-
-  if (body.status && !SUCCESS_STATUSES.has(body.status)) {
-    return { ok: true, skipped: true, reason: `status=${body.status}` };
-  }
-
-  const ref = body.reference || body.tx_ref || body.charge_id;
-  if (!ref) throw appError(400, 'VALIDATION_ERROR', 'Missing charge reference');
-
-  const booking = await findByTxRef(ref);
+async function processPaidBooking({
+  txRef,
+  chargeId,
+  paidAt = new Date(),
+  moveInDateRaw,
+}) {
+  const booking = await findByTxRef(txRef);
   if (!booking) throw appError(404, 'BOOKING_NOT_FOUND', 'No booking for this charge');
 
   if (config.paychangu.enabled) {
-    await assertVerified(booking.tx_ref);
+    await assertVerified(txRef);
   }
 
-  if (body.charge_id && booking.charge_id !== body.charge_id) {
-    booking.charge_id = body.charge_id;
-    await booking.save();
-  }
-
-  const paidAt = new Date();
-  const gatewayChargeId = body.charge_id || booking.tx_ref;
+  const gatewayChargeId = chargeId || booking.tx_ref;
   const result = await consumeBed({
     roomId: booking.room_id,
     chargeId: gatewayChargeId,
@@ -77,7 +58,7 @@ async function handlePayChanguWebhook(rawBody) {
     return { ok: true, skipped: true, reason: 'no-bed' };
   }
 
-  const moveInDate = toMoveInDate(body.move_in_date, result.room.available_from);
+  const moveInDate = toMoveInDate(moveInDateRaw, result.room.available_from);
 
   const claimed = await completePayment({
     booking,
@@ -98,4 +79,39 @@ async function handlePayChanguWebhook(rawBody) {
   return { ok: true, booking_id: claimed.id, room_rented: result.justRented };
 }
 
-module.exports = { handlePayChanguWebhook };
+async function handlePayChanguWebhook(rawBody) {
+  let body;
+  try {
+    body = JSON.parse(Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : String(rawBody));
+  } catch (err) {
+    throw appError(400, 'VALIDATION_ERROR', 'Webhook body must be valid JSON');
+  }
+
+  if (body.event_type && !PAYMENT_EVENT_TYPES.has(body.event_type)) {
+    return { ok: true, skipped: true, reason: `event_type=${body.event_type}` };
+  }
+
+  if (body.status && !SUCCESS_STATUSES.has(body.status)) {
+    return { ok: true, skipped: true, reason: `status=${body.status}` };
+  }
+
+  const ref = body.tx_ref || body.reference || body.charge_id;
+  if (!ref) throw appError(400, 'VALIDATION_ERROR', 'Missing charge reference');
+
+  const booking = await findByTxRef(ref);
+  if (!booking) throw appError(404, 'BOOKING_NOT_FOUND', 'No booking for this charge');
+
+  if (body.charge_id && booking.charge_id !== body.charge_id) {
+    booking.charge_id = body.charge_id;
+    await booking.save();
+  }
+
+  return processPaidBooking({
+    txRef: booking.tx_ref,
+    chargeId: body.charge_id,
+    paidAt: new Date(),
+    moveInDateRaw: body.move_in_date,
+  });
+}
+
+module.exports = { handlePayChanguWebhook, processPaidBooking };

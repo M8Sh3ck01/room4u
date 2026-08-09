@@ -53,7 +53,7 @@ describe('GET /api/paychangu/return (Inline Checkout callback, gateway enabled)'
     [room] = await Room.create([stockRoom({ hostel_id: hostel._id, landlord_id: landlord._id })]);
   });
 
-  it('verifies the tx_ref and redirects to the reserve page with status=success', async () => {
+  it('credits the payment, consumes a bed, and redirects with status=success', async () => {
     await Booking.create({
       room_id: room._id,
       user_id: new mongoose.Types.ObjectId(),
@@ -70,9 +70,48 @@ describe('GET /api/paychangu/return (Inline Checkout callback, gateway enabled)'
     expect(url).toBe('https://gateway.test/verify-payment/room4u_abc');
     expect(opts.headers.Authorization).toBe('Bearer sk-test');
     spy.mockRestore();
+
+    const booking = await Booking.findOne({ tx_ref: 'room4u_abc' });
+    expect(booking.status).toBe('paid');
+    expect(booking.paid_at).toBeTruthy();
+
+    const saved = await Room.findById(room.id);
+    expect(saved.beds_left).toBe(1);
+    expect(saved.rented).toBe(false);
+    expect(saved.sold).toHaveLength(1);
+    expect(saved.sold[0].charge_id).toBe('room4u_abc');
+
+    const Payment = require('../src/modules/bookings/payment.model');
+    const FollowUp = require('../src/modules/bookings/followup.model');
+    expect(await Payment.countDocuments({})).toBe(2);
+    expect(await FollowUp.countDocuments({})).toBe(1);
   });
 
-  it('redirects without status when the payment is not yet successful', async () => {
+  it('is idempotent for a repeated return callback', async () => {
+    await Booking.create({
+      room_id: room._id,
+      user_id: new mongoose.Types.ObjectId(),
+      status: 'requested',
+      tx_ref: 'room4u_idem',
+    });
+    const spy = mockVerify({ status: 'success', currency: 'MWK', amount: 20000, tx_ref: 'room4u_idem' });
+
+    await request(app).get('/api/paychangu/return?tx_ref=room4u_idem');
+    const second = await request(app).get('/api/paychangu/return?tx_ref=room4u_idem');
+    expect(second.status).toBe(302);
+    expect(second.headers.location).toBe(`/rooms/${room.id}/reserve?status=success`);
+    spy.mockRestore();
+
+    const saved = await Room.findById(room.id);
+    expect(saved.beds_left).toBe(1);
+    expect(saved.sold).toHaveLength(1);
+    const Payment = require('../src/modules/bookings/payment.model');
+    const FollowUp = require('../src/modules/bookings/followup.model');
+    expect(await Payment.countDocuments({})).toBe(2);
+    expect(await FollowUp.countDocuments({})).toBe(1);
+  });
+
+  it('redirects with status=error when the payment is not successful', async () => {
     await Booking.create({
       room_id: room._id,
       user_id: new mongoose.Types.ObjectId(),
@@ -83,8 +122,13 @@ describe('GET /api/paychangu/return (Inline Checkout callback, gateway enabled)'
 
     const res = await request(app).get('/api/paychangu/return?tx_ref=room4u_pending');
     expect(res.status).toBe(302);
-    expect(res.headers.location).toBe(`/rooms/${room.id}/reserve`);
+    expect(res.headers.location).toBe(`/rooms/${room.id}/reserve?status=error`);
     spy.mockRestore();
+
+    const booking = await Booking.findOne({ tx_ref: 'room4u_pending' });
+    expect(booking.status).toBe('requested');
+    const Payment = require('../src/modules/bookings/payment.model');
+    expect(await Payment.countDocuments({})).toBe(0);
   });
 
   it('redirects with status=error when verification itself fails', async () => {
