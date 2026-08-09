@@ -5,6 +5,7 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
   const uid = useId();
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
+  const [menuStyle, setMenuStyle] = useState(null);
   const wrapRef = useRef(null);
   const triggerRef = useRef(null);
   const listRef = useRef(null);
@@ -17,6 +18,25 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
     setHighlight(selectedIndex);
     setOpen(true);
   };
+
+  useEffect(() => {
+    if (!open) {
+      setMenuStyle(null);
+      return undefined;
+    }
+    const placeMenu = () => {
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      const rect = wrap.getBoundingClientRect();
+      const vw = document.documentElement.clientWidth;
+      const menuWidth = Math.min(Math.max(rect.width, 220), vw - 24);
+      const shift = Math.min(0, vw - 12 - (rect.left + menuWidth));
+      setMenuStyle({ minWidth: menuWidth, left: shift });
+    };
+    placeMenu();
+    window.addEventListener('resize', placeMenu);
+    return () => window.removeEventListener('resize', placeMenu);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -90,7 +110,7 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
       </button>
 
       {open && (
-        <ul ref={listRef} className="filter-select-menu" role="listbox" aria-label={ariaLabel}>
+        <ul ref={listRef} className="filter-select-menu" style={menuStyle} role="listbox" aria-label={ariaLabel}>
           {options.map((opt, i) => (
             <li
               key={opt.value}
