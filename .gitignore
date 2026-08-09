@@ -9,3 +9,4 @@ server/coverage/
 /hostel *.jpeg
 client_secret_*.json
 /docs
+/.opencode/
