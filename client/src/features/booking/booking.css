@@ -341,3 +341,49 @@
 .booking-skeleton-line--short {
   width: 45%;
 }
+
+.booked-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  color: var(--color-text-muted);
+}
+
+.booked-back-icon {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.booked-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.booked-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.booked-panel-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-muted);
+}
+
+.booked-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  width: 100%;
+}

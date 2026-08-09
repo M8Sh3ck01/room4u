@@ -34,6 +34,9 @@ export const claimRoom = (roomId, idempotencyKey) =>
 export const getBooking = (id) =>
   api(`/api/bookings/${id}`).then((res) => res.data.booking);
 
+export const getBookedRoom = (id) =>
+  api(`/api/bookings/${id}/room`).then((res) => res.data);
+
 export const getMyBookings = () =>
   api('/api/bookings/mine').then((res) => res.data.bookings);
 

@@ -300,6 +300,46 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     expect(paidCancelOwner.status).toBe(409);
   });
 
+  it('serves the booked room to its owner even when the room has no beds left', async () => {
+    const { token, user } = await devLogin('roomview@gmail.com');
+    const paid = await Booking.create({
+      room_id: fullRoom._id,
+      user_id: user.id,
+      status: 'paid',
+      paid_at: new Date(),
+    });
+    const res = await request(app)
+      .get(`/api/bookings/${paid.id}/room`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.room).toMatchObject({
+      id: fullRoom.id,
+      hostel: 'Chibavi Hostel',
+      area: 'Chibavi',
+      type: 'shared',
+      price: 20000,
+    });
+    expect(res.body.data.room.photos).toBeTruthy();
+    expect(res.body.data.room.directions_url).toBeTruthy();
+    expect(res.body.data.booking.id).toBe(paid.id);
+    expect(res.body.data.booking.status).toBe('paid');
+  });
+
+  it('forbids viewing another users booked room', async () => {
+    const { user } = await devLogin('roomowner@gmail.com');
+    const paid = await Booking.create({
+      room_id: fullRoom._id,
+      user_id: user.id,
+      status: 'paid',
+      paid_at: new Date(),
+    });
+    const otherToken = await loginWithPhone('thiefroom@gmail.com');
+    const res = await request(app)
+      .get(`/api/bookings/${paid.id}/room`)
+      .set('Authorization', `Bearer ${otherToken}`);
+    expect(res.status).toBe(403);
+  });
+
   it('lets the same tenant re-claim after cancelling', async () => {
     const token = await loginWithPhone('reclaim@gmail.com');
     const first = await claim(token, room.id, 'key-reclaim-1');

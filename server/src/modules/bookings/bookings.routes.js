@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const config = require('@config');
 const { claimRoom, getBookingById, getMyBookings, cancelBooking, findByTxRef } = require('./bookings.service');
 const { serializeBooking } = require('./booking.model');
+const { serializeRoom } = require('@modules/rooms/room.service');
 const { processPaidBooking } = require('@shared/services/paychanguWebhook');
 
 const router = express.Router();
@@ -75,6 +76,27 @@ router.get(
     }
     const booking = await getBookingById({ bookingId: req.params.id, user: req.user });
     successResponse(res, { booking: serializeBooking(booking) }, 'OK', 200);
+  })
+);
+
+router.get(
+  '/bookings/:id/room',
+  auth,
+  asyncCatch(async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
+    }
+    const booking = await getBookingById({ bookingId: req.params.id, user: req.user });
+    const room = booking.room_id;
+    if (!room || typeof room !== 'object') {
+      throw appError(404, 'ROOM_NOT_FOUND', 'Room not found');
+    }
+    successResponse(
+      res,
+      { booking: serializeBooking(booking), room: serializeRoom(room, { detail: true }) },
+      'OK',
+      200
+    );
   })
 );
 

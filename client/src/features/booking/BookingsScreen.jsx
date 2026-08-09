@@ -135,8 +135,8 @@ export function BookingsScreen() {
                       {cancellingId === booking.id ? 'Cancelling…' : 'Cancel booking'}
                     </Button>
                   )}
-                  {room && (
-                    <Link to={`/rooms/${room.id}`}>
+                  {(booking.status === 'paid' || booking.status === 'requested') && room && (
+                    <Link to={`/bookings/${booking.id}/room`}>
                       <Button variant="ghost" size="sm">
                         View room
                       </Button>
