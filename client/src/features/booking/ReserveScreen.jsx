@@ -359,7 +359,7 @@ export function ReserveScreen() {
           </p>
           {moveIn && <p className="pay-success-movein">Move-in {formatDate(moveIn)}</p>}
           <div className="pay-success-facts">
-            <p>The booking fee is part of the rental fee.</p>
+            <p>The deposit counts toward your rent. The agent fee is separate.</p>
             <p>We call to check you&apos;ve settled in, 3 days after move-in.</p>
           </div>
           <div className="pay-actions">
@@ -452,7 +452,7 @@ export function ReserveScreen() {
                   </p>
                 </div>
               </div>
-              <p className="pay-trust">The booking fee is part of the rental fee.</p>
+              <p className="pay-trust">The deposit counts toward your rent. The agent fee is separate.</p>
               {payError && <Alert variant="danger">{payError}</Alert>}
               <Button
                 onClick={(e) => {
