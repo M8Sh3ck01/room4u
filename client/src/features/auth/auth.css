@@ -5,6 +5,14 @@
   min-height: calc(100vh - var(--space-6) - var(--space-4));
 }
 
+#g_id_onload {
+  display: flex;
+  justify-content: center;
+  transform: scale(1.25);
+  transform-origin: top center;
+  margin-bottom: var(--space-3);
+}
+
 .profile-head {
   display: flex;
   align-items: center;
