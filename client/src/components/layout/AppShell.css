@@ -156,7 +156,7 @@
 }
 
 @media (max-width: 767px) {
-  .header-user > span {
+  .header-user > span:not(.header-avatar) {
     display: none;
   }
 
