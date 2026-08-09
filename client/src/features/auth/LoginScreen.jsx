@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { GoogleButton } from './GoogleButton';
-import { Card, Field, Input, Button } from '../../design/primitives';
+import { Card, Alert } from '../../design/primitives';
 import './auth.css';
 
 const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
@@ -10,8 +10,6 @@ const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
 export function LoginScreen() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -28,60 +26,18 @@ export function LoginScreen() {
     }
   };
 
-  const handleDev = async (e) => {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await signIn({ dev: { email, name } });
-      navigate('/', { replace: true });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
     <div className="auth-center">
       <Card className="center measure">
       <div className="stack">
         <h1>Sign in</h1>
-        <p className="text-muted">
-          {googleConfigured
-            ? 'Sign in with Google to find and claim your room.'
-            : 'Google sign-in is not configured yet use the dev sign-in below.'}
-        </p>
+        <p className="text-muted">Sign in with Google to find and claim your room.</p>
 
-        <GoogleButton onCredential={handleGoogle} />
-
-        {!googleConfigured && (
-          <form onSubmit={handleDev} className="stack">
-            <Field label="Email" htmlFor="dev-email">
-              <Input
-                id="dev-email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@gmail.com"
-                required
-              />
-            </Field>
-            <Field label="Name (optional)" htmlFor="dev-name">
-              <Input
-                id="dev-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Chisomo Banda"
-              />
-            </Field>
-            {error && <p className="text-error">{error}</p>}
-            <Button loading={busy} fullWidth>
-              {busy ? 'Signing in…' : 'Sign in (dev)'}
-            </Button>
-          </form>
+        {googleConfigured ? <GoogleButton onCredential={handleGoogle} /> : (
+          <Alert variant="warning">Google sign-in is not configured yet.</Alert>
         )}
 
-        {googleConfigured && error && <p className="text-error">{error}</p>}
+        {error && <p className="text-error">{error}</p>}
         </div>
       </Card>
     </div>

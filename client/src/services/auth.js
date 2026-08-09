@@ -1,8 +1,5 @@
 import { api } from './api';
 
-export const login = (credentials) =>
-  api('/api/auth/dev', { method: 'POST', body: JSON.stringify(credentials) });
-
 export const loginWithGoogle = (id_token) =>
   api('/api/auth/google', { method: 'POST', body: JSON.stringify({ id_token }) });
 

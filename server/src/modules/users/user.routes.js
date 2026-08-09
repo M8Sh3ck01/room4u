@@ -6,7 +6,7 @@ const { auth } = require('@core/middleware/auth');
 const { successResponse } = require('@core/utils/apiResponse');
 const { appError } = require('@core/errors');
 const { normalizePhone } = require('@core/utils/phone');
-const { signInWithGoogle, devSignIn } = require('./auth.service');
+const { signInWithGoogle } = require('./auth.service');
 const { serializeUser } = require('./user.model');
 
 const router = express.Router();
@@ -39,16 +39,6 @@ router.post(
     const { id_token } = req.body || {};
     if (!id_token) throw appError(400, 'VALIDATION_ERROR', 'id_token is required');
     const result = await signInWithGoogle(id_token);
-    setSessionCookie(res, result.token);
-    successResponse(res, sessionPayload(result), 'Signed in', 200);
-  })
-);
-
-router.post(
-  '/auth/dev',
-  asyncCatch(async (req, res) => {
-    const { email, name } = req.body || {};
-    const result = await devSignIn(email, name);
     setSessionCookie(res, result.token);
     successResponse(res, sessionPayload(result), 'Signed in', 200);
   })

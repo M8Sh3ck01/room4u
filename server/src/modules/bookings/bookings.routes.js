@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const config = require('@config');
 const { claimRoom, getBookingById, getMyBookings, cancelBooking, findByTxRef } = require('./bookings.service');
 const { serializeBooking } = require('./booking.model');
-const Booking = require('./booking.model');
 const { processPaidBooking } = require('@shared/services/paychanguWebhook');
 
 const router = express.Router();
@@ -88,24 +87,6 @@ router.post(
     }
     const booking = await cancelBooking({ bookingId: req.params.id, user: req.user });
     successResponse(res, { booking: serializeBooking(booking) }, 'Booking cancelled', 200);
-  })
-);
-
-router.post(
-  '/dev/bookings/:id/simulate-payment',
-  auth,
-  asyncCatch(async (req, res) => {
-    if (!config.allowDevLogin) throw appError(404, 'NOT_FOUND', 'Not found');
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
-    }
-    const booking = await Booking.findById(req.params.id);
-    if (!booking) throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
-    if (!booking.tx_ref) throw appError(409, 'CONFLICT', 'Booking has no charge yet');
-    const result = await handlePayChanguWebhook(
-      JSON.stringify({ reference: booking.tx_ref, status: 'success' })
-    );
-    successResponse(res, result, 'Payment simulated', 200);
   })
 );
 

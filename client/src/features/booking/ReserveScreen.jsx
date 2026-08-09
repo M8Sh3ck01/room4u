@@ -9,7 +9,6 @@ import {
   makeIdempotencyKey,
   CLAIM_STORAGE_KEY,
   getCachedClaim,
-  simulatePayment,
 } from '../../services/bookings';
 import { useAuth } from '../auth/AuthContext';
 import { GoogleButton } from '../auth/GoogleButton';
@@ -32,10 +31,7 @@ export function ReserveScreen() {
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
-  const [authBusy, setAuthBusy] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [savingPhone, setSavingPhone] = useState(false);
   const [phoneError, setPhoneError] = useState(null);
@@ -43,7 +39,6 @@ export function ReserveScreen() {
   const [booking, setBooking] = useState(null);
   const [claiming, setClaiming] = useState(false);
   const [payError, setPayError] = useState(null);
-  const [simulating, setSimulating] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [claimExpired, setClaimExpired] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
@@ -109,33 +104,14 @@ export function ReserveScreen() {
 
   const handleGoogle = useCallback(
     async (credential) => {
-      setAuthBusy(true);
       setAuthError(null);
       try {
         await signIn({ google: credential });
       } catch (err) {
         setAuthError(err.message);
-      } finally {
-        setAuthBusy(false);
       }
     },
     [signIn]
-  );
-
-  const handleDev = useCallback(
-    async (e) => {
-      e.preventDefault();
-      setAuthBusy(true);
-      setAuthError(null);
-      try {
-        await signIn({ dev: { email, name } });
-      } catch (err) {
-        setAuthError(err.message);
-      } finally {
-        setAuthBusy(false);
-      }
-    },
-    [signIn, email, name]
   );
 
   const handlePhone = useCallback(
@@ -183,6 +159,9 @@ export function ReserveScreen() {
           } catch {
             // storage unavailable
           }
+          setClaim(null);
+          setBooking(null);
+          setClaimExpired(false);
         } else if (data.status === 'requested' && Date.now() >= deadline) {
           setClaimExpired(true);
         }
@@ -296,31 +275,20 @@ export function ReserveScreen() {
     }
   }, [claim, room, openInlineCheckout]);
 
-  const simulate = useCallback(async () => {
-    if (!claim) return;
-    setSimulating(true);
-    setPayError(null);
-    try {
-      await simulatePayment(claim.bookingId);
-      setBooking(await getBooking(claim.bookingId));
-    } catch (err) {
-      setPayError(err.message);
-    } finally {
-      setSimulating(false);
-    }
-  }, [claim]);
-
   const cancel = useCallback(async () => {
     if (!claim) return;
     setCancelling(true);
     setPayError(null);
     try {
-      setBooking(await cancelBooking(claim.bookingId));
+      await cancelBooking(claim.bookingId);
       try {
         sessionStorage.removeItem(CLAIM_STORAGE_KEY);
       } catch {
         // storage unavailable
       }
+      setClaim(null);
+      setBooking(null);
+      setClaimExpired(false);
     } catch (err) {
       setPayError(err.message);
     } finally {
@@ -381,31 +349,9 @@ export function ReserveScreen() {
           </p>
           <GoogleButton onCredential={handleGoogle} />
           {!googleConfigured && (
-            <form onSubmit={handleDev} className="stack">
-              <Field label="Email" htmlFor="reserve-email">
-                <Input
-                  id="reserve-email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@gmail.com"
-                  required
-                />
-              </Field>
-              <Field label="Name (optional)" htmlFor="reserve-name">
-                <Input
-                  id="reserve-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Chisomo Banda"
-                />
-              </Field>
-              {authError && <p className="text-error">{authError}</p>}
-              <Button loading={authBusy} fullWidth>
-                {authBusy ? 'Signing in…' : 'Continue'}
-              </Button>
-            </form>
+            <Alert variant="warning">Google sign-in is not configured yet.</Alert>
           )}
-          {googleConfigured && authError && <p className="text-error">{authError}</p>}
+          {authError && <p className="text-error">{authError}</p>}
         </Card>
       ) : !user.phone ? (
         <Card className="reserve-step">
@@ -445,9 +391,9 @@ export function ReserveScreen() {
             <p>We call to check you&apos;ve settled in, 3 days after move-in.</p>
           </div>
           <div className="pay-actions">
-            <Link to={`/rooms/${claim.roomId}`}>
+            <Link to="/bookings">
               <Button variant="ghost" fullWidth>
-                Back to room
+                My bookings
               </Button>
             </Link>
             <Link to="/">
@@ -460,17 +406,6 @@ export function ReserveScreen() {
           <Alert variant="danger">This payment link expired.</Alert>
           <p className="text-muted">
             Your spot at {claim.roomName} was released. You can reserve again if the room is still
-            available.
-          </p>
-          <Link to={`/rooms/${claim.roomId}`}>
-            <Button fullWidth>Back to room</Button>
-          </Link>
-        </Card>
-      ) : status === 'cancelled' ? (
-        <Card className="stack">
-          <Alert variant="danger">This claim was cancelled.</Alert>
-          <p className="text-muted">
-            Your spot at {claim.roomName} was released. You can try again if the room is still
             available.
           </p>
           <Link to={`/rooms/${claim.roomId}`}>
@@ -499,11 +434,6 @@ export function ReserveScreen() {
                 <Button variant="ghost-danger" onClick={cancel} loading={cancelling}>
                   {cancelling ? 'Cancelling…' : 'Cancel'}
                 </Button>
-                {import.meta.env.DEV && (
-                  <Button variant="ghost" onClick={simulate} loading={simulating}>
-                    {simulating ? 'Simulating…' : 'Simulate payment (dev)'}
-                  </Button>
-                )}
               </div>
             </>
           ) : (

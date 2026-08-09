@@ -1,5 +1,4 @@
 process.env.NODE_ENV = 'test';
-process.env.ALLOW_DEV_LOGIN = 'true';
 process.env.OPERATOR_EMAILS = 'operator@example.com';
 
 const request = require('supertest');
@@ -7,6 +6,7 @@ const mongoose = require('mongoose');
 
 const app = require('../src/app');
 const { connectTestDb, clearDb, disconnectDb } = require('./helpers/db');
+const { createSession } = require('./helpers/session');
 
 const Area = require('../src/modules/rooms/area.model');
 const Hostel = require('../src/modules/rooms/hostel.model');
@@ -33,10 +33,8 @@ const claim = (token, roomId, key) =>
     .set('Idempotency-Key', key)
     .send({});
 
-const devLogin = async (email, name = 'Tenant One') => {
-  const res = await request(app).post('/api/auth/dev').send({ email, name });
-  return { token: res.body.data.token, user: res.body.data.user };
-};
+const devLogin = async (email, name = 'Tenant One', is_operator = false) =>
+  createSession(email, { name, is_operator });
 
 const loginWithPhone = async (email) => {
   const { token } = await devLogin(email);
@@ -202,6 +200,30 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
     expect(res.body.data.bookings[0].id).toBe(first.body.data.booking.id);
   });
 
+  it('GET /api/bookings/mine includes paid bookings with room details', async () => {
+    const { token, user } = await devLogin('paidmine@gmail.com');
+    const booking = await Booking.create({
+      room_id: room._id,
+      user_id: user.id,
+      status: 'paid',
+      tx_ref: 'room4u_paid_1',
+      paid_at: new Date(),
+      move_in_date: new Date('2026-09-01'),
+    });
+
+    const res = await request(app).get('/api/bookings/mine').set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.bookings).toHaveLength(1);
+    expect(res.body.data.bookings[0].id).toBe(booking.id);
+    expect(res.body.data.bookings[0].status).toBe('paid');
+    expect(res.body.data.bookings[0].move_in_date).toBe('2026-09-01');
+    expect(res.body.data.bookings[0].room).toMatchObject({
+      hostel: 'Chibavi Hostel',
+      area: 'Chibavi',
+      price: 20000,
+    });
+  });
+
   it('GET /api/bookings/:id is visible to the owner only', async () => {
     const token = await loginWithPhone('owner@gmail.com');
     const created = await claim(token, room.id, 'key-owner');
@@ -322,7 +344,7 @@ describe('bookings module — claim a bed (Phase 3A)', () => {
   });
 
   it('an operator can view and cancel any requested booking', async () => {
-    const { token } = await devLogin('operator@example.com', 'Operator');
+    const { token } = await devLogin('operator@example.com', 'Operator', true);
     const created = await claim(await loginWithPhone('tenant-op@gmail.com'), room.id, 'key-op');
     const bookingId = created.body.data.booking.id;
 

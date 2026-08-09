@@ -23,6 +23,9 @@ export function AppShell() {
         <div className="header-actions">
           {user ? (
             <>
+              <Link to="/bookings" className="header-link">
+                My bookings
+              </Link>
               <Link to="/me" className="header-user">
                 {user.avatar_url ? (
                   <img className="header-avatar" src={user.avatar_url} alt="" />

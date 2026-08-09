@@ -34,12 +34,10 @@ export const claimRoom = (roomId, idempotencyKey) =>
 export const getBooking = (id) =>
   api(`/api/bookings/${id}`).then((res) => res.data.booking);
 
+export const getMyBookings = () =>
+  api('/api/bookings/mine').then((res) => res.data.bookings);
+
 export const cancelBooking = (id) =>
   api(`/api/bookings/${id}/cancel`, { method: 'POST' }).then(
     (res) => res.data.booking
   );
-
-export const simulatePayment = (bookingId) =>
-  api(`/api/dev/bookings/${bookingId}/simulate-payment`, {
-    method: 'POST',
-  }).then((res) => res.data);

@@ -20,9 +20,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = useCallback(async (credentials) => {
-    const res = credentials.google
-      ? await authApi.loginWithGoogle(credentials.google)
-      : await authApi.login(credentials.dev);
+    const res = await authApi.loginWithGoogle(credentials.google);
     setUser(res.data.user);
   }, []);
 

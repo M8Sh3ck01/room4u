@@ -80,26 +80,10 @@ async function signInWithGoogle(idToken) {
   return { token: issueSessionToken(user), user: serializeUser(user) };
 }
 
-async function devSignIn(email, name) {
-  if (config.isProduction || !config.allowDevLogin) {
-    throw appError(404, 'NOT_FOUND', 'Not found');
-  }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw appError(400, 'VALIDATION_ERROR', 'A valid email is required');
-  }
-  const user = await findOrCreateUser({
-    sub: `dev:${email}`,
-    email,
-    name: name || email.split('@')[0],
-  });
-  return { token: issueSessionToken(user), user: serializeUser(user) };
-}
-
 module.exports = {
   verifyGoogleIdToken,
   findOrCreateUser,
   getUserById,
   issueSessionToken,
   signInWithGoogle,
-  devSignIn,
 };
