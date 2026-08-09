@@ -161,16 +161,22 @@ export function ReserveScreen() {
     };
   }, [claim, status]);
 
-  const loadPaychanguScript = () =>
+  const loadScript = (src) =>
     new Promise((resolve, reject) => {
-      if (typeof window !== 'undefined' && window.PaychanguCheckout) return resolve();
+      if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = document.createElement('script');
-      script.src = 'https://in.paychangu.com/js/popup.js';
+      script.src = src;
       script.async = true;
       script.onload = () => resolve();
       script.onerror = () => reject(new Error('Could not load the payment provider. Try again.'));
       document.head.appendChild(script);
     });
+
+  const loadPaychanguScript = async () => {
+    if (typeof window !== 'undefined' && window.PaychanguCheckout) return;
+    await loadScript('https://code.jquery.com/jquery-3.7.1.min.js');
+    await loadScript('https://in.paychangu.com/js/popup.js');
+  };
 
   const openInlineCheckout = useCallback(
     async (claimData) => {
@@ -181,6 +187,11 @@ export function ReserveScreen() {
       }
       try {
         await loadPaychanguScript();
+        if (!document.getElementById('wrapper')) {
+          const wrapper = document.createElement('div');
+          wrapper.id = 'wrapper';
+          document.body.appendChild(wrapper);
+        }
         const [firstName, ...rest] = (user.name || '').trim().split(/\s+/);
         window.PaychanguCheckout({
           public_key: publicKey,
@@ -433,14 +444,15 @@ export function ReserveScreen() {
             <>
               <div className="pay-hero" role="status">
                 <Spinner className="pay-hero-spinner" />
-                <p className="pay-hero-title">Approve the payment on your phone</p>
+                <p className="pay-hero-title">Complete your payment</p>
                 <p className="pay-hero-amount">{formatMoney(claim.payAmount)}</p>
                 <p className="pay-hero-meta">
                   Booking fee for a bed at {claim.roomName}
                   {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
                 </p>
                 <p className="pay-hero-note">
-                  Then come back. This page updates by itself. The link expires in 5 minutes.
+                  The payment window opens above on this page. This page updates by itself once
+                  you&apos;re done — your spot is held for 5 minutes.
                 </p>
               </div>
               {payError && <Alert variant="danger">{payError}</Alert>}
