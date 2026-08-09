@@ -231,3 +231,25 @@
   flex-direction: column;
   gap: var(--space-3);
 }
+
+/* PayChangu inline popup: present the checkout iframe as a centered modal.
+   popup.js injects the iframe into #wrapper with full-screen inline styles;
+   we override those (with !important) to show a rounded card over a backdrop. */
+#wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9998;
+}
+
+#wrapper iframe {
+  position: relative !important;
+  inset: auto !important;
+  width: min(94vw, 520px) !important;
+  height: min(92vh, 720px) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35) !important;
+}
