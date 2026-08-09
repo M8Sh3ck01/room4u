@@ -1,7 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '../../design/primitives';
-import { BottomNav } from './BottomNav';
 import './AppShell.css';
 
 export function AppShell() {
@@ -48,7 +47,6 @@ export function AppShell() {
       <main className="app-main">
         <Outlet />
       </main>
-      {user && <BottomNav />}
       {showFooter && (
         <footer className="app-footer">
           <div className="app-footer-inner">
