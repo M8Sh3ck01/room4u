@@ -678,7 +678,7 @@
 }
 
 .detail-title {
-  font-size: var(--text-display);
+  font-size: clamp(var(--text-xl), 3.5vw, var(--text-2xl));
   line-height: var(--leading-display);
   margin: 0;
 }
@@ -690,7 +690,7 @@
   margin: 0;
   padding-top: var(--space-3);
   border-top: var(--border-width) solid var(--color-border);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   color: var(--color-primary-text);
 }
