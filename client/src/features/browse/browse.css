@@ -95,19 +95,19 @@
   }
 
   .browse .hero-chips .badge {
-    padding-left: 6px;
-    padding-right: 6px;
+    padding-left: var(--space-1);
+    padding-right: var(--space-1);
     font-size: var(--text-xs);
   }
 
   .browse .chip-icon {
-    width: 16px;
-    height: 16px;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
   }
 
   .browse .filter-select-trigger,
   .browse .filters-clear {
-    min-height: 38px;
+    min-height: var(--control-min-h-sm);
     font-size: var(--text-xs);
   }
 
@@ -116,12 +116,12 @@
   }
 
   .browse .filter-select-chevron {
-    width: 16px;
-    height: 16px;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
   }
 
   .browse .filter-select-option {
-    min-height: 38px;
+    min-height: var(--control-min-h-sm);
     padding: var(--space-1) var(--space-2);
     font-size: var(--text-xs);
   }

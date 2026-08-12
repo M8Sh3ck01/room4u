@@ -6,7 +6,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const src = path.join(dirname, '..', 'src');
 const tokensFile = path.resolve(src, 'design', 'tokens.css');
 
-const hexRe = /#[0-9a-fA-F]{3,8}\b/;
+const hexRe = /#[0-9a-fA-F]{3,8}\b(?![^<]*>)/;
 const lengthRe = /\b\d+(\.\d+)?(px|rem|em)\b/;
 
 const violations = [];

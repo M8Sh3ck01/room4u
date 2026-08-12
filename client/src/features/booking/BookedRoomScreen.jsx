@@ -179,7 +179,7 @@ export function BookedRoomScreen() {
       <h1 className="detail-title">{room.hostel}</h1>
       <p className="detail-price">
         {formatMoney(room.price)}
-        <span className="text-muted">&#160;per month</span>
+        <span className="text-muted">&nbsp;per month</span>
       </p>
 
       <Card className="booked-panel">
