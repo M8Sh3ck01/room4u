@@ -11,7 +11,13 @@ const lengthRe = /\b\d+(\.\d+)?(px|rem|em)\b/;
 
 const violations = [];
 
+// Vendored shadcn/ui components use Tailwind utilities (no raw design values
+// other than a few arbitrary --radius/ring helpers). They're a generated,
+// owned layer distinct from hand-written feature styles, so skip them.
+const uiDir = path.join(dirname, '..', 'src', 'components', 'ui');
+
 function walk(dir) {
+  if (path.resolve(dir) === path.resolve(uiDir)) return;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {

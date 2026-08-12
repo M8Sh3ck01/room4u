@@ -2,9 +2,19 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { updateMe } from '../../services/auth';
-import { Card, Field, Input, Button, Alert } from '../../design/primitives';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Loader2 } from 'lucide-react';
 import { normalizePhone, isValidPhone, PHONE_HINT } from '../../lib/phone';
-import './auth.css';
+
+const warningAlert =
+  'border-[var(--color-warning-soft-text)] bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]';
+const successAlert =
+  'border-[var(--color-success-soft-text)] bg-[var(--color-success-soft)] text-[var(--color-success-soft-text)]';
 
 export function ProfileScreen() {
   const { user, setUserFromResponse, signOut } = useAuth();
@@ -49,37 +59,38 @@ export function ProfileScreen() {
   const initial = (user?.name || user?.email || '?')[0]?.toUpperCase() || '?';
 
   return (
-    <Card className="center measure">
-      <div className="stack">
-        <div className="profile-head">
+    <Card className="mx-auto w-full max-w-measure">
+      <CardContent className="flex flex-col gap-6">
+        <div className="flex items-center gap-4">
           {user?.avatar_url ? (
-            <img className="profile-avatar" src={user.avatar_url} alt="" />
+            <Avatar className="size-12">
+              <AvatarImage src={user.avatar_url} alt="" />
+            </Avatar>
           ) : (
-            <span className="profile-avatar profile-avatar--fallback" aria-hidden="true">
-              {initial}
-            </span>
+            <Avatar className="size-12">
+              <AvatarFallback className="text-lg font-bold bg-primary text-primary-foreground">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
           )}
-          <div className="profile-head-text">
-            <h1 className="profile-title">{user?.name || 'My profile'}</h1>
-          </div>
+          <h1 className="font-heading text-3xl uppercase leading-none">{user?.name || 'My profile'}</h1>
         </div>
 
         {!user?.phone && (
-          <Alert variant="warning">
-            <strong>Add a phone number to continue.</strong> You need a phone to claim a room and
-            receive status updates.
+          <Alert className={warningAlert}>
+            <AlertTitle>Add a phone number to continue.</AlertTitle>
+            <AlertDescription>You need a phone to claim a room and receive status updates.</AlertDescription>
           </Alert>
         )}
 
-        <div className="profile-rows">
-          <div className="profile-row">
-            <span className="profile-row-label">Email</span>
-            <span className="profile-row-value">{user?.email}</span>
-          </div>
+        <div className="flex items-baseline justify-between gap-3 text-base">
+          <span className="text-muted-foreground">Email</span>
+          <span className="font-semibold break-all">{user?.email}</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="stack">
-          <Field label="Full name" htmlFor="name">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name">Full name</Label>
             <Input
               id="name"
               value={name}
@@ -90,13 +101,10 @@ export function ProfileScreen() {
               placeholder="Chisomo Banda"
               autoComplete="name"
             />
-          </Field>
-          <Field
-            label="Phone number"
-            htmlFor="phone"
-            hint={PHONE_HINT}
-            error={phoneInvalid ? 'Enter a valid Malawi number, e.g. 0888 123 456.' : null}
-          >
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="phone">Phone number</Label>
             <Input
               id="phone"
               type="tel"
@@ -111,28 +119,41 @@ export function ProfileScreen() {
               autoComplete="tel"
               aria-invalid={phoneInvalid || undefined}
             />
-          </Field>
+            {phoneInvalid ? (
+              <p className="text-sm text-destructive">Enter a valid Malawi number, e.g. 0888 123 456.</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">{PHONE_HINT}</p>
+            )}
+          </div>
+
           {error && (
-            <Alert variant="danger" role="alert">
-              {error}
+            <Alert variant="destructive" role="alert">
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           {saved && (
-            <Alert variant="success" role="status">
-              Your changes were saved.
+            <Alert className={successAlert} role="status">
+              <AlertDescription>Your changes were saved.</AlertDescription>
             </Alert>
           )}
-          <Button type="submit" loading={saving} disabled={!dirty || phoneInvalid} fullWidth>
+
+          <Button type="submit" className="w-full" disabled={!dirty || phoneInvalid || saving}>
+            {saving && <Loader2 className="size-4 animate-spin" />}
             {saving ? 'Saving…' : 'Save changes'}
           </Button>
         </form>
 
-        <div className="profile-signout">
-          <Button type="button" variant="ghost-danger" fullWidth onClick={handleSignOut}>
+        <div className="border-t border-border pt-6">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full text-destructive border-destructive/40 hover:border-destructive/60"
+            onClick={handleSignOut}
+          >
             Sign out
           </Button>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 }
