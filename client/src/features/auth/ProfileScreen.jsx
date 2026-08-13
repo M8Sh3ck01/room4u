@@ -63,17 +63,21 @@ export function ProfileScreen() {
       <CardContent className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
           {user?.avatar_url ? (
-            <Avatar className="size-12">
+            <Avatar className="size-14">
               <AvatarImage src={user.avatar_url} alt="" />
             </Avatar>
           ) : (
-            <Avatar className="size-12">
-              <AvatarFallback className="text-lg font-bold bg-primary text-primary-foreground">
+            <Avatar className="size-14">
+              <AvatarFallback className="bg-primary text-lg font-bold text-primary-foreground">
                 {initial}
               </AvatarFallback>
             </Avatar>
           )}
-          <h1 className="font-heading text-3xl uppercase leading-none">{user?.name || 'My profile'}</h1>
+          <div className="min-w-0">
+            <h1 className="truncate text-2xl font-semibold tracking-tight">
+              {user?.name || 'My profile'}
+            </h1>
+          </div>
         </div>
 
         {!user?.phone && (
@@ -83,12 +87,18 @@ export function ProfileScreen() {
           </Alert>
         )}
 
-        <div className="flex items-baseline justify-between gap-3 text-base">
-          <span className="text-muted-foreground">Email</span>
-          <span className="font-semibold break-all">{user?.email}</span>
-        </div>
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              value={user?.email || ''}
+              disabled
+              readOnly
+              autoComplete="email"
+            />
+          </div>
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">Full name</Label>
             <Input
