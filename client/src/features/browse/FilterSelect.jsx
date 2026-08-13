@@ -95,7 +95,7 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
       <button
         type="button"
         ref={triggerRef}
-        className="flex min-h-[var(--control-min-h)] w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-left font-sans text-base text-foreground transition-[border-color,box-shadow] focus-visible:border-ring focus-visible:ring-[var(--focus-ring)] focus-visible:ring-ring/40 focus-visible:outline-none"
+        className="flex min-h-12 w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-left font-sans text-base text-foreground transition-[border-color,box-shadow] focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none"
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={onKeyDown}
         aria-haspopup="listbox"
@@ -115,7 +115,7 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
       {open && (
         <ul
           ref={listRef}
-          className="absolute left-0 right-0 top-[calc(100%+var(--space-2))] z-[var(--z-overlay)] m-0 list-none rounded-lg border border-border bg-card p-2"
+          className="absolute left-0 right-0 top-full mt-2 z-50 m-0 list-none rounded-lg border border-border bg-card p-2"
           style={menuStyle}
           role="listbox"
           aria-label={ariaLabel}
@@ -127,7 +127,7 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
               role="option"
               aria-selected={opt.value === value}
               className={cn(
-                'flex min-h-[var(--control-min-h)] cursor-pointer items-center justify-between gap-2 rounded-sm px-3 text-foreground',
+                'flex min-h-12 cursor-pointer items-center justify-between gap-2 rounded-sm px-3 text-foreground',
                 (i === current || opt.value === value) && 'bg-muted',
                 opt.value === value && 'font-semibold'
               )}

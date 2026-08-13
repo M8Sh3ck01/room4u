@@ -14,10 +14,10 @@ import { showArea } from '../../lib/area';
 const BOOKING_FEE = 20000;
 
 const STATUS_META = {
-  requested: { badge: 'bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]', label: 'Awaiting payment' },
-  paid: { badge: 'bg-[var(--color-success-soft)] text-[var(--color-success-soft-text)]', label: 'Paid' },
-  cancelled: { badge: 'bg-[var(--color-danger-soft)] text-[var(--color-danger-soft-text)]', label: 'Cancelled' },
-  refunded: { badge: 'bg-[var(--color-info-soft)] text-[var(--color-info-soft-text)]', label: 'Refunded' },
+  requested: { badge: 'bg-amber-50 text-amber-800', label: 'Awaiting payment' },
+  paid: { badge: 'bg-emerald-50 text-emerald-800', label: 'Paid' },
+  cancelled: { badge: 'bg-red-50 text-red-800', label: 'Cancelled' },
+  refunded: { badge: 'bg-sky-50 text-sky-800', label: 'Refunded' },
 };
 
 export function BookingsScreen() {
@@ -56,14 +56,14 @@ export function BookingsScreen() {
 
   if (!bookings) {
     return (
-      <div className="mx-auto flex w-full max-w-measure flex-col gap-4">
-        <h1 className="m-0">My bookings</h1>
+      <div className="mx-auto flex w-full max-w-md flex-col gap-4">
+        <h1 className="m-0 text-2xl font-semibold tracking-tight">My bookings</h1>
         <div className="flex flex-col gap-3" aria-label="Loading">
           {[0, 1, 2].map((i) => (
             <Card key={i} className="gap-2">
-              <Skeleton className="h-[var(--text-lg)] w-3/5" />
-              <Skeleton className="h-[var(--text-sm)] w-[45%]" />
-              <Skeleton className="h-[var(--text-sm)]" />
+              <Skeleton className="h-5 w-3/5" />
+              <Skeleton className="h-4 w-[45%]" />
+              <Skeleton className="h-4" />
             </Card>
           ))}
         </div>
@@ -72,8 +72,8 @@ export function BookingsScreen() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-measure flex-col gap-4">
-      <h1 className="m-0">My bookings</h1>
+    <div className="mx-auto flex w-full max-w-md flex-col gap-4">
+      <h1 className="m-0 text-2xl font-semibold tracking-tight">My bookings</h1>
 
       {error && (
         <Alert variant="destructive" role="alert">

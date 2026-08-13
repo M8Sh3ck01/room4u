@@ -12,9 +12,9 @@ import { Loader2 } from 'lucide-react';
 import { normalizePhone, isValidPhone, PHONE_HINT } from '../../lib/phone';
 
 const warningAlert =
-  'border-[var(--color-warning-soft-text)] bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]';
+  'border-amber-800 bg-amber-50 text-amber-800';
 const successAlert =
-  'border-[var(--color-success-soft-text)] bg-[var(--color-success-soft)] text-[var(--color-success-soft-text)]';
+  'border-emerald-800 bg-emerald-50 text-emerald-800';
 
 export function ProfileScreen() {
   const { user, setUserFromResponse, signOut } = useAuth();
@@ -59,7 +59,7 @@ export function ProfileScreen() {
   const initial = (user?.name || user?.email || '?')[0]?.toUpperCase() || '?';
 
   return (
-    <Card className="mx-auto w-full max-w-measure">
+    <Card className="mx-auto w-full max-w-md">
       <CardContent className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
           {user?.avatar_url ? (

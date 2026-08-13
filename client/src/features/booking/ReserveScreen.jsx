@@ -303,13 +303,13 @@ export function ReserveScreen() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
         <Card className="gap-3" aria-label="Loading">
-          <Skeleton className="h-[var(--text-xl)] w-[70%]" />
-          <Skeleton className="h-[var(--text-base)]" />
-          <Skeleton className="h-[var(--text-display)] w-[40%] mt-3" />
-          <Skeleton className="h-[var(--text-base)]" />
-          <Skeleton className="mt-3 h-[var(--control-min-h)]" />
+          <Skeleton className="h-5 w-[70%]" />
+          <Skeleton className="h-4" />
+          <Skeleton className="h-9 w-[40%] mt-3" />
+          <Skeleton className="h-4" />
+          <Skeleton className="mt-3 h-12" />
         </Card>
       </div>
     );
@@ -317,7 +317,7 @@ export function ReserveScreen() {
 
   if ((loadError || !room) && !claim) {
     return (
-      <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
         <Card>
           <EmptyState
             title="Room not available"
@@ -337,26 +337,26 @@ export function ReserveScreen() {
   const moveIn = booking?.move_in_date || claim?.availableFrom;
 
   return (
-    <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-md flex-col gap-6">
       <Link to={`/rooms/${room ? room.id : claim.roomId}`} className="w-fit text-sm text-muted-foreground no-underline">
         ← Back to room
       </Link>
 
       {full ? (
         <Card>
-          <Alert className="bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]">
+          <Alert className="bg-amber-50 text-amber-800">
             This room is full right now.
           </Alert>
         </Card>
       ) : !user ? (
         <Card className="gap-3">
-          <h1 className="m-0">Sign in</h1>
+          <h1 className="m-0 text-2xl font-semibold tracking-tight">Sign in</h1>
           <p className="m-0 text-sm text-muted-foreground">
             Sign in once to pay the {formatMoney(BOOKING_FEE)} booking fee and lock the bed.
           </p>
           <GoogleButton onCredential={handleGoogle} />
           {!googleConfigured && (
-            <Alert className="bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]">
+            <Alert className="bg-amber-50 text-amber-800">
               Google sign-in is not configured yet.
             </Alert>
           )}
@@ -364,7 +364,7 @@ export function ReserveScreen() {
         </Card>
       ) : !user.phone ? (
         <Card className="gap-3">
-          <h1 className="m-0">Your phone number</h1>
+          <h1 className="m-0 text-2xl font-semibold tracking-tight">Your phone number</h1>
           <form onSubmit={handlePhone} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="reserve-phone">Phone number</Label>
@@ -386,8 +386,8 @@ export function ReserveScreen() {
         </Card>
       ) : status === 'paid' ? (
         <Card className="items-center gap-3 text-center">
-          <CheckCircle2 className="size-12 text-[var(--color-success)]" aria-hidden="true" />
-          <h1 className="m-0">Your bed is secured</h1>
+          <CheckCircle2 className="size-12 text-emerald-600" aria-hidden="true" />
+          <h1 className="m-0 text-2xl font-semibold tracking-tight">Your bed is secured</h1>
           <p className="m-0 text-muted-foreground">
             {claim.roomName}
             {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
@@ -424,9 +424,9 @@ export function ReserveScreen() {
           {claim ? (
             <>
               <div className="flex flex-col items-center gap-3 text-center" role="status">
-                <Loader2 className="size-[var(--icon-sm)] animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
                 <p className="m-0 text-lg font-semibold">Complete your payment</p>
-                <p className="m-0 font-display text-display leading-[var(--leading-display)] tracking-[var(--tracking-display)]">
+                <p className="m-0 text-3xl font-bold tracking-tight">
                   {formatMoney(claim.payAmount)}
                 </p>
                 <p className="m-0 text-sm text-muted-foreground">

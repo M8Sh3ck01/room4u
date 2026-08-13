@@ -39,7 +39,7 @@ function CardTitle({
   return (
     <div
       data-slot="card-title"
-      className={cn("font-heading leading-none font-semibold", className)}
+      className={cn("font-semibold leading-none", className)}
       {...props} />
   );
 }

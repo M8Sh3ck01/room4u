@@ -8,7 +8,7 @@ export function RoomMap({ lat, lng }) {
   return (
     <div className="w-full overflow-hidden rounded-md border border-border bg-card">
       <p className="m-0 inline-flex w-full items-center justify-center gap-2 border-b border-border px-4 py-3 font-mono text-xs font-medium text-muted-foreground uppercase tracking-wider">
-        <MapPin className="size-[var(--icon-sm)] text-muted-foreground" aria-hidden="true" />
+        <MapPin className="size-4 text-muted-foreground" aria-hidden="true" />
         Show location on map
       </p>
       <iframe

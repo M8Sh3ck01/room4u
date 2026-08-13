@@ -13,10 +13,10 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col">
       {showHeader && (
-        <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-background/95 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-[var(--bp-lg)] items-center justify-between gap-2 px-4 py-3 md:px-4">
+        <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-2 px-4 py-3 md:px-4">
             <Link to="/" className="inline-flex items-center gap-2 text-foreground no-underline" aria-label="Room4U home">
-              <span className="font-display text-2xl leading-none tracking-tight whitespace-nowrap uppercase">
+              <span className="text-2xl font-bold tracking-tight whitespace-nowrap">
                 Room<span className="text-foreground">4</span>
                 <span className="text-foreground">U</span>
               </span>
@@ -49,13 +49,13 @@ export function AppShell() {
           </div>
         </header>
       )}
-      <main className="mx-auto w-full max-w-[var(--bp-lg)] flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <Outlet />
       </main>
       {showFooter && (
         <footer className="border-t border-border bg-muted">
-          <div className="mx-auto w-full max-w-[var(--bp-lg)] px-4 py-12">
-            <p className="m-0 mb-2 font-display text-display leading-[var(--leading-display)] tracking-[var(--tracking-display)] uppercase">
+          <div className="mx-auto w-full max-w-5xl px-4 py-12">
+            <p className="m-0 mb-2 text-2xl font-bold tracking-tight">
               Room<span className="text-foreground">4</span>
               <span className="text-foreground">U</span>
             </p>

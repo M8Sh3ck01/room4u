@@ -25,10 +25,10 @@ import { RoomMap } from '../browse/RoomMap';
 const BOOKING_FEE = 20000;
 
 const STATUS_META = {
-  requested: { badge: 'bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]', label: 'Awaiting payment' },
-  paid: { badge: 'bg-[var(--color-success-soft)] text-[var(--color-success-soft-text)]', label: 'Paid' },
-  cancelled: { badge: 'bg-[var(--color-danger-soft)] text-[var(--color-danger-soft-text)]', label: 'Cancelled' },
-  refunded: { badge: 'bg-[var(--color-info-soft)] text-[var(--color-info-soft-text)]', label: 'Refunded' },
+  requested: { badge: 'bg-amber-50 text-amber-800', label: 'Awaiting payment' },
+  paid: { badge: 'bg-emerald-50 text-emerald-800', label: 'Paid' },
+  cancelled: { badge: 'bg-red-50 text-red-800', label: 'Cancelled' },
+  refunded: { badge: 'bg-sky-50 text-sky-800', label: 'Refunded' },
 };
 
 const realPhotos = (room) =>
@@ -72,7 +72,7 @@ export function BookedRoomScreen() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-measure-lg flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
         <Skeleton className="aspect-video w-full rounded-md" />
       </div>
     );
@@ -80,7 +80,7 @@ export function BookedRoomScreen() {
 
   if (error || !data || !data.room) {
     return (
-      <div className="mx-auto flex w-full max-w-measure-lg flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
         <Card>
           <EmptyState
             title="Booking not found"
@@ -116,7 +116,7 @@ export function BookedRoomScreen() {
   return (
     <div className="mx-auto flex w-full flex-col gap-6">
       <Link to="/bookings" className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground no-underline">
-        <ArrowLeft className="size-[var(--icon-sm)]" />
+        <ArrowLeft className="size-4" />
         My bookings
       </Link>
 
@@ -135,12 +135,12 @@ export function BookedRoomScreen() {
             />
             {photos.length > 1 && (
               <>
-                <span className="pointer-events-none absolute top-2 right-2 rounded-full bg-[var(--color-overlay)] px-2 text-xs text-white" aria-live="polite">
+                <span className="pointer-events-none absolute top-2 right-2 rounded-full bg-black/60 px-2 text-xs text-white" aria-live="polite">
                   {active + 1} / {photos.length}
                 </span>
                 <button
                   type="button"
-                  className="absolute top-1/2 left-2 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 bg-[var(--color-overlay)] text-white hover:bg-primary hover:text-primary-foreground"
+                  className="absolute top-1/2 left-2 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground"
                   onClick={prev}
                   aria-label="Previous photo"
                 >
@@ -148,7 +148,7 @@ export function BookedRoomScreen() {
                 </button>
                 <button
                   type="button"
-                  className="absolute top-1/2 right-2 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 bg-[var(--color-overlay)] text-white hover:bg-primary hover:text-primary-foreground"
+                  className="absolute top-1/2 right-2 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 bg-black/60 text-white hover:bg-primary hover:text-primary-foreground"
                   onClick={next}
                   aria-label="Next photo"
                 >
@@ -164,7 +164,7 @@ export function BookedRoomScreen() {
                   key={src}
                   type="button"
                   className={cn(
-                    'flex min-h-[var(--control-min-h)] w-16 shrink-0 cursor-pointer overflow-hidden rounded-sm border-2 border-transparent bg-muted p-1',
+                    'flex min-h-12 w-16 shrink-0 cursor-pointer overflow-hidden rounded-sm border-2 border-transparent bg-muted p-1',
                     i === active && 'border-primary'
                   )}
                   onClick={() => setActive(i)}
@@ -178,16 +178,16 @@ export function BookedRoomScreen() {
           )}
         </>
       ) : (
-        <div className="flex aspect-video w-full items-center justify-center rounded-md bg-muted text-[var(--color-text-faint)]">
+        <div className="flex aspect-video w-full items-center justify-center rounded-md bg-muted text-muted-foreground">
           <Illustration />
         </div>
       )}
 
-      <p className="m-0 font-mono text-xs text-[var(--color-text-faint)] uppercase tracking-wider">
+      <p className="m-0 font-mono text-xs text-muted-foreground uppercase tracking-wider">
         {room.type === 'shared' ? 'Shared room' : 'Single room'}
         {showArea(room.hostel, room.area) ? ` · ${room.area}` : ''}
       </p>
-      <h1 className="m-0 text-[clamp(var(--text-xl),3.5vw,var(--text-2xl))] leading-[var(--leading-display)]">
+      <h1 className="m-0 text-2xl font-semibold tracking-tight leading-tight md:text-3xl">
         {room.hostel}
       </h1>
       <p className="m-0 border-t border-border pt-3 text-lg font-bold text-foreground whitespace-nowrap">

@@ -131,8 +131,8 @@ export function BrowseScreen() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="relative -mt-6 w-screen -ml-[calc(50vw-50%)] overflow-hidden border-b border-border bg-[radial-gradient(circle_at_75%_10%,var(--color-surface-muted)_0%,transparent_50%),linear-gradient(115deg,var(--color-mist-gray)_0%,var(--color-surface)_60%,var(--color-mist-gray)_100%)] text-foreground">
-        <div className="mx-auto max-w-[var(--bp-lg)] px-4 py-16">
+      <section className="relative -mt-6 w-screen -ml-[calc(50vw-50%)] overflow-hidden border-b border-border bg-[radial-gradient(circle_at_75%_10%,var(--muted)_0%,transparent_50%),linear-gradient(115deg,var(--muted)_0%,var(--background)_60%,var(--muted)_100%)] text-foreground">
+        <div className="mx-auto max-w-5xl px-4 py-16">
           <h1 className="mb-6 max-w-[18ch] font-sans text-4xl font-bold text-foreground tracking-tight normal-case leading-tight md:text-5xl">
             Discover your room around Mzuzu University
           </h1>
@@ -156,7 +156,7 @@ export function BrowseScreen() {
       </section>
 
       <div
-        className="sticky top-[calc(var(--space-3)*2+var(--control-min-h)+var(--space-2))] z-10 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card/95 p-2 shadow-sm backdrop-blur"
+        className="sticky top-20 z-10 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card/95 p-2 shadow-sm backdrop-blur"
         role="group"
         aria-label="Filter rooms"
         ref={toolbarRef}
@@ -204,7 +204,7 @@ export function BrowseScreen() {
         {activeFilters.length > 0 && (
           <button
             type="button"
-            className="inline-flex shrink-0 cursor-pointer items-center whitespace-nowrap bg-none px-2 font-semibold text-base text-foreground hover:text-[var(--color-slate)] hover:underline"
+            className="inline-flex shrink-0 cursor-pointer items-center whitespace-nowrap bg-none px-2 font-semibold text-base text-foreground hover:text-muted-foreground hover:underline"
             onClick={clearAll}
           >
             Clear all

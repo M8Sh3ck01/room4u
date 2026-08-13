@@ -16,44 +16,20 @@
   body {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: var(--text-base);
-    line-height: var(--leading-normal);
-    color: var(--color-text-primary);
-    background: var(--background);
     -webkit-font-smoothing: antialiased;
   }
 
   h1,
-  h2 {
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    line-height: var(--leading-display);
-    letter-spacing: var(--tracking-display);
-    font-weight: var(--weight-regular);
-    margin: 0 0 var(--space-4);
-  }
-
+  h2,
   h3,
   h4,
   h5,
   h6 {
     font-family: var(--font-sans);
-    line-height: var(--leading-tight);
-    letter-spacing: var(--tracking-tight);
-    margin: 0 0 var(--space-4);
-  }
-
-  p {
-    margin: 0 0 var(--space-4);
   }
 
   a {
-    color: var(--color-primary-text);
-  }
-
-  :focus-visible {
-    outline: var(--border-strong) solid var(--color-carbon-black);
-    outline-offset: var(--border-strong);
+    color: var(--color-primary);
   }
 
   svg.lucide {
