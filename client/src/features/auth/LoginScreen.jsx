@@ -38,7 +38,7 @@ export function LoginScreen() {
     <div className="mx-auto flex min-h-dvh w-full max-w-measure flex-col items-center justify-center px-4 py-6">
       <Card className="w-full max-w-md">
         <CardHeader className="items-center pb-6 pt-8 text-center">
-          <div className="mb-4 flex size-12 items-center justify-center rounded-xl border bg-card shadow-sm">
+          <div className="mb-4 flex size-12 items-center justify-center justify-self-center rounded-xl border bg-card shadow-sm">
             <KeyRound className="size-6" aria-hidden="true" />
           </div>
           <CardTitle className="text-2xl">Sign in to Room4U</CardTitle>
