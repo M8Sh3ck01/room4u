@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { updateMe } from '../../services/auth';
@@ -339,7 +339,7 @@ export function ReserveScreen() {
   return (
     <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
       <Link to={`/rooms/${room ? room.id : claim.roomId}`} className="w-fit text-sm text-muted-foreground no-underline">
-        â† Back to room
+        ← Back to room
       </Link>
 
       {full ? (
@@ -380,7 +380,7 @@ export function ReserveScreen() {
               <p className="m-0 text-sm text-muted-foreground">We text you about the move-in date.</p>
             </div>
             <Button disabled={savingPhone} className="w-full">
-              {savingPhone ? 'Savingâ€¦' : 'Continue'}
+              {savingPhone ? 'Saving…' : 'Continue'}
             </Button>
           </form>
         </Card>
@@ -390,7 +390,7 @@ export function ReserveScreen() {
           <h1 className="m-0">Your bed is secured</h1>
           <p className="m-0 text-muted-foreground">
             {claim.roomName}
-            {showArea(claim.roomName, claim.roomArea) ? ` Â· ${claim.roomArea}` : ''}
+            {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
           </p>
           {moveIn && <p className="m-0 text-lg font-semibold">Move-in {formatDate(moveIn)}</p>}
           <div className="flex w-full flex-col gap-2 text-sm text-muted-foreground">
@@ -431,17 +431,17 @@ export function ReserveScreen() {
                 </p>
                 <p className="m-0 text-sm text-muted-foreground">
                   Booking fee for a bed at {claim.roomName}
-                  {showArea(claim.roomName, claim.roomArea) ? ` Â· ${claim.roomArea}` : ''}
+                  {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
                 </p>
                 <p className="m-0 text-sm text-muted-foreground">
                   The payment window opens above on this page. This page updates by itself once
-                  you&apos;re done â€” your spot is held for 5 minutes.
+                  you&apos;re done — your spot is held for 5 minutes.
                 </p>
               </div>
               {payError && <Alert variant="destructive">{payError}</Alert>}
               <div className="flex w-full flex-wrap justify-center gap-2">
                 <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={cancel} disabled={cancelling}>
-                  {cancelling ? 'Cancellingâ€¦' : 'Cancel'}
+                  {cancelling ? 'Cancelling…' : 'Cancel'}
                 </Button>
               </div>
             </>
@@ -453,7 +453,7 @@ export function ReserveScreen() {
                   {showArea(room.hostel, room.area) && (
                     <span>
                       {room.area}
-                      {room.available_from ? ' Â· ' : ''}
+                      {room.available_from ? ' · ' : ''}
                     </span>
                   )}
                   {room.available_from && `available ${formatDate(room.available_from)}`}
@@ -473,7 +473,7 @@ export function ReserveScreen() {
               </p>
               {payError && <Alert variant="destructive">{payError}</Alert>}
               <Button onClick={onPay} disabled={claiming} className="w-full">
-                {claiming ? 'Reservingâ€¦' : `Pay ${formatMoney(BOOKING_FEE)} now`}
+                {claiming ? 'Reserving…' : `Pay ${formatMoney(BOOKING_FEE)} now`}
               </Button>
             </>
           )}

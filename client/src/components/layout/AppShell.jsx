@@ -1,4 +1,4 @@
-﻿import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -61,7 +61,7 @@ export function AppShell() {
             </p>
             <p className="m-0 mb-2 text-muted-foreground">Vetted student rooms near Mzuzu University.</p>
             <p className="m-0 font-mono text-xs text-muted-foreground uppercase tracking-wider">
-              Â© {new Date().getFullYear()} Room4U
+              © {new Date().getFullYear()} Room4U
             </p>
           </div>
         </footer>

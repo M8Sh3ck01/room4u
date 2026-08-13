@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { listRooms } from '../../services/rooms';
 import { Badge } from '@/components/ui/badge';
@@ -107,7 +107,7 @@ export function BrowseScreen() {
     activeFilters.push({ key: 'max_walk_min', label: `~${filters.max_walk_min} min walk` });
   }
   if (filters.max_price) {
-    activeFilters.push({ key: 'max_price', label: `â‰¤ ${formatMoney(filters.max_price)} per month` });
+    activeFilters.push({ key: 'max_price', label: `≤ ${formatMoney(filters.max_price)} per month` });
   }
 
   const hasFilters = activeFilters.length > 0;
@@ -169,10 +169,10 @@ export function BrowseScreen() {
           onChange={change('max_walk_min')}
           options={[
             { value: '', label: 'Walk' },
-            { value: '15', label: 'â‰¤ 15 min' },
-            { value: '30', label: 'â‰¤ 30 min' },
-            { value: '45', label: 'â‰¤ 45 min' },
-            { value: '60', label: 'â‰¤ 60 min' },
+            { value: '15', label: '≤ 15 min' },
+            { value: '30', label: '≤ 30 min' },
+            { value: '45', label: '≤ 45 min' },
+            { value: '60', label: '≤ 60 min' },
           ]}
         />
 
@@ -183,10 +183,10 @@ export function BrowseScreen() {
           onChange={change('max_price')}
           options={[
             { value: '', label: 'Price' },
-            { value: '10000', label: 'â‰¤ MK10,000' },
-            { value: '15000', label: 'â‰¤ MK15,000' },
-            { value: '20000', label: 'â‰¤ MK20,000' },
-            { value: '25000', label: 'â‰¤ MK25,000' },
+            { value: '10000', label: '≤ MK10,000' },
+            { value: '15000', label: '≤ MK15,000' },
+            { value: '20000', label: '≤ MK20,000' },
+            { value: '25000', label: '≤ MK25,000' },
           ]}
         />
 
@@ -241,7 +241,7 @@ export function BrowseScreen() {
             <div className="rounded-xl border border-border bg-card">
               <EmptyState
                 title="Rooms won't load right now"
-                body="Your connection seems fine — the server is just slow. We'll keep trying, and rooms will appear once it's back."
+                body="Your connection seems fine � the server is just slow. We'll keep trying, and rooms will appear once it's back."
                 action={
                   <Button onClick={handleRetry} disabled={retrying}>
                     {retrying ? (
@@ -249,7 +249,7 @@ export function BrowseScreen() {
                     ) : (
                       <RefreshCw className="size-4" aria-hidden="true" />
                     )}
-                    {retrying ? 'Retrying…' : 'Try again'}
+                    {retrying ? 'Retrying�' : 'Try again'}
                   </Button>
                 }
               >

@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { formatMoney } from '../../lib/formatMoney';
