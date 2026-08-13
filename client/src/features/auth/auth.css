@@ -1,7 +1,7 @@
 #g_id_onload {
   display: flex;
   justify-content: center;
-  transform: scale(1.25);
+  transform: scale(1.1);
   transform-origin: top center;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
 }
