@@ -35,7 +35,7 @@ export function LoginScreen() {
           <div className="mb-4 flex size-12 items-center justify-center justify-self-center rounded-xl border bg-card shadow-sm">
             <KeyRound className="size-6" aria-hidden="true" />
           </div>
-          <CardTitle className="text-2xl">Sign in to Room4U</CardTitle>
+          <CardTitle className="text-xl">Sign in to Room4U</CardTitle>
           <CardDescription className="max-w-xs">
             Find and claim your room near Mzuzu University.
           </CardDescription>
