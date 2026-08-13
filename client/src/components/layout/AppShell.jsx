@@ -1,7 +1,7 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+﻿import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
-import { Button } from '../../design/primitives';
-import './AppShell.css';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 export function AppShell() {
   const { user, signOut } = useAuth();
@@ -11,51 +11,58 @@ export function AppShell() {
   const onReserve = /\/rooms\/[^/]+\/reserve$/.test(pathname);
 
   return (
-    <div className="app">
+    <div className="flex min-h-screen flex-col">
       {showHeader && (
-        <header className="app-header">
-        <Link to="/" className="brand" aria-label="Room4U home">
-          <span className="brand-name">
-            Room<span className="brand-name-num">4</span>
-            <span className="brand-name-accent">U</span>
-          </span>
-        </Link>
-        <div className="header-actions">
-          {user ? (
-            <>
-              <Link to="/bookings" className="header-link">
-                My bookings
-              </Link>
-              <Link to="/me" className="header-user">
-                {user.avatar_url ? (
-                  <img className="header-avatar" src={user.avatar_url} alt="" />
-                ) : (
-                  <span className="header-avatar">{user.name?.[0] || user.email?.[0]}</span>
-                )}
-                <span>{user.name || user.email}</span>
-              </Link>
-              
-            </>
-          ) : !onReserve ? (
-            <Link to="/login">
-              <Button size="sm">Sign in</Button>
+        <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-background/95 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-[var(--bp-lg)] items-center justify-between gap-2 px-4 py-3 md:px-4">
+            <Link to="/" className="inline-flex items-center gap-2 text-foreground no-underline" aria-label="Room4U home">
+              <span className="font-display text-2xl leading-none tracking-tight whitespace-nowrap uppercase">
+                Room<span className="text-foreground">4</span>
+                <span className="text-foreground">U</span>
+              </span>
             </Link>
-          ) : null}
-        </div>
+            <div className="flex items-center gap-2 md:gap-3">
+              {user ? (
+                <>
+                  <Link to="/bookings" className="text-sm text-muted-foreground no-underline whitespace-nowrap hover:text-foreground">
+                    My bookings
+                  </Link>
+                  <Link to="/me" className="flex items-center gap-2 text-sm text-foreground no-underline">
+                    <Avatar className="bg-primary text-primary-foreground">
+                      {user.avatar_url ? (
+                        <AvatarImage src={user.avatar_url} alt="" />
+                      ) : (
+                        <AvatarFallback>{user.name?.[0] || user.email?.[0]}</AvatarFallback>
+                      )}
+                    </Avatar>
+                    <span className="hidden max-w-[20ch] overflow-hidden text-ellipsis whitespace-nowrap md:block">
+                      {user.name || user.email}
+                    </span>
+                  </Link>
+                </>
+              ) : !onReserve ? (
+                <Link to="/login">
+                  <Button size="sm">Sign in</Button>
+                </Link>
+              ) : null}
+            </div>
+          </div>
         </header>
       )}
-      <main className="app-main">
+      <main className="mx-auto w-full max-w-[var(--bp-lg)] flex-1 px-4 py-6">
         <Outlet />
       </main>
       {showFooter && (
-        <footer className="app-footer">
-          <div className="app-footer-inner">
-            <p className="app-footer-brand">
-              Room<span className="app-footer-brand-num">4</span>
-              <span className="app-footer-brand-accent">U</span>
+        <footer className="border-t border-border bg-muted">
+          <div className="mx-auto w-full max-w-[var(--bp-lg)] px-4 py-12">
+            <p className="m-0 mb-2 font-display text-display leading-[var(--leading-display)] tracking-[var(--tracking-display)] uppercase">
+              Room<span className="text-foreground">4</span>
+              <span className="text-foreground">U</span>
             </p>
-            <p className="app-footer-about">Vetted student rooms near Mzuzu University.</p>
-            <p className="app-footer-line app-footer-copy">© {new Date().getFullYear()} Room4U</p>
+            <p className="m-0 mb-2 text-muted-foreground">Vetted student rooms near Mzuzu University.</p>
+            <p className="m-0 font-mono text-xs text-muted-foreground uppercase tracking-wider">
+              Â© {new Date().getFullYear()} Room4U
+            </p>
           </div>
         </footer>
       )}

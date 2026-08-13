@@ -1,12 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { listRooms } from '../../services/rooms';
-import { Card, Button, Alert, Skeleton, EmptyState, Badge } from '../../design/primitives';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Alert } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/EmptyState';
+import { cn } from '@/lib/utils';
 import { Footprints, BadgeCheck, Banknote, X, ArrowDown } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from './RoomCard';
 import { FilterSelect } from './FilterSelect';
-import './browse.css';
 
 const PARAM_BY_KEY = { type: 'type', max_walk_min: 'walk', max_price: 'price' };
 
@@ -72,7 +76,7 @@ export function BrowseScreen() {
     activeFilters.push({ key: 'max_walk_min', label: `~${filters.max_walk_min} min walk` });
   }
   if (filters.max_price) {
-    activeFilters.push({ key: 'max_price', label: `≤ ${formatMoney(filters.max_price)} per month` });
+    activeFilters.push({ key: 'max_price', label: `â‰¤ ${formatMoney(filters.max_price)} per month` });
   }
 
   const hasFilters = activeFilters.length > 0;
@@ -84,35 +88,37 @@ export function BrowseScreen() {
     : "We're setting up the first rooms near Mzuzu University. Check back soon.";
 
   return (
-    <div className="browse">
-      <section className="hero-banner">
-        <div className="hero-banner-inner">
-          <div className="hero-message">
-            <div className="hero-copy">
-              
-              <h1>Discover your room around Mzuzu University</h1>
-              <div className="hero-chips" aria-label="What you get on every room">
-                <Badge variant="primary">
-                  <BadgeCheck className="chip-icon" /> Verified
-                </Badge>
-                <Badge variant="primary">
-                  <Footprints className="chip-icon" /> Walkable
-                </Badge>
-                <Badge variant="primary">
-                  <Banknote className="chip-icon" /> Affordable
-                </Badge>
-              </div>
-
-              <button type="button" className="hero-cta" onClick={scrollToResults}>
-                Find a room
-                <ArrowDown className="hero-cta-icon" aria-hidden="true" />
-              </button>
-            </div>
+    <div className="flex flex-col gap-6">
+      <section className="relative -mt-6 w-screen -ml-[calc(50vw-50%)] overflow-hidden border-b border-border bg-[radial-gradient(circle_at_75%_10%,var(--color-surface-muted)_0%,transparent_50%),linear-gradient(115deg,var(--color-mist-gray)_0%,var(--color-surface)_60%,var(--color-mist-gray)_100%)] text-foreground">
+        <div className="mx-auto max-w-[var(--bp-lg)] px-4 py-16">
+          <h1 className="mb-6 max-w-[18ch] font-sans text-4xl font-bold text-foreground tracking-tight normal-case leading-tight md:text-5xl">
+            Discover your room around Mzuzu University
+          </h1>
+          <div className="flex flex-wrap gap-2" aria-label="What you get on every room">
+            <Badge variant="secondary">
+              <BadgeCheck className="size-4" /> Verified
+            </Badge>
+            <Badge variant="secondary">
+              <Footprints className="size-4" /> Walkable
+            </Badge>
+            <Badge variant="secondary">
+              <Banknote className="size-4" /> Affordable
+            </Badge>
           </div>
+
+          <Button size="lg" className="mt-8" onClick={scrollToResults}>
+            Find a room
+            <ArrowDown className="size-4" aria-hidden="true" />
+          </Button>
         </div>
       </section>
 
-      <div className="results-toolbar" role="group" aria-label="Filter rooms" ref={toolbarRef}>
+      <div
+        className="sticky top-[calc(var(--space-3)*2+var(--control-min-h)+var(--space-2))] z-10 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card/95 p-2 shadow-sm backdrop-blur"
+        role="group"
+        aria-label="Filter rooms"
+        ref={toolbarRef}
+      >
         <FilterSelect
           label="Type"
           ariaLabel="Room type"
@@ -132,10 +138,10 @@ export function BrowseScreen() {
           onChange={change('max_walk_min')}
           options={[
             { value: '', label: 'Walk' },
-            { value: '15', label: '≤ 15 min' },
-            { value: '30', label: '≤ 30 min' },
-            { value: '45', label: '≤ 45 min' },
-            { value: '60', label: '≤ 60 min' },
+            { value: '15', label: 'â‰¤ 15 min' },
+            { value: '30', label: 'â‰¤ 30 min' },
+            { value: '45', label: 'â‰¤ 45 min' },
+            { value: '60', label: 'â‰¤ 60 min' },
           ]}
         />
 
@@ -146,79 +152,83 @@ export function BrowseScreen() {
           onChange={change('max_price')}
           options={[
             { value: '', label: 'Price' },
-            { value: '10000', label: '≤ MK10,000' },
-            { value: '15000', label: '≤ MK15,000' },
-            { value: '20000', label: '≤ MK20,000' },
-            { value: '25000', label: '≤ MK25,000' },
+            { value: '10000', label: 'â‰¤ MK10,000' },
+            { value: '15000', label: 'â‰¤ MK15,000' },
+            { value: '20000', label: 'â‰¤ MK20,000' },
+            { value: '25000', label: 'â‰¤ MK25,000' },
           ]}
         />
 
         {activeFilters.length > 0 && (
-          <button type="button" className="filters-clear" onClick={clearAll}>
+          <button
+            type="button"
+            className="inline-flex shrink-0 cursor-pointer items-center whitespace-nowrap bg-none px-2 font-semibold text-base text-foreground hover:text-[var(--color-slate)] hover:underline"
+            onClick={clearAll}
+          >
             Clear all
           </button>
         )}
       </div>
 
       {activeFilters.length > 0 && (
-        <div className="filter-chips">
+        <div className="flex flex-wrap gap-2">
           {activeFilters.map((chip) => (
             <button
               key={chip.key}
               type="button"
-              className="filter-chip"
+              className="inline-flex max-w-full min-w-0 cursor-pointer items-center gap-2 rounded-full bg-secondary px-3 font-medium text-base text-secondary-foreground hover:bg-muted"
               onClick={() => clear(chip.key)}
               aria-label={`Remove ${chip.label} filter`}
             >
               {chip.label}
-              <X className="filter-chip-icon" aria-hidden="true" />
+              <X className="size-4" aria-hidden="true" />
             </button>
           ))}
         </div>
       )}
 
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <Alert variant="destructive">{error}</Alert>}
 
       <div className="results-area" aria-busy={loading}>
         <div
           key={loading ? 'loading' : rooms.length === 0 ? 'empty' : 'rooms'}
-          className="results-swap"
+          className="animate-in fade-in duration-200"
         >
-        {loading ? (
-          <div className="room-grid">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="skeleton-card">
-                <Skeleton className="skeleton-photo" />
-                <div className="skeleton-body">
-                  <Skeleton className="skeleton-line" />
-                  <Skeleton className="skeleton-line skeleton-line--short" />
-                  <Skeleton className="skeleton-line skeleton-line--price" />
+          {loading ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex flex-col">
+                  <Skeleton className="aspect-video w-full rounded-md" />
+                  <div className="mt-3 flex flex-1 flex-col gap-3">
+                    <Skeleton className="h-4 rounded-sm" />
+                    <Skeleton className="h-4 w-3/5 rounded-sm" />
+                    <Skeleton className="h-5 w-2/5 rounded-sm" />
+                  </div>
+                  <Skeleton className="mt-auto h-11" />
                 </div>
-                <Skeleton className="skeleton-footer" />
-              </div>
-            ))}
-          </div>
-        ) : error ? null : rooms.length === 0 ? (
-          <Card>
-            <EmptyState
-              title={emptyTitle}
-              body={emptyBody}
-              action={
-                hasFilters ? (
-                  <Button variant="ghost" onClick={clearAll}>
-                    Reset
-                  </Button>
-                ) : null
-              }
-            />
-          </Card>
-        ) : (
-          <div className="room-grid">
-            {rooms.map((room) => (
-              <RoomCard key={room.id} room={room} />
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : error ? null : rooms.length === 0 ? (
+            <div className="rounded-xl border border-border bg-card">
+              <EmptyState
+                title={emptyTitle}
+                body={emptyBody}
+                action={
+                  hasFilters ? (
+                    <Button variant="ghost" onClick={clearAll}>
+                      Reset
+                    </Button>
+                  ) : null
+                }
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {rooms.map((room) => (
+                <RoomCard key={room.id} room={room} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

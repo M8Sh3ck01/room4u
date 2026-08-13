@@ -1,13 +1,13 @@
 export function Illustration({ className = '', ...rest }) {
   return (
     <svg
-      className={`illustration ${className}`.trim()}
+      className={`block h-full w-full ${className}`.trim()}
       viewBox="0 0 320 180"
       role="img"
       aria-hidden="true"
       {...rest}
     >
-      <circle className="illustration-accent" cx="60" cy="46" r="13" />
+      <circle className="fill-[var(--color-text-faint)]" cx="60" cy="46" r="13" />
       <g stroke="currentColor" strokeWidth="5" strokeLinecap="square">
         <line x1="60" y1="21" x2="60" y2="15" />
         <line x1="85" y1="46" x2="91" y2="46" />

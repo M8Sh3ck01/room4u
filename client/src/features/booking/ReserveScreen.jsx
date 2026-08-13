@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getRoom } from '../../services/rooms';
 import { updateMe } from '../../services/auth';
@@ -12,12 +12,17 @@ import {
 } from '../../services/bookings';
 import { useAuth } from '../auth/AuthContext';
 import { GoogleButton } from '../auth/GoogleButton';
-import { Button, Card, Field, Input, Alert, EmptyState, Skeleton, Spinner } from '../../design/primitives';
-import { CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Alert } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/EmptyState';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { formatDate } from '../../lib/formatDate';
 import { showArea } from '../../lib/area';
-import './booking.css';
 
 const BOOKING_FEE = 20000;
 const DEPOSIT = 10000;
@@ -298,13 +303,13 @@ export function ReserveScreen() {
 
   if (loading) {
     return (
-      <div className="reserve center measure">
-        <Card className="reserve-skeleton" aria-label="Loading">
-          <Skeleton className="reserve-skeleton-room" />
-          <Skeleton className="reserve-skeleton-line reserve-skeleton-line--short" />
-          <Skeleton className="reserve-skeleton-amount" />
-          <Skeleton className="reserve-skeleton-line" />
-          <Skeleton className="reserve-skeleton-btn" />
+      <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
+        <Card className="gap-3" aria-label="Loading">
+          <Skeleton className="h-[var(--text-xl)] w-[70%]" />
+          <Skeleton className="h-[var(--text-base)]" />
+          <Skeleton className="h-[var(--text-display)] w-[40%] mt-3" />
+          <Skeleton className="h-[var(--text-base)]" />
+          <Skeleton className="mt-3 h-[var(--control-min-h)]" />
         </Card>
       </div>
     );
@@ -312,7 +317,7 @@ export function ReserveScreen() {
 
   if ((loadError || !room) && !claim) {
     return (
-      <div className="reserve center measure">
+      <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
         <Card>
           <EmptyState
             title="Room not available"
@@ -332,37 +337,37 @@ export function ReserveScreen() {
   const moveIn = booking?.move_in_date || claim?.availableFrom;
 
   return (
-    <div className="reserve center measure">
-      <Link to={`/rooms/${room ? room.id : claim.roomId}`} className="reserve-back">
-        ← Back to room
+    <div className="mx-auto flex w-full max-w-measure flex-col gap-6">
+      <Link to={`/rooms/${room ? room.id : claim.roomId}`} className="w-fit text-sm text-muted-foreground no-underline">
+        â† Back to room
       </Link>
 
       {full ? (
-        <Card className="stack">
-          <Alert variant="warning">This room is full right now.</Alert>
+        <Card>
+          <Alert className="bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]">
+            This room is full right now.
+          </Alert>
         </Card>
       ) : !user ? (
-        <Card className="reserve-step">
-          <h1 className="reserve-title">Sign in</h1>
-          <p className="claim-hint text-muted">
+        <Card className="gap-3">
+          <h1 className="m-0">Sign in</h1>
+          <p className="m-0 text-sm text-muted-foreground">
             Sign in once to pay the {formatMoney(BOOKING_FEE)} booking fee and lock the bed.
           </p>
           <GoogleButton onCredential={handleGoogle} />
           {!googleConfigured && (
-            <Alert variant="warning">Google sign-in is not configured yet.</Alert>
+            <Alert className="bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]">
+              Google sign-in is not configured yet.
+            </Alert>
           )}
-          {authError && <p className="text-error">{authError}</p>}
+          {authError && <p className="m-0 text-destructive">{authError}</p>}
         </Card>
       ) : !user.phone ? (
-        <Card className="reserve-step">
-          <h1 className="reserve-title">Your phone number</h1>
-          <form onSubmit={handlePhone} className="stack">
-            <Field
-              label="Phone number"
-              htmlFor="reserve-phone"
-              error={phoneError}
-              hint="We text you about the move-in date."
-            >
+        <Card className="gap-3">
+          <h1 className="m-0">Your phone number</h1>
+          <form onSubmit={handlePhone} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="reserve-phone">Phone number</Label>
               <Input
                 id="reserve-phone"
                 type="tel"
@@ -371,96 +376,104 @@ export function ReserveScreen() {
                 placeholder="0995 123 456"
                 required
               />
-            </Field>
-            <Button loading={savingPhone} fullWidth>
-              {savingPhone ? 'Saving…' : 'Continue'}
+              {phoneError && <p className="m-0 text-sm text-destructive">{phoneError}</p>}
+              <p className="m-0 text-sm text-muted-foreground">We text you about the move-in date.</p>
+            </div>
+            <Button disabled={savingPhone} className="w-full">
+              {savingPhone ? 'Savingâ€¦' : 'Continue'}
             </Button>
           </form>
         </Card>
       ) : status === 'paid' ? (
-        <Card className="pay-success">
-          <CheckCircle2 className="pay-success-icon" aria-hidden="true" />
-          <h1 className="pay-success-title">Your bed is secured</h1>
-          <p className="text-muted">
+        <Card className="items-center gap-3 text-center">
+          <CheckCircle2 className="size-12 text-[var(--color-success)]" aria-hidden="true" />
+          <h1 className="m-0">Your bed is secured</h1>
+          <p className="m-0 text-muted-foreground">
             {claim.roomName}
-            {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
+            {showArea(claim.roomName, claim.roomArea) ? ` Â· ${claim.roomArea}` : ''}
           </p>
-          {moveIn && <p className="pay-success-movein">Move-in {formatDate(moveIn)}</p>}
-          <div className="pay-success-facts">
-            <p>The deposit counts toward your rent. The agent fee is separate.</p>
-            <p>We call to check you&apos;ve settled in, 3 days after move-in.</p>
+          {moveIn && <p className="m-0 text-lg font-semibold">Move-in {formatDate(moveIn)}</p>}
+          <div className="flex w-full flex-col gap-2 text-sm text-muted-foreground">
+            <p className="m-0">The deposit counts toward your rent. The agent fee is separate.</p>
+            <p className="m-0">We call to check you&apos;ve settled in, 3 days after move-in.</p>
           </div>
-          <div className="pay-actions">
-            <Link to="/bookings">
-              <Button variant="ghost" fullWidth>
+          <div className="flex w-full flex-wrap gap-2">
+            <Link to="/bookings" className="w-full">
+              <Button variant="ghost" className="w-full">
                 My bookings
               </Button>
             </Link>
-            <Link to="/">
-              <Button fullWidth>Keep browsing</Button>
+            <Link to="/" className="w-full">
+              <Button className="w-full">Keep browsing</Button>
             </Link>
           </div>
         </Card>
       ) : claimExpired && status === 'requested' ? (
-        <Card className="stack">
-          <Alert variant="danger">This payment link expired.</Alert>
-          <p className="text-muted">
+        <Card className="gap-3">
+          <Alert variant="destructive">This payment link expired.</Alert>
+          <p className="m-0 text-muted-foreground">
             Your spot at {claim.roomName} was released. You can reserve again if the room is still
             available.
           </p>
           <Link to={`/rooms/${claim.roomId}`}>
-            <Button fullWidth>Back to room</Button>
+            <Button className="w-full">Back to room</Button>
           </Link>
         </Card>
       ) : (
-        <Card className="reserve-step">
+        <Card className="gap-3">
           {claim ? (
             <>
-              <div className="pay-hero" role="status">
-                <Spinner className="pay-hero-spinner" />
-                <p className="pay-hero-title">Complete your payment</p>
-                <p className="pay-hero-amount">{formatMoney(claim.payAmount)}</p>
-                <p className="pay-hero-meta">
-                  Booking fee for a bed at {claim.roomName}
-                  {showArea(claim.roomName, claim.roomArea) ? ` · ${claim.roomArea}` : ''}
+              <div className="flex flex-col items-center gap-3 text-center" role="status">
+                <Loader2 className="size-[var(--icon-sm)] animate-spin" />
+                <p className="m-0 text-lg font-semibold">Complete your payment</p>
+                <p className="m-0 font-display text-display leading-[var(--leading-display)] tracking-[var(--tracking-display)]">
+                  {formatMoney(claim.payAmount)}
                 </p>
-                <p className="pay-hero-note">
+                <p className="m-0 text-sm text-muted-foreground">
+                  Booking fee for a bed at {claim.roomName}
+                  {showArea(claim.roomName, claim.roomArea) ? ` Â· ${claim.roomArea}` : ''}
+                </p>
+                <p className="m-0 text-sm text-muted-foreground">
                   The payment window opens above on this page. This page updates by itself once
-                  you&apos;re done — your spot is held for 5 minutes.
+                  you&apos;re done â€” your spot is held for 5 minutes.
                 </p>
               </div>
-              {payError && <Alert variant="danger">{payError}</Alert>}
-              <div className="pay-actions pay-actions--center">
-                <Button variant="ghost-danger" onClick={cancel} loading={cancelling}>
-                  {cancelling ? 'Cancelling…' : 'Cancel'}
+              {payError && <Alert variant="destructive">{payError}</Alert>}
+              <div className="flex w-full flex-wrap justify-center gap-2">
+                <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={cancel} disabled={cancelling}>
+                  {cancelling ? 'Cancellingâ€¦' : 'Cancel'}
                 </Button>
               </div>
             </>
           ) : (
             <>
-              <div className="reserve-summary">
-                <p className="reserve-summary-room">{room.hostel}</p>
-                <p className="reserve-summary-meta text-muted">
+              <div className="flex flex-col gap-2">
+                <p className="m-0 text-xl font-semibold">{room.hostel}</p>
+                <p className="m-0 text-sm text-muted-foreground">
                   {showArea(room.hostel, room.area) && (
                     <span>
                       {room.area}
-                      {room.available_from ? ' · ' : ''}
+                      {room.available_from ? ' Â· ' : ''}
                     </span>
                   )}
                   {room.available_from && `available ${formatDate(room.available_from)}`}
                 </p>
-                <div className="claim-fee">
-                  <p className="claim-fee-label">Booking fee</p>
-                  <p className="claim-fee-amount">{formatMoney(BOOKING_FEE)}</p>
-                  <p className="claim-fee-note">
+                <div className="mt-3 flex flex-col gap-1 border-t border-border pt-3">
+                  <p className="m-0 font-mono text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Booking fee
+                  </p>
+                  <p className="m-0 text-xl font-bold">{formatMoney(BOOKING_FEE)}</p>
+                  <p className="m-0 text-sm text-muted-foreground">
                     {formatMoney(DEPOSIT)} deposit + {formatMoney(AGENT_FEE)} agent fee
                   </p>
                 </div>
               </div>
-              <p className="pay-trust">The deposit counts toward your rent. The agent fee is separate.</p>
-              {payError && <Alert variant="danger">{payError}</Alert>}
-              <Button onClick={onPay} loading={claiming} fullWidth>
-                {claiming ? 'Reserving…' : `Pay ${formatMoney(BOOKING_FEE)} now`}
+              <p className="m-0 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
+                The deposit counts toward your rent. The agent fee is separate.
+              </p>
+              {payError && <Alert variant="destructive">{payError}</Alert>}
+              <Button onClick={onPay} disabled={claiming} className="w-full">
+                {claiming ? 'Reservingâ€¦' : `Pay ${formatMoney(BOOKING_FEE)} now`}
               </Button>
             </>
           )}

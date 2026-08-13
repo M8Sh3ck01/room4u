@@ -1,65 +1,67 @@
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
-html,
-body {
-  overflow-x: clip;
-}
+  html,
+  body {
+    overflow-x: clip;
+  }
 
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  color: var(--color-text-primary);
-  background: var(--color-surface);
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--color-text-primary);
+    background: var(--background);
+    -webkit-font-smoothing: antialiased;
+  }
 
-h1,
-h2 {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
-  font-weight: var(--weight-regular);
-  margin: 0 0 var(--space-4);
-}
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    font-weight: var(--weight-regular);
+    margin: 0 0 var(--space-4);
+  }
 
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-sans);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  margin: 0 0 var(--space-4);
-}
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    margin: 0 0 var(--space-4);
+  }
 
-p {
-  margin: 0 0 var(--space-4);
-}
+  p {
+    margin: 0 0 var(--space-4);
+  }
 
-a {
-  color: var(--color-primary-text);
-}
+  a {
+    color: var(--color-primary-text);
+  }
 
-:focus-visible {
-  outline: var(--border-strong) solid var(--color-accent-yellow);
-  outline-offset: var(--border-strong);
-}
+  :focus-visible {
+    outline: var(--border-strong) solid var(--color-carbon-black);
+    outline-offset: var(--border-strong);
+  }
 
-svg.lucide {
-  stroke-linecap: square;
-  stroke-linejoin: miter;
-  stroke-width: 2.5;
-  flex-shrink: 0;
+  svg.lucide {
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    stroke-width: 2.5;
+    flex-shrink: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

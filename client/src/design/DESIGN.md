@@ -1,34 +1,32 @@
 # Room4U Design System
 
-One source of truth: `client/src/design/tokens.css`. Everything visual lives there; nothing is hardcoded in features.
+Room4U is rebuilt on the **shadcn/ui foundation** (Tailwind v4 + Radix). One source of truth: `client/tailwind.css` holds the shadcn theme contract (neutral/monochrome); `client/src/design/tokens.css` holds raw Dayos base values still referenced by feature code.
 
 ## Layers
 
-1. **Tokens** (`design/tokens.css`) — raw palette + type + space + shape + motion values.
-2. **Semantic roles** (`design/tokens.css`) — colors by role: `--color-primary`, `--color-on-primary`, `--color-surface`, `--color-danger`, …
-3. **Primitive components** (`design/primitives/`) — `Button, Card, Badge, Input, Select, Field, Alert, Spinner, Skeleton, EmptyState` + layout/utility classes in `design/primitives.css`. Feature code uses these; it never picks values.
+1. **Token base** (`design/tokens.css`) — raw palette + type + space + shape + motion values (the only place raw `hex` / `px` / `rem` / `em` are allowed), plus the neutral grays feature code still maps to.
+2. **Theme** (`client/tailwind.css`) — the shadcn contract (`--background`, `--card`, `--primary`, `--muted`, `--border`, `--ring`, …) set to the **default shadcn neutral palette** (white background, zinc borders, near-black primary, real shadows), with radius/size/shadow tokens (`--radius-md/lg/xl`, `--shadow-sm/md/lg`).
+3. **Components** (`components/ui/`) — generated shadcn components (`Button`, `Card`, `Badge`, `Input`, `Label`, `Alert`, `Select`, `Avatar`, `Skeleton`) in their default styles.
+4. **Feature code** — uses shadcn components directly plus Tailwind utilities (token-backed `var()` arbitrary values where needed). No bespoke primitives; no per-screen CSS files.
 
 ## Tokens (quick map)
 
-- **Color**: brutalist editorial on warm gray. `--color-carbon-black #000000` (blocks, primary) · `--color-warm-canvas #e5e5e5` (page) · `--color-paper-white #ffffff` (cards) · `--color-mint-chip #d1ffca` (small accent fills, chips) · `--color-voltage-yellow #fff100` (micro-only: icon accents, focus) · neutrals `--color-mist-gray → --color-graphite` · semantic roles (`--color-*`) with `on-*`, `*-soft` variants.
-- **Type**: `--font-sans` (Inter) / `--font-display` (Anton) / `--font-mono` (JetBrains Mono) · `--text-xs…hero` · `--weight-*` · `--leading-*` · `--tracking-*`.
+- **Color**: **monochrome shadcn** — white page (`--background`), zinc borders (`--border`), `--muted`/`--muted-foreground` surfaces, near-black `--primary` buttons. The Dayos brand accents (volt yellow, mint) are no longer used in the UI.
+- **Type**: `--font-sans` (Inter) / `--font-display` (Anton, wordmark + old h1s) / `--font-mono` (JetBrains Mono) · `--text-xs…hero` · `--weight-*` · `--leading-*` · `--tracking-*`.
 - **Space**: `--space-1…16` (4px grid).
-- **Shape**: `--radius-sm/md/lg/xl/pill/full` · **all shadows `none`** (flat, border-driven) · `--border-width/strong`.
+- **Shape**: `--radius-sm/md/lg/xl` (`6px/8px/12px/16px`) · real `--shadow-sm/md/lg` · `--border-width/strong`.
 - **Control**: `--control-min-h[-sm/-lg]` (touch targets) · `--focus-ring` · `--measure[-lg]`.
 - **Motion**: `--dur-fast/med/slow/spin/pulse` + `--ease`.
 - **Layout**: `--bp-sm/md/lg` · `--icon-sm/md/lg/xl/2xl` · `--z-*`.
 
 ## Rules
 
-- **Zero elevation**: no drop shadows anywhere. Structure comes from `--border-width` hairlines (`--color-border` ash) and, where it matters, `--border-strong` black outlines.
-- **Black blocks**: primary actions are solid `--color-carbon-black` fills with `--color-paper-white` text; hover `--color-graphite`, active `--color-slate`.
-- **Mint accent**: `--color-mint-chip` is the small-accents family — chips, soft fills, `--color-primary-soft`, the wordmark "4" spark. Never as body text on white (contrast fails).
-- **Yellow is micro-only**: `--color-voltage-yellow` for icon accents, status micro-details, and the focus ring (`--color-focus`). Never as a fill.
-- **One dark moment**: `--color-banner` (carbon black) appears only on the hero. The footer is light with a hairline top border. No other dark surfaces.
-- **Wordmark**: three-part mark — Room + `4` (mint spark) + `U`. On light surfaces `4` is `--color-accent`; Room and `U` inherit `--color-text-primary`.
-- **Ban**: raw hex/rgb colors and `px/rem/em` lengths anywhere in `client/src` except `design/tokens.css`. Enforced by `npm run check:design`.
-- **Allowlist** (documented exceptions): `0`, `100%`, `auto`, `transparent`, `currentColor`; layout-only values (`width: 100%`, `flex`, `overflow`, `position`); unitless numbers passed as props (e.g. `Skeleton` dimensions).
-- **Media queries**: `@media` lines may use literal `px` breakpoints (Lightning CSS can't resolve `var()` in media conditions). Values must match the `--bp-*` tokens (`640px`/`768px`/`1024px`). Enforced by `check:design` skipping `@media` lines.
+- **Default shadcn look**: white background, `border` + `shadow-sm` cards (`rounded-xl`), 8px button radii, neutral focus rings. No raw Dayos accent fills.
+- **Primary actions**: `Button variant="default"` (near-black) with white text.
+- **Status colors** remain for feedback only: `--color-danger-soft/-success-soft/-warning-soft/-info-soft` with their `*-soft-text` pairs on badges/alerts.
+- **Wordmark**: three-part mark — Room + `4` + `U`, all monochrome `text-foreground`.
+- **Ban**: raw hex/rgb colors and `px/rem/em` lengths anywhere in `client/src` except `design/tokens.css`. Enforced by `npm run check:design` (which also scans `.jsx`, so token-backed `var()` arbitrary values are required in feature code).
+- **Utilities over CSS**: layout lives in Tailwind utilities in feature JSX. There are no feature `.css` files.
 - **Allowed pairs** (the "this on this" contract):
   - `surface` → `text-primary` / `text-muted` / `text-faint`
   - `primary` / `danger` → only their `on-*` token
@@ -37,6 +35,6 @@ One source of truth: `client/src/design/tokens.css`. Everything visual lives the
 
 ## Adding a screen
 
-1. Compose from primitives (`Button`, `Card`, `Badge`, `Field`, …).
-2. Co-locate a tokens-only CSS file for screen-specific layout (like `AppShell.css`).
+1. Compose from shadcn components (`Button`, `Card`, `Badge`, `Input`, `Label`, `Alert`, `Select`, `Avatar`, `Skeleton`) and Tailwind utilities.
+2. Use token-backed arbitrary values (e.g. `bg-[var(--color-primary-soft)]`, `min-h-[var(--control-min-h)]`) when a utility doesn't exist.
 3. Run `npm run check:design` — it must pass before build.

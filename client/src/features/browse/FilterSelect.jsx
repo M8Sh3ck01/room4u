@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function FilterSelect({ label, value, options, onChange, className = '', ariaLabel }) {
   const uid = useId();
@@ -90,11 +91,11 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
   };
 
   return (
-    <div ref={wrapRef} className={`filter-select ${className}`.trim()}>
+    <div ref={wrapRef} className={cn('relative min-w-0 flex-1', className)}>
       <button
         type="button"
         ref={triggerRef}
-        className="filter-select-trigger"
+        className="flex min-h-[var(--control-min-h)] w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 text-left font-sans text-base text-foreground transition-[border-color,box-shadow] focus-visible:border-ring focus-visible:ring-[var(--focus-ring)] focus-visible:ring-ring/40 focus-visible:outline-none"
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={onKeyDown}
         aria-haspopup="listbox"
@@ -102,22 +103,34 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
         aria-activedescendant={open ? `${uid}-opt-${current}` : undefined}
         aria-label={ariaLabel}
       >
-        <span className="filter-select-value">{selected ? selected.label : label}</span>
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap">
+          {selected ? selected.label : label}
+        </span>
         <ChevronDown
-          className={`filter-select-chevron${open ? ' filter-select-chevron--open' : ''}`}
+          className={cn('shrink-0 text-muted-foreground size-6 transition-transform', open && 'rotate-180')}
           aria-hidden="true"
         />
       </button>
 
       {open && (
-        <ul ref={listRef} className="filter-select-menu" style={menuStyle} role="listbox" aria-label={ariaLabel}>
+        <ul
+          ref={listRef}
+          className="absolute left-0 right-0 top-[calc(100%+var(--space-2))] z-[var(--z-overlay)] m-0 list-none rounded-lg border border-border bg-card p-2"
+          style={menuStyle}
+          role="listbox"
+          aria-label={ariaLabel}
+        >
           {options.map((opt, i) => (
             <li
               key={opt.value}
               id={`${uid}-opt-${i}`}
               role="option"
               aria-selected={opt.value === value}
-              className={`filter-select-option${i === current ? ' filter-select-option--active' : ''}${opt.value === value ? ' filter-select-option--selected' : ''}`}
+              className={cn(
+                'flex min-h-[var(--control-min-h)] cursor-pointer items-center justify-between gap-2 rounded-sm px-3 text-foreground',
+                (i === current || opt.value === value) && 'bg-muted',
+                opt.value === value && 'font-semibold'
+              )}
               onMouseDown={(e) => {
                 e.preventDefault();
                 onChange(opt.value);
@@ -125,8 +138,8 @@ export function FilterSelect({ label, value, options, onChange, className = '', 
                 triggerRef.current?.focus();
               }}
             >
-              <span className="filter-select-option-label">{opt.label}</span>
-              {opt.value === value && <Check className="filter-select-option-check" aria-hidden="true" />}
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap">{opt.label}</span>
+              {opt.value === value && <Check className="size-6 shrink-0 text-foreground" aria-hidden="true" />}
             </li>
           ))}
         </ul>

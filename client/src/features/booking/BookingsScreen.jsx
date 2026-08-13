@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMyBookings, cancelBooking } from '../../services/bookings';
-import { Button, Card, Alert, Badge, EmptyState, Skeleton } from '../../design/primitives';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Alert } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/EmptyState';
 import { formatMoney } from '../../lib/formatMoney';
 import { formatDate } from '../../lib/formatDate';
 import { showArea } from '../../lib/area';
-import './booking.css';
 
 const BOOKING_FEE = 20000;
 
 const STATUS_META = {
-  requested: { variant: 'warning', label: 'Awaiting payment' },
-  paid: { variant: 'success', label: 'Paid' },
-  cancelled: { variant: 'danger', label: 'Cancelled' },
-  refunded: { variant: 'info', label: 'Refunded' },
+  requested: { badge: 'bg-[var(--color-warning-soft)] text-[var(--color-warning-soft-text)]', label: 'Awaiting payment' },
+  paid: { badge: 'bg-[var(--color-success-soft)] text-[var(--color-success-soft-text)]', label: 'Paid' },
+  cancelled: { badge: 'bg-[var(--color-danger-soft)] text-[var(--color-danger-soft-text)]', label: 'Cancelled' },
+  refunded: { badge: 'bg-[var(--color-info-soft)] text-[var(--color-info-soft-text)]', label: 'Refunded' },
 };
 
 export function BookingsScreen() {
@@ -52,14 +56,14 @@ export function BookingsScreen() {
 
   if (!bookings) {
     return (
-      <div className="bookings center measure">
-        <h1 className="bookings-title">My bookings</h1>
-        <div className="bookings-list" aria-label="Loading">
+      <div className="mx-auto flex w-full max-w-measure flex-col gap-4">
+        <h1 className="m-0">My bookings</h1>
+        <div className="flex flex-col gap-3" aria-label="Loading">
           {[0, 1, 2].map((i) => (
-            <Card key={i} className="booking-card booking-card--skeleton">
-              <Skeleton className="booking-skeleton-title" />
-              <Skeleton className="booking-skeleton-line booking-skeleton-line--short" />
-              <Skeleton className="booking-skeleton-line" />
+            <Card key={i} className="gap-2">
+              <Skeleton className="h-[var(--text-lg)] w-3/5" />
+              <Skeleton className="h-[var(--text-sm)] w-[45%]" />
+              <Skeleton className="h-[var(--text-sm)]" />
             </Card>
           ))}
         </div>
@@ -68,11 +72,11 @@ export function BookingsScreen() {
   }
 
   return (
-    <div className="bookings center measure">
-      <h1 className="bookings-title">My bookings</h1>
+    <div className="mx-auto flex w-full max-w-measure flex-col gap-4">
+      <h1 className="m-0">My bookings</h1>
 
       {error && (
-        <Alert variant="danger" role="alert">
+        <Alert variant="destructive" role="alert">
           {error}
         </Alert>
       )}
@@ -90,47 +94,48 @@ export function BookingsScreen() {
           />
         </Card>
       ) : (
-        <div className="bookings-list">
+        <div className="flex flex-col gap-3">
           {bookings.map((booking) => {
-            const meta = STATUS_META[booking.status] || { variant: 'info', label: booking.status };
+            const meta = STATUS_META[booking.status] || { badge: '', label: booking.status };
             const room = booking.room;
             return (
-              <Card key={booking.id} className="booking-card">
-                <div className="booking-card-head">
-                  <h2 className="booking-room">{room ? room.hostel : 'Room'}</h2>
-                  <Badge variant={meta.variant}>{meta.label}</Badge>
+              <Card key={booking.id} className="gap-3">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h2 className="m-0 text-lg font-semibold">{room ? room.hostel : 'Room'}</h2>
+                  <Badge className={meta.badge}>{meta.label}</Badge>
                 </div>
                 {room && (
-                  <p className="booking-meta text-muted">
+                  <p className="m-0 text-sm text-muted-foreground">
                     {showArea(room.hostel, room.area) ? room.area : ''}
                     {room.available_from ? ` · available ${formatDate(room.available_from)}` : ''}
                   </p>
                 )}
-                <div className="booking-rows">
-                  <div className="booking-row">
-                    <span className="booking-row-label">Booking fee</span>
-                    <span className="booking-row-value">{formatMoney(BOOKING_FEE)}</span>
+                <div className="flex flex-col gap-1 text-sm">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-muted-foreground">Booking fee</span>
+                    <span className="font-semibold">{formatMoney(BOOKING_FEE)}</span>
                   </div>
                   {booking.status === 'paid' && booking.move_in_date && (
-                    <div className="booking-row">
-                      <span className="booking-row-label">Move-in</span>
-                      <span className="booking-row-value">{formatDate(booking.move_in_date)}</span>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-muted-foreground">Move-in</span>
+                      <span className="font-semibold">{formatDate(booking.move_in_date)}</span>
                     </div>
                   )}
                   {booking.status === 'cancelled' && booking.cancelled_at && (
-                    <div className="booking-row">
-                      <span className="booking-row-label">Cancelled</span>
-                      <span className="booking-row-value">{formatDate(booking.cancelled_at)}</span>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-muted-foreground">Cancelled</span>
+                      <span className="font-semibold">{formatDate(booking.cancelled_at)}</span>
                     </div>
                   )}
                 </div>
-                <div className="booking-actions">
+                <div className="flex flex-wrap gap-2 border-t border-border pt-2">
                   {booking.status === 'requested' && (
                     <Button
-                      variant="ghost-danger"
+                      variant="ghost"
                       size="sm"
+                      className="text-destructive hover:text-destructive"
                       onClick={() => cancel(booking.id)}
-                      loading={cancellingId === booking.id}
+                      disabled={cancellingId === booking.id}
                     >
                       {cancellingId === booking.id ? 'Cancelling…' : 'Cancel booking'}
                     </Button>
