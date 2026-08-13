@@ -32,6 +32,17 @@ async function verifyPayment(txRef) {
   return body.data;
 }
 
+async function hasConfirmedCharge(txRef) {
+  if (!config.paychangu.enabled) return false;
+  try {
+    const data = await verifyPayment(txRef);
+    const inner = data && data.data ? data.data : data;
+    return Boolean(inner && inner.status === 'success');
+  } catch {
+    return false;
+  }
+}
+
 function verifyWebhookSignature(rawBody, signature) {
   const secret = config.paychangu.webhookSecret;
   if (!secret || !signature) return false;
@@ -44,4 +55,4 @@ function verifyWebhookSignature(rawBody, signature) {
   return crypto.timingSafeEqual(expected, given);
 }
 
-module.exports = { generateTxRef, verifyPayment, verifyWebhookSignature };
+module.exports = { generateTxRef, verifyPayment, verifyWebhookSignature, hasConfirmedCharge };

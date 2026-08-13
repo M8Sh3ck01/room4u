@@ -44,3 +44,6 @@ export const cancelBooking = (id) =>
   api(`/api/bookings/${id}/cancel`, { method: 'POST' }).then(
     (res) => res.data.booking
   );
+
+export const verifyPayment = (id) =>
+  api(`/api/bookings/${id}/verify`, { method: 'POST' }).then((res) => res.data);

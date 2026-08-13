@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const config = require('@config');
 const { appError } = require('@core/errors');
 const { getClaimableRoom } = require('@modules/rooms/room.service');
-const { generateTxRef } = require('@shared/services/paychanguService');
+const { generateTxRef, hasConfirmedCharge } = require('@shared/services/paychanguService');
 const Booking = require('./booking.model');
 const IdempotencyKey = require('./idempotencykey.model');
 const Payment = require('./payment.model');
@@ -20,6 +20,12 @@ const bookingPopulate = [
 async function expireIfStale(booking, now = new Date()) {
   if (!booking || booking.status !== 'requested') return false;
   if (!booking.expires_at || booking.expires_at >= now) return false;
+
+  // P1 guard: never auto-cancel a reservation whose gateway charge is actually
+  //   confirmed. The reconcile job / "check payment status" will finalise it
+  //   (mark paid, consume bed) instead of silently forfeiting the money.
+  if (await hasConfirmedCharge(booking.tx_ref)) return false;
+
   await Booking.updateOne(
     { _id: booking._id, status: 'requested' },
     { $set: { status: 'cancelled', cancelled_at: now } }
@@ -138,7 +144,7 @@ async function markPaid({ booking, moveInDate, paidAt = new Date() }) {
   if (booking.status !== 'requested') return null;
   return Booking.findOneAndUpdate(
     { _id: booking._id, status: 'requested' },
-    { $set: { status: 'paid', paid_at: paidAt, move_in_date: moveInDate } },
+    { $set: { status: 'paid', payment_status: 'confirmed', paid_at: paidAt, move_in_date: moveInDate } },
     { returnDocument: 'after' }
   );
 }
@@ -194,5 +200,6 @@ module.exports = {
   completePayment,
   cancelRequestsForRoom,
   findByTxRef,
+  bookingPopulate,
   FOLLOW_UP_DAYS,
 };

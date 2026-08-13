@@ -7,9 +7,12 @@ const { appError } = require('@core/errors');
 const mongoose = require('mongoose');
 const config = require('@config');
 const { claimRoom, getBookingById, getMyBookings, cancelBooking, findByTxRef } = require('./bookings.service');
+const Booking = require('./booking.model');
 const { serializeBooking } = require('./booking.model');
 const { serializeRoom } = require('@modules/rooms/room.service');
 const { processPaidBooking } = require('@shared/services/paychanguWebhook');
+const { reconcileBooking } = require('@shared/jobs/reconcilePayments');
+const { bookingPopulate } = require('./bookings.service');
 
 const router = express.Router();
 
@@ -109,6 +112,29 @@ router.post(
     }
     const booking = await cancelBooking({ bookingId: req.params.id, user: req.user });
     successResponse(res, { booking: serializeBooking(booking) }, 'Booking cancelled', 200);
+  })
+);
+
+router.post(
+  '/bookings/:id/verify',
+  auth,
+  asyncCatch(async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
+    }
+    // Raw ownership check (no expireIfStale) so we can still rescue a booking
+    //   whose window lapsed but where the user actually paid.
+    const raw = await Booking.findById(req.params.id);
+    if (!raw) throw appError(404, 'BOOKING_NOT_FOUND', 'Booking not found');
+    if (!req.user.is_operator && raw.user_id.toString() !== req.user.id) {
+      throw appError(403, 'FORBIDDEN', 'Not your booking');
+    }
+
+    const payment = await reconcileBooking({ bookingId: raw._id });
+
+    // Refresh with population for the response.
+    const refreshed = await Booking.findById(raw._id).populate(bookingPopulate);
+    successResponse(res, { booking: serializeBooking(refreshed), payment }, 'OK', 200);
   })
 );
 

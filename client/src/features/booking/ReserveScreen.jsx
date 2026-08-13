@@ -6,6 +6,7 @@ import {
   claimRoom,
   getBooking,
   cancelBooking,
+  verifyPayment,
   makeIdempotencyKey,
   CLAIM_STORAGE_KEY,
   getCachedClaim,
@@ -45,6 +46,8 @@ export function ReserveScreen() {
   const [claiming, setClaiming] = useState(false);
   const [payError, setPayError] = useState(null);
   const [cancelling, setCancelling] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyMessage, setVerifyMessage] = useState(null);
   const [claimExpired, setClaimExpired] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
 
@@ -301,6 +304,30 @@ export function ReserveScreen() {
     }
   }, [claim]);
 
+  // P1: rescue a booking that was actually paid but never confirmed by the
+  //   webhook/return redirect — re-verify against the gateway on demand.
+  const verify = useCallback(async () => {
+    if (!claim) return;
+    setVerifying(true);
+    setPayError(null);
+    setVerifyMessage(null);
+    try {
+      const res = await verifyPayment(claim.bookingId);
+      setBooking(res.booking);
+      setVerifyMessage(
+        res.payment?.message ||
+          (res.booking.status === 'paid'
+            ? 'Payment confirmed — your bed is secured.'
+            : 'No completed payment confirmed yet.')
+      );
+      if (res.booking.status === 'paid') setClaimExpired(false);
+    } catch (err) {
+      setPayError(err.message);
+    } finally {
+      setVerifying(false);
+    }
+  }, [claim]);
+
   if (loading) {
     return (
       <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
@@ -439,6 +466,18 @@ export function ReserveScreen() {
                 </p>
               </div>
               {payError && <Alert variant="destructive">{payError}</Alert>}
+              {verifyMessage && (
+                <Alert className="bg-amber-50 text-amber-800">{verifyMessage}</Alert>
+              )}
+              <div className="flex w-full flex-col items-center gap-2">
+                <p className="m-0 text-xs text-muted-foreground">
+                  Paid but still seeing &ldquo;Awaiting payment&rdquo;? We can re-check with your
+                  bank — it turns green the moment it&apos;s confirmed.
+                </p>
+                <Button variant="outline" size="sm" onClick={verify} disabled={verifying}>
+                  {verifying ? 'Checking…' : 'Check payment status'}
+                </Button>
+              </div>
               <div className="flex w-full flex-wrap justify-center gap-2">
                 <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={cancel} disabled={cancelling}>
                   {cancelling ? 'Cancelling…' : 'Cancel'}

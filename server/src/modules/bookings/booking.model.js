@@ -18,6 +18,18 @@ const bookingSchema = new mongoose.Schema(
       enum: ['requested', 'paid', 'cancelled', 'refunded'],
       default: 'requested',
     },
+    // Tracks the state of the gateway charge. Distinct from `status` so a
+    //   charge that is confirmed / in-flight / failed is never confused with
+    //   "user never initiated payment".
+    // none|pending  -> no confirmed charge (default)
+    // confirmed     -> gateway confirmed success, booking marked paid
+    // failed        -> a charge was attempted but not confirmed
+    // refund_pending-> a confirmed charge needs reversing (operator)
+    payment_status: {
+      type: String,
+      enum: ['none', 'pending', 'confirmed', 'failed', 'refund_pending'],
+      default: 'none',
+    },
     tx_ref: { type: String, default: null },
     charge_id: { type: String, default: null },
     move_in_date: { type: Date, default: null },
@@ -50,6 +62,7 @@ const serializeBooking = (booking) => {
     id: booking.id,
     room_id: room ? room.id : booking.room_id,
     status: booking.status,
+    payment_status: booking.payment_status || 'none',
     tx_ref: booking.tx_ref,
     charge_id: booking.charge_id,
     move_in_date: booking.move_in_date ? booking.move_in_date.toISOString().slice(0, 10) : null,
