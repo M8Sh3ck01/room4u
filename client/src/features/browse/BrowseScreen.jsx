@@ -3,11 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { listRooms } from '../../services/rooms';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Alert } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { cn } from '@/lib/utils';
-import { Footprints, BadgeCheck, Banknote, X, ArrowDown } from 'lucide-react';
+import { Footprints, BadgeCheck, Banknote, X, ArrowDown, ServerOff, RefreshCw, Loader2 } from 'lucide-react';
 import { formatMoney } from '../../lib/formatMoney';
 import { RoomCard } from './RoomCard';
 import { FilterSelect } from './FilterSelect';
@@ -19,7 +18,13 @@ export function BrowseScreen() {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const toolbarRef = useRef(null);
+  const retryStart = useRef(0);
+
+  const MIN_FEEDBACK_MS = 900;
 
   const filters = {
     type: searchParams.get('type') ?? '',
@@ -27,16 +32,34 @@ export function BrowseScreen() {
     max_price: searchParams.get('price') ?? '',
   };
 
+  const handleRetry = () => {
+    retryStart.current = Date.now();
+    setRetrying(true);
+    setAttempt((n) => n + 1);
+  };
+
+  useEffect(() => {
+    if (!retrying || loading) return undefined;
+    const remain = Math.max(0, MIN_FEEDBACK_MS - (Date.now() - retryStart.current));
+    const timer = setTimeout(() => setRetrying(false), remain);
+    return () => clearTimeout(timer);
+  }, [retrying, loading]);
+
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
+    if (!failed) setLoading(true);
     listRooms(filters)
       .then((data) => {
-        if (!cancelled) setRooms(data);
+        if (!cancelled) {
+          setRooms(data);
+          setFailed(false);
+        }
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) {
+          setError(err.message);
+          setFailed(true);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -44,7 +67,15 @@ export function BrowseScreen() {
     return () => {
       cancelled = true;
     };
-  }, [filters.type, filters.max_walk_min, filters.max_price]);
+  }, [filters.type, filters.max_walk_min, filters.max_price, attempt]);
+
+  const RETRY_MS = 4000;
+
+  useEffect(() => {
+    if (!failed) return undefined;
+    const timer = setTimeout(() => setAttempt((n) => n + 1), RETRY_MS);
+    return () => clearTimeout(timer);
+  }, [failed, attempt]);
 
   const change = (key) => (value) => {
     setSearchParams(
@@ -187,14 +218,12 @@ export function BrowseScreen() {
         </div>
       )}
 
-      {error && <Alert variant="destructive">{error}</Alert>}
-
-      <div className="results-area" aria-busy={loading}>
+      <div className="results-area" aria-busy={loading || failed}>
         <div
-          key={loading ? 'loading' : rooms.length === 0 ? 'empty' : 'rooms'}
+          key={loading && !failed ? 'loading' : error || failed ? 'error' : rooms.length ? 'rooms' : 'empty'}
           className="animate-in fade-in duration-200"
         >
-          {loading ? (
+          {loading && !failed ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[0, 1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="flex flex-col">
@@ -208,7 +237,26 @@ export function BrowseScreen() {
                 </div>
               ))}
             </div>
-          ) : error ? null : rooms.length === 0 ? (
+          ) : error || failed ? (
+            <div className="rounded-xl border border-border bg-card">
+              <EmptyState
+                title="Rooms won't load right now"
+                body="Your connection seems fine — the server is just slow. We'll keep trying, and rooms will appear once it's back."
+                action={
+                  <Button onClick={handleRetry} disabled={retrying}>
+                    {retrying ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <RefreshCw className="size-4" aria-hidden="true" />
+                    )}
+                    {retrying ? 'Retrying…' : 'Try again'}
+                  </Button>
+                }
+              >
+                <ServerOff className="size-10 text-muted-foreground" aria-hidden="true" />
+              </EmptyState>
+            </div>
+          ) : rooms.length === 0 ? (
             <div className="rounded-xl border border-border bg-card">
               <EmptyState
                 title={emptyTitle}
