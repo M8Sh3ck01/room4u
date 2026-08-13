@@ -13,6 +13,8 @@ import { FilterSelect } from './FilterSelect';
 
 const PARAM_BY_KEY = { type: 'type', max_walk_min: 'walk', max_price: 'price' };
 
+const MAX_AUTO_RETRIES = 3;
+
 export function BrowseScreen() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [rooms, setRooms] = useState([]);
@@ -21,6 +23,7 @@ export function BrowseScreen() {
   const [failed, setFailed] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [autoRetries, setAutoRetries] = useState(0);
   const toolbarRef = useRef(null);
   const retryStart = useRef(0);
 
@@ -53,6 +56,7 @@ export function BrowseScreen() {
         if (!cancelled) {
           setRooms(data);
           setFailed(false);
+          setAutoRetries(0);
         }
       })
       .catch((err) => {
@@ -72,10 +76,17 @@ export function BrowseScreen() {
   const RETRY_MS = 4000;
 
   useEffect(() => {
-    if (!failed) return undefined;
-    const timer = setTimeout(() => setAttempt((n) => n + 1), RETRY_MS);
+    if (!failed || autoRetries >= MAX_AUTO_RETRIES) return undefined;
+    const timer = setTimeout(() => {
+      setAutoRetries((n) => n + 1);
+      setAttempt((n) => n + 1);
+    }, RETRY_MS);
     return () => clearTimeout(timer);
-  }, [failed, attempt]);
+  }, [failed, autoRetries, attempt]);
+
+  useEffect(() => {
+    setAutoRetries(0);
+  }, [filters.type, filters.max_walk_min, filters.max_price]);
 
   const change = (key) => (value) => {
     setSearchParams(
@@ -241,7 +252,11 @@ export function BrowseScreen() {
             <div className="rounded-xl border border-border bg-card">
               <EmptyState
                 title="Rooms won't load right now"
-                body="Your connection seems fine — the server is just slow. We'll keep trying, and rooms will appear once it's back."
+                body={
+                  autoRetries >= MAX_AUTO_RETRIES
+                    ? 'We stopped auto-retrying after a few tries. Give it another shot with the button below, and rooms will appear once it\'s back.'
+                    : 'Your connection seems fine — the server is just slow. We\'ll keep trying, and rooms will appear once it\'s back.'
+                }
                 action={
                   <Button onClick={handleRetry} disabled={retrying}>
                     {retrying ? (
