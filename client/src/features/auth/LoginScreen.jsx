@@ -4,16 +4,10 @@ import { useAuth } from './AuthContext';
 import { GoogleButton } from './GoogleButton';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { KeyRound, BadgeCheck, Footprints, Banknote } from 'lucide-react';
+import { KeyRound } from 'lucide-react';
 import './auth.css';
 
 const googleConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID);
-
-const perks = [
-  { icon: BadgeCheck, title: 'Verified', body: 'Every listing is checked before it goes live.' },
-  { icon: Footprints, title: 'Walkable', body: 'A short walk from Mzuzu University.' },
-  { icon: Banknote, title: 'Affordable', body: 'Priced for a student budget.' },
-];
 
 export function LoginScreen() {
   const { signIn } = useAuth();
@@ -36,7 +30,7 @@ export function LoginScreen() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-measure flex-col items-center justify-center px-4 py-6">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-sm">
         <CardHeader className="items-center pb-6 pt-8 text-center">
           <div className="mb-4 flex size-12 items-center justify-center justify-self-center rounded-xl border bg-card shadow-sm">
             <KeyRound className="size-6" aria-hidden="true" />
@@ -61,26 +55,6 @@ export function LoginScreen() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
-          <div className="flex items-center gap-3 text-muted-foreground" aria-hidden="true">
-            <span className="h-px flex-1 bg-border" />
-            <span className="text-xs font-medium uppercase tracking-wider">Why Room4U</span>
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {perks.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="flex flex-col items-center gap-2 text-center">
-                <span className="flex size-9 items-center justify-center rounded-md border bg-card shadow-sm">
-                  <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-sm font-medium">{title}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>
