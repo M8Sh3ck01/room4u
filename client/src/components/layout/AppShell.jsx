@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { CalendarDays, ChevronDown, LogOut, User } from 'lucide-react';
+import { CalendarDays, Home, LogOut, Menu, User } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -36,20 +36,17 @@ export function AppShell() {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="flex cursor-pointer items-center gap-2 rounded-full outline-none transition-opacity focus-visible:ring-3 focus-visible:ring-ring/50 hover:opacity-80"
-                      aria-label="Account menu"
+                      className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-border bg-background py-1 pr-1 pl-1.5 text-foreground outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 hover:bg-muted"
+                      aria-label="Menu"
                     >
-                      <Avatar className="bg-primary text-primary-foreground">
+                      <Avatar className="size-7 bg-primary text-primary-foreground">
                         {user.avatar_url ? (
                           <AvatarImage src={user.avatar_url} alt="" />
                         ) : (
                           <AvatarFallback>{user.name?.[0] || user.email?.[0]}</AvatarFallback>
                         )}
                       </Avatar>
-                      <span className="hidden max-w-[16ch] truncate text-sm font-medium md:block">
-                        {user.name || user.email}
-                      </span>
-                      <ChevronDown className="hidden size-4 text-muted-foreground md:block" aria-hidden="true" />
+                      <Menu className="size-4 shrink-0" aria-hidden="true" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -60,6 +57,12 @@ export function AppShell() {
                       )}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/">
+                        <Home aria-hidden="true" />
+                        Browse rooms
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/bookings">
                         <CalendarDays aria-hidden="true" />
