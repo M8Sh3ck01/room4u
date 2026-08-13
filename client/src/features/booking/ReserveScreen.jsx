@@ -303,8 +303,8 @@ export function ReserveScreen() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
-        <Card className="gap-3" aria-label="Loading">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
+        <Card className="gap-4 px-6 py-6" aria-label="Loading">
           <Skeleton className="h-5 w-[70%]" />
           <Skeleton className="h-4" />
           <Skeleton className="h-9 w-[40%] mt-3" />
@@ -317,7 +317,7 @@ export function ReserveScreen() {
 
   if ((loadError || !room) && !claim) {
     return (
-      <div className="mx-auto flex w-full max-w-md flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
         <Card>
           <EmptyState
             title="Room not available"
@@ -343,13 +343,13 @@ export function ReserveScreen() {
       </Link>
 
       {full ? (
-        <Card>
+        <Card className="px-6 py-6">
           <Alert className="bg-amber-50 text-amber-800">
             This room is full right now.
           </Alert>
         </Card>
       ) : !user ? (
-        <Card className="gap-3">
+        <Card className="gap-4 px-6 py-6">
           <h1 className="m-0 text-2xl font-semibold tracking-tight">Sign in</h1>
           <p className="m-0 text-sm text-muted-foreground">
             Sign in once to pay the {formatMoney(BOOKING_FEE)} booking fee and lock the bed.
@@ -363,10 +363,10 @@ export function ReserveScreen() {
           {authError && <p className="m-0 text-destructive">{authError}</p>}
         </Card>
       ) : !user.phone ? (
-        <Card className="gap-3">
+        <Card className="gap-4 px-6 py-6">
           <h1 className="m-0 text-2xl font-semibold tracking-tight">Your phone number</h1>
-          <form onSubmit={handlePhone} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+          <form onSubmit={handlePhone} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-3">
               <Label htmlFor="reserve-phone">Phone number</Label>
               <Input
                 id="reserve-phone"
@@ -385,7 +385,7 @@ export function ReserveScreen() {
           </form>
         </Card>
       ) : status === 'paid' ? (
-        <Card className="items-center gap-3 text-center">
+        <Card className="items-center gap-5 px-6 py-8 text-center">
           <CheckCircle2 className="size-12 text-emerald-600" aria-hidden="true" />
           <h1 className="m-0 text-2xl font-semibold tracking-tight">Your bed is secured</h1>
           <p className="m-0 text-muted-foreground">
@@ -409,7 +409,7 @@ export function ReserveScreen() {
           </div>
         </Card>
       ) : claimExpired && status === 'requested' ? (
-        <Card className="gap-3">
+        <Card className="gap-4 px-6 py-6">
           <Alert variant="destructive">This payment link expired.</Alert>
           <p className="m-0 text-muted-foreground">
             Your spot at {claim.roomName} was released. You can reserve again if the room is still
@@ -420,10 +420,10 @@ export function ReserveScreen() {
           </Link>
         </Card>
       ) : (
-        <Card className="gap-3">
+        <Card className="gap-5 px-6 py-8">
           {claim ? (
             <>
-              <div className="flex flex-col items-center gap-3 text-center" role="status">
+              <div className="flex flex-col items-center gap-4 text-center" role="status">
                 <Loader2 className="size-4 animate-spin" />
                 <p className="m-0 text-lg font-semibold">Complete your payment</p>
                 <p className="m-0 text-3xl font-bold tracking-tight">
@@ -447,7 +447,7 @@ export function ReserveScreen() {
             </>
           ) : (
             <>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 <p className="m-0 text-xl font-semibold">{room.hostel}</p>
                 <p className="m-0 text-sm text-muted-foreground">
                   {showArea(room.hostel, room.area) && (
@@ -458,17 +458,17 @@ export function ReserveScreen() {
                   )}
                   {room.available_from && `available ${formatDate(room.available_from)}`}
                 </p>
-                <div className="mt-3 flex flex-col gap-1 border-t border-border pt-3">
+                <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4">
                   <p className="m-0 font-mono text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Booking fee
                   </p>
-                  <p className="m-0 text-xl font-bold">{formatMoney(BOOKING_FEE)}</p>
+                  <p className="m-0 text-2xl font-bold">{formatMoney(BOOKING_FEE)}</p>
                   <p className="m-0 text-sm text-muted-foreground">
                     {formatMoney(DEPOSIT)} deposit + {formatMoney(AGENT_FEE)} agent fee
                   </p>
                 </div>
               </div>
-              <p className="m-0 rounded-md bg-muted px-3 py-3 text-sm text-muted-foreground">
+              <p className="m-0 rounded-md bg-muted px-4 py-4 text-sm text-muted-foreground">
                 The deposit counts toward your rent. The agent fee is separate.
               </p>
               {payError && <Alert variant="destructive">{payError}</Alert>}

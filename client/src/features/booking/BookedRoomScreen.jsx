@@ -195,14 +195,14 @@ export function BookedRoomScreen() {
         <span className="text-muted-foreground">&nbsp;per month</span>
       </p>
 
-      <Card className="gap-2">
-        <div className="flex items-center justify-between gap-3 border-b border-border pb-2">
+      <Card className="gap-4">
+        <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
           <span className="font-mono text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Your booking
           </span>
           <Badge className={meta.badge}>{meta.label}</Badge>
         </div>
-        <div className="flex flex-col gap-1 text-sm">
+        <div className="flex flex-col gap-2 text-sm">
           <div className="flex items-baseline justify-between gap-3">
             <span className="text-muted-foreground">Booking fee</span>
             <span className="font-semibold">{formatMoney(BOOKING_FEE)}</span>
