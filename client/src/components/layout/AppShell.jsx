@@ -2,7 +2,6 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { CalendarDays, Home, LogOut, Menu, User } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -36,17 +35,10 @@ export function AppShell() {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-border bg-background py-1 pr-1 pl-1.5 text-foreground outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 hover:bg-muted"
+                      className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-foreground outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 hover:bg-muted"
                       aria-label="Menu"
                     >
-                      <Avatar className="size-7 bg-primary text-primary-foreground">
-                        {user.avatar_url ? (
-                          <AvatarImage src={user.avatar_url} alt="" />
-                        ) : (
-                          <AvatarFallback>{user.name?.[0] || user.email?.[0]}</AvatarFallback>
-                        )}
-                      </Avatar>
-                      <Menu className="size-4 shrink-0" aria-hidden="true" />
+                      <Menu className="size-5" aria-hidden="true" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
