@@ -1,7 +1,9 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { CalendarDays } from 'lucide-react';
 import { useAuth } from '../../features/auth/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 export function AppShell() {
   const { user, signOut } = useAuth();
@@ -9,6 +11,8 @@ export function AppShell() {
   const showHeader = pathname !== '/login';
   const showFooter = pathname === '/';
   const onReserve = /\/rooms\/[^/]+\/reserve$/.test(pathname);
+  const onBookings = pathname === '/bookings' || pathname.startsWith('/bookings/');
+  const onProfile = pathname === '/me';
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -21,13 +25,32 @@ export function AppShell() {
                 <span className="text-foreground">U</span>
               </span>
             </Link>
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-1 md:gap-2">
               {user ? (
                 <>
-                  <Link to="/bookings" className="text-sm text-muted-foreground no-underline whitespace-nowrap hover:text-foreground">
-                    My bookings
-                  </Link>
-                  <Link to="/me" className="flex items-center gap-2 text-sm text-foreground no-underline">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    aria-label="My bookings"
+                    className={cn(
+                      'px-2.5 md:px-4',
+                      onBookings && 'bg-accent text-foreground hover:bg-accent'
+                    )}
+                  >
+                    <Link to="/bookings" className="inline-flex items-center gap-1.5">
+                      <CalendarDays className="size-4 shrink-0" aria-hidden="true" />
+                      <span className="hidden md:inline">My bookings</span>
+                    </Link>
+                  </Button>
+                  <Link
+                    to="/me"
+                    aria-label="My profile"
+                    className={cn(
+                      'flex items-center gap-2 rounded-full text-sm text-foreground no-underline',
+                      onProfile && 'bg-accent'
+                    )}
+                  >
                     <Avatar className="bg-primary text-primary-foreground">
                       {user.avatar_url ? (
                         <AvatarImage src={user.avatar_url} alt="" />
