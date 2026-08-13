@@ -252,11 +252,7 @@ export function BrowseScreen() {
             <div className="rounded-xl border border-border bg-card">
               <EmptyState
                 title="Rooms won't load right now"
-                body={
-                  autoRetries >= MAX_AUTO_RETRIES
-                    ? 'We stopped auto-retrying after a few tries. Give it another shot with the button below, and rooms will appear once it\'s back.'
-                    : 'Your connection seems fine — the server is just slow. We\'ll keep trying, and rooms will appear once it\'s back.'
-                }
+                body="The server's taking a while — hang tight."
                 action={
                   <Button onClick={handleRetry} disabled={retrying}>
                     {retrying ? (
