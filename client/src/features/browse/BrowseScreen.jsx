@@ -241,7 +241,7 @@ export function BrowseScreen() {
             <div className="rounded-xl border border-border bg-card">
               <EmptyState
                 title="Rooms won't load right now"
-                body="Your connection seems fine � the server is just slow. We'll keep trying, and rooms will appear once it's back."
+                body="Your connection seems fine — the server is just slow. We'll keep trying, and rooms will appear once it's back."
                 action={
                   <Button onClick={handleRetry} disabled={retrying}>
                     {retrying ? (
@@ -249,7 +249,7 @@ export function BrowseScreen() {
                     ) : (
                       <RefreshCw className="size-4" aria-hidden="true" />
                     )}
-                    {retrying ? 'Retrying�' : 'Try again'}
+                    {retrying ? 'Retrying…' : 'Try again'}
                   </Button>
                 }
               >
