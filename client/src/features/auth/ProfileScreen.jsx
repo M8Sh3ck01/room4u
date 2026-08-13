@@ -59,16 +59,16 @@ export function ProfileScreen() {
   const initial = (user?.name || user?.email || '?')[0]?.toUpperCase() || '?';
 
   return (
-    <Card className="mx-auto w-full max-w-md">
-      <CardContent className="flex flex-col gap-6">
-        <div className="flex items-center gap-4">
+    <Card className="mx-auto w-full max-w-lg">
+      <CardContent className="flex flex-col gap-8 px-7 py-8">
+        <div className="flex items-center gap-5">
           {user?.avatar_url ? (
-            <Avatar className="size-14">
+            <Avatar className="size-16">
               <AvatarImage src={user.avatar_url} alt="" />
             </Avatar>
           ) : (
-            <Avatar className="size-14">
-              <AvatarFallback className="bg-primary text-lg font-bold text-primary-foreground">
+            <Avatar className="size-16">
+              <AvatarFallback className="bg-primary text-xl font-bold text-primary-foreground">
                 {initial}
               </AvatarFallback>
             </Avatar>
@@ -87,8 +87,8 @@ export function ProfileScreen() {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+          <div className="flex flex-col gap-3">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -99,7 +99,7 @@ export function ProfileScreen() {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <Label htmlFor="name">Full name</Label>
             <Input
               id="name"
@@ -113,7 +113,7 @@ export function ProfileScreen() {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <Label htmlFor="phone">Phone number</Label>
             <Input
               id="phone"
@@ -147,17 +147,17 @@ export function ProfileScreen() {
             </Alert>
           )}
 
-          <Button type="submit" className="w-full" disabled={!dirty || phoneInvalid || saving}>
+          <Button type="submit" className="mt-2 h-11 w-full" disabled={!dirty || phoneInvalid || saving}>
             {saving && <Loader2 className="size-4 animate-spin" />}
             {saving ? 'Saving…' : 'Save changes'}
           </Button>
         </form>
 
-        <div className="border-t border-border pt-6">
+        <div className="border-t border-border pt-8">
           <Button
             type="button"
             variant="outline"
-            className="w-full text-destructive border-destructive/40 hover:border-destructive/60"
+            className="h-11 w-full text-destructive border-destructive/40 hover:border-destructive/60"
             onClick={handleSignOut}
           >
             Sign out
